@@ -1,0 +1,42 @@
+body: {
+    font-family: verdana, sans-serif;
+    font-size: medium
+}
+
+h1: {
+    font-family: verdana, sans-serif;
+    font-weight: bold;
+    font=size: 1.6em
+}
+
+h2 {
+    font-family: verdana, sans-serif;
+    font-weight: bold;
+    font-size: 1.4em;
+}
+
+
+h2:before {
+    content: "["
+}
+h2:after {
+    content: "]"
+}
+
+.box {
+    padding: 1px;
+    border: 1px solid black;
+    width: auto
+}
+
+.chord {
+    font-weight: bold;
+    before: "(";
+    after: ")";
+}
+.chord:before {
+    content: "("
+}
+.chord:after {
+    content: ")"
+}
