@@ -1,0 +1,5 @@
+*.swp
+*.pyo
+*.pyc
+bookenv*
+*.db
