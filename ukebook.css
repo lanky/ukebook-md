@@ -3,18 +3,18 @@ body: {
     font-size: medium
 }
 
-h1: {
+h1 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font=size: 1.6em
+    font=size: 1.4em
 }
 
+/* h2 is our 'section' header */
 h2 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font-size: 1.4em;
+    font-size: 1.2em;
 }
-
 
 h2:before {
     content: "["
@@ -23,10 +23,31 @@ h2:after {
     content: "]"
 }
 
+p {
+    font-family: verdana, sans-serif;
+    font-weight: normal;
+    padding: 0px;
+}
+
 .box {
-    padding: 1px;
-    border: 1px solid black;
+    padding: 2px;
+    margin: 1px;
+    border: 2px solid black;
     width: auto
+}
+
+div.box {
+    display: inline-block;
+    padding: 5px;
+}
+
+.box > p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.box > p:last-child {
+    margin-bottom: 0;
 }
 
 .chord {
