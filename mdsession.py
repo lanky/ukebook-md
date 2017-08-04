@@ -1,9 +1,9 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import markdown
 import codecs
-import ukedown_extension
+import ukedown.udn
 from jinja2 import Environment, FileSystemLoader
 
 import sys
@@ -17,13 +17,11 @@ def render(template, context):
     return tpl.render(context)
 
 def ukedown_to_html(inputfile):
-
-    ukebook = ukedown_extension.UkeBookExtension()
     
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
     txt = fh.read()
 
-    return markdown.markdown(txt, extensions=['markdown.extensions.nl2br', ukebook])
+    return markdown.markdown(txt, extensions=['markdown.extensions.nl2br', 'ukedown.udn'])
 
 
 

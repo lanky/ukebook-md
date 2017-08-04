@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import print_function, absolute_import, unicode_literals
 from markdown.inlinepatterns import Pattern
 from markdown import Extension
 from markdown.util import etree
 from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
+import codecs
 import logging
 import re
+
+from glob import glob
 
 # constants
 # approximation of chords - covers major minor dim aug sus and 7/9/13 etc
 CHORD = r'\(([A-G][adgijmnsu0-9#b+-]*)\)'
 # lines that start (and optionally end) with a | character are part of boxed paragraphs
-BOX = r'(^|\n)\| *([^ ].*)\|?$'
+BOX = r'(^|\n)\| *([^ ][^|]*)\|?$'
 # a line containing something encapsulated by [] characters
 HEADER = r'^(.*)\[([^]]+)\](.*)$'
 
@@ -61,10 +64,6 @@ class ChordPattern(Pattern):
         el.text = m.group(2)
         return el
 
-class ChordExtension(Extension):
-    def extendMarkdown(self, md, md_globals):
-        md.inlinePatterns.add('chord', ChordPattern(CHORD, md), '<reference')
-
 class BoxSectionProcessor(BlockProcessor):
     """process the ^| lines representing a box in a chord sheet"""
 
@@ -79,22 +78,21 @@ class BoxSectionProcessor(BlockProcessor):
         block = blocks.pop(0)
         m = self.pattern.search(block)
         if m:
-            before = block[:m.start()]  # Lines before blockquote
+            before = block[:m.start()]  # Lines before box
             # Pass lines before blockquote in recursively for parsing forst.
             self.parser.parseBlocks(parent, [before])
-            # Remove ``> `` from begining of each line.
             block = '\n'.join(
                 [self.clean(line) for line in block[m.start():].split('\n')]
             )
         # gets the last element at this level
         sibling = self.lastChild(parent)
-        if sibling is not None and sibling.tag == 'div':
-            # Previous block was a blockquote so set that as this blocks parent
+        if sibling is not None and sibling.tag == 'div' and sibling.get('class') == 'box':
+            # Previous block was also a div
             quote = sibling
         else:
             # This is a new blockquote. Create a new parent element.
-            quote = etree.SubElement(parent, 'div')
-            quote.set('class', 'box')
+            quote = etree.SubElement(parent, 'div', {'class': 'box'})
+        #    quote.set('class', 'box')
         # Recursively parse block with blockquote as parent.
         # change parser state so blockquotes embedded in lists use p tags
         self.parser.state.set('box')
@@ -102,27 +100,15 @@ class BoxSectionProcessor(BlockProcessor):
         self.parser.state.reset()
 
     def clean(self, line):
-        """ Remove ``|`` from beginning of a line. """
+        """ Remove ``|`` from beginning (and possibly end)of a line. """
         m = self.pattern.match(line)
-        if line.strip() == "|" or re.match(r'\| *\|$', line):
-            return ""
+        if line.strip() == "|" or re.match(r'^\| *\|$', line):
+            return "<br />"
         elif m:
             return m.group(2)
         else:
-            return line
-#         if m:
-#             if m.group(2).strip() == '':
-#                 return "\n"
-#             else:
-#                 return m.group(2)
-#         else:
-#             return line
+            return line.strip()
 
-
-class BoxExtension(Extension):
-
-    def extendMarkdown(self, md, md_globals):
-        md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '<quote')
 
 
 class UkeBookExtension(Extension):
@@ -131,5 +117,7 @@ class UkeBookExtension(Extension):
         # preprocessor
         md.preprocessors.add('headers', HeaderProcessor(md, HEADER), '<reference')
         md.inlinePatterns.add('chord', ChordPattern(CHORD, md), '<reference')
-        md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '<quote')
+        md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '>empty')
 
+def makeExtension(*args, **kwargs):
+    return UkeBookExtension(*args, **kwargs)
