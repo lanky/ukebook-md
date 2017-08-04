@@ -6,6 +6,7 @@ from markdown import Extension
 from markdown.util import etree
 from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
+from markdown.treeprocessors import Treeprocessor
 import codecs
 import logging
 import re
@@ -103,13 +104,64 @@ class BoxSectionProcessor(BlockProcessor):
         """ Remove ``|`` from beginning (and possibly end)of a line. """
         m = self.pattern.match(line)
         if line.strip() == "|" or re.match(r'^\| *\|$', line):
-            return "<br />"
+            return "\n"
         elif m:
             return m.group(2)
         else:
             return line.strip()
 
+class CollapseDivProcessor(Treeprocessor):
+    """
+    Find <p> tags inside a <div class='box'> elem,
+    replace with 
+    <div>
+    <p>
+    p1.text<br />
+    ...
+    </p>
+    </div>
+    """
+    def run(self, tree):
+        # handle the idea that there may be multiple top-level elements
+        stack=[tree]
+        while stack:
+            current = stack.pop()
+            # process each element, which may have children of its own
+            for elem in current:
+                if elem.tag == 'div' and elem.get('class') == 'box':
+                    # merge all children under a single 'p' container
+                    self.mergepara(elem, 'p')
 
+    def mergepara(self, element, ptag='p'):
+        """
+        merges all child paragraphs into a single para, replacing the <p> elements with linebreaks
+
+        Args:
+            element (etree.ElementTree.Element) - parent element whose children are to be merged/collapsed
+
+        Kwargs:
+            ptag(str): type of element that you wish to create as the new 'merged' child.
+        """
+        # get current children, as we're going to edit in place
+        current_children = list(element)
+        # create a new child element, to which we will add the content of existing children (and their children)
+        # arguably we should just use the first found p
+        target = etree.SubElement(element, ptag)
+        found = False
+        for child in current_children:
+            # the first child provides element text to our new parent 'p'
+            if found is False:
+                target.text = child.text
+                found = True
+            else:
+                newbr = etree.SubElement(target, 'br')
+                if len(child.text.strip()) != 0:
+                    newbr.tail = child.text
+                
+            for i in child.getchildren():
+                target.append(i)
+
+            element.remove(child)
 
 class UkeBookExtension(Extension):
     def extendMarkdown(self, md, md_globals):
@@ -118,6 +170,7 @@ class UkeBookExtension(Extension):
         md.preprocessors.add('headers', HeaderProcessor(md, HEADER), '<reference')
         md.inlinePatterns.add('chord', ChordPattern(CHORD, md), '<reference')
         md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '>empty')
+        md.treeprocessors.add('collapsediv', CollapseDivProcessor(md), '<inline') 
 
 def makeExtension(*args, **kwargs):
     return UkeBookExtension(*args, **kwargs)
