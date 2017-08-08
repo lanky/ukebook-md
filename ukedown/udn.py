@@ -68,7 +68,23 @@ class ChordPattern(Pattern):
         el = etree.Element('span')
         el.attrib['class'] =  'chord'
         el.text = m.group(2)
+
         return el
+
+class VoxPattern(Pattern):
+    def handleMatch(self, m):
+        el = etree.Element('span')
+        el.set('class', 'vox')
+        el.text = m.group(2)
+        return el
+
+class NotesPattern(Pattern):
+    def handleMatch(self, m):
+        el = etree.Element('span')
+        el.set('class', 'notes')
+        el.text = m.group(2)
+        return el
+
 
 class BoxSectionProcessor(BlockProcessor):
     """process the ^| lines representing a box in a chord sheet"""
