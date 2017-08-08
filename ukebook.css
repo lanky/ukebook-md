@@ -6,14 +6,14 @@ body: {
 h1 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font=size: 1.4em
+    font=size: 110%;
 }
 
 /* h2 is our 'section' header */
 h2 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: medium
 }
 
 h2:before {
@@ -61,3 +61,33 @@ div.box {
 .chord:after {
     content: ")"
 }
+
+.notes:before {
+    content: "["
+}
+
+.notes: after {
+    content: "]";
+}
+
+.vox {
+    font-style: italic;
+    font-weight: normal;
+}
+.vox:before {
+    content: '(';
+}
+.vox:after {
+    content: ')';
+}
+
+/* PRINT STYLESHEET */
+@media print {
+    #editableArea {
+        display: none
+    }
+
+}
+
+
+
