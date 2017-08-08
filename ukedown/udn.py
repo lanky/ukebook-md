@@ -16,6 +16,11 @@ from glob import glob
 # constants
 # approximation of chords - covers major minor dim aug sus and 7/9/13 etc
 CHORD = r'\(([A-G][adgijmnsu0-9#b+-]*)\)'
+# backing vox - anything in () that is not a chord.
+VOX = r'\(([\w\s]+)\)'
+# band/performance instructions - use a differnt delimiter - {}
+NOTES = r'\{([\w\s]+)\}'
+
 # lines that start (and optionally end) with a | character are part of boxed paragraphs
 BOX = r'(^|\n)\| *([^ ][^|]*)\|?$'
 # a line containing something encapsulated by [] characters
