@@ -57,7 +57,10 @@ class HeaderProcessor(Preprocessor):
             # does the line match our [ ] pattern?
             m = self.pattern.match(line)
             if m:
-                new_lines.append("## %s" % m.group(2).strip())
+                if m.group(1).strip().startswith('|'):
+                    new_lines.append("| ## %s" % m.group(2).strip())
+                else:
+                    new_lines.append("## %s" % m.group(2).strip())
             else:
                 new_lines.append(line)
         return new_lines
