@@ -134,9 +134,10 @@ class BoxSectionProcessor(BlockProcessor):
         else:
             return line.strip()
 
-class CollapseDivProcessor(Treeprocessor):
+class CollapseChildProcessor(Treeprocessor):
     """
-    Find <p> tags inside a <div class='box'> elem,
+    Find specified consecutive tags inside a <div class='box'> elem,
+    default tag is 'p'
     replace with 
     <div>
     <p>
@@ -144,7 +145,16 @@ class CollapseDivProcessor(Treeprocessor):
     ...
     </p>
     </div>
-    """
+    """ 
+    def __init__(self, markdown_instance=None, target='div', tclass='box', child_tag='p'):
+        """
+        """
+        super(CollapseChildProcessor, self).__init__(markdown_instance)
+        self.target = target
+        if tclass is not None:
+            self.tclass = set(tclass.split())
+        self.child_tag = child_tag
+
     def run(self, tree):
         # handle the idea that there may be multiple top-level elements
         stack=[tree]
@@ -152,11 +162,15 @@ class CollapseDivProcessor(Treeprocessor):
             current = stack.pop()
             # process each element, which may have children of its own
             for elem in current:
-                if elem.tag == 'div' and elem.get('class') == 'box':
+                cur_classes = set(elem.get('class','' ).split())
+                if elem.tag == self.target:
+                    if self.tclass is not None:
+                        if not self.tclass.issubset(cur_classes):
+                            continue
                     # merge all children under a single 'p' container
-                    self.mergepara(elem, 'p')
+                    self.mergechildren(elem)
 
-    def mergepara(self, element, ptag='p'):
+    def mergechildren(self, element):
         """
         merges all child paragraphs into a single para, replacing the <p> elements with linebreaks
 
@@ -164,15 +178,19 @@ class CollapseDivProcessor(Treeprocessor):
             element (etree.ElementTree.Element) - parent element whose children are to be merged/collapsed
 
         Kwargs:
-            ptag(str): type of element that you wish to create as the new 'merged' child.
+            ptag(str): type of element that you wish to create as the new 'merged' child. Defaults to 'para'
         """
         # get current children, as we're going to edit in place
         current_children = list(element)
         # create a new child element, to which we will add the content of existing children (and their children)
         # arguably we should just use the first found p
-        target = etree.SubElement(element, ptag)
+        target = etree.SubElement(element, self.child_tag)
         found = False
         for child in current_children:
+            # don't merge headers
+            # only merge top-level 'para' entries
+            if child.tag != self.child_tag:
+                continue
             # the first child provides element text to our new parent 'p'
             if found is False:
                 target.text = child.text
@@ -187,14 +205,18 @@ class CollapseDivProcessor(Treeprocessor):
 
             element.remove(child)
 
+
 class UkeBookExtension(Extension):
     def extendMarkdown(self, md, md_globals):
         # add our extensions...
         # preprocessor
         md.preprocessors.add('headers', HeaderProcessor(md, HEADER), '<reference')
         md.inlinePatterns.add('chord', ChordPattern(CHORD, md), '<reference')
+        # add our 'other stuff in brackets' pattern AFTER chord processing
+        md.inlinePatterns.add('vox', VoxPattern(VOX, md), '>chord')
+        md.inlinePatterns.add('notes', VoxPattern(NOTES, md), '>vox')
         md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '>empty')
-        md.treeprocessors.add('collapsediv', CollapseDivProcessor(md), '<inline') 
+        md.treeprocessors.add('collapsediv', CollapseChildProcessor(md), '<inline') 
 
 def makeExtension(*args, **kwargs):
     return UkeBookExtension(*args, **kwargs)
