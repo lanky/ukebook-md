@@ -69,7 +69,7 @@ def main(options):
             ud = ukedown_to_html(f)
             out = render("ukesong.j2", {'rendered_text': ud })
             if opts.stdout:
-                print (codecs.encode(out, encoding="utf-8"))
+                print (codecs.encode(out, "utf-8"))
             else:
                 output = opts.output
                 if not output:
