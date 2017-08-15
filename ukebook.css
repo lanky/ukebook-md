@@ -1,3 +1,5 @@
+@charset "utf-8";
+
 body: {
     font-family: verdana, sans-serif;
     font-size: medium
@@ -6,14 +8,15 @@ body: {
 h1 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font=size: 110%;
+    font=size: 1.1em;
+    text-align: center;
 }
 
 /* h2 is our 'section' header */
 h2 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font-size: medium
+    font-size: 1em;
 }
 
 h2:before {
@@ -50,10 +53,13 @@ div.box {
     margin-bottom: 0;
 }
 
+.box > h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+
 .chord {
     font-weight: bold;
-    before: "(";
-    after: ")";
 }
 .chord:before {
     content: "("
@@ -62,11 +68,15 @@ div.box {
     content: ")"
 }
 
+.notes {
+    font-weight: bold;
+}
+
 .notes:before {
     content: "["
 }
 
-.notes: after {
+.notes:after {
     content: "]";
 }
 
@@ -85,6 +95,20 @@ div.box {
 @media print {
     #editableArea {
         display: none
+    }
+    h1 {
+        font-size: 14pt;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+    }
+    h2 {
+        font-size: 12pt;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    .box > h2 {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
 }
