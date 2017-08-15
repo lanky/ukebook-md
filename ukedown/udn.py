@@ -1,42 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function, absolute_import, unicode_literals
-from markdown.inlinepatterns import Pattern
 from markdown import Extension
 from markdown.util import etree
-from markdown.blockprocessors import BlockProcessor
 from markdown.preprocessors import Preprocessor
+from markdown.blockprocessors import BlockProcessor
+from markdown.inlinepatterns import Pattern
 from markdown.treeprocessors import Treeprocessor
+
+
 import codecs
-import logging
 import re
 
-from glob import glob
+# from glob import glob
+
+# local imports
+from . import patterns
+from . import translations
 
 # constants
-# approximation of chords - covers major minor dim aug sus and 7/9/13 etc
-CHORD = r'\(([A-G][adgijmnsu0-9#b+-]*)\)'
-# backing vox - anything in () that is not a chord.
-VOX = r'\(([\w\s]+)\)'
-# band/performance instructions - use a differnt delimiter - {}
-NOTES = r'\{([\w\s]+)\}'
-
-# lines that start (and optionally end) with a | character are part of boxed paragraphs
-BOX = r'(^|\n)\| *([^ ][^|]*)\|?$'
-# a line containing something encapsulated by [] characters
-HEADER = r'^(.*)\[([^]]+)\](.*)$'
 
 # TODO
 # preprocess - replace [ ] with h2
 # replace line 1 ( or the first blank line ) with h1
 # presuming that it only consists of alnum¸space and hyphen (or n-dash or em-dash, bloody unicode)
 
+class JunkCleaner(Preprocessor):
+    """
+    just cleans up and returns unicode - essentially strips out the 'smart' characters wordprocessors like to
+    use in place of good old proper text. Mostly hyphens and quote characters.
+    """
+    def run(self, lines):
+        return [ line.translate(translations.UNICODE_CLEAN_TABLE) for line in lines ]
+
+
+
 class HeaderProcessor(Preprocessor):
-    """ 
+    """
     assume first non-blank line is the song title (plus potentially artist)
     find and replace [] entries, replace with h2 (i.e. ##)
     """
-    def __init__(self, markdown_instance=None, pattern=HEADER):
+    def __init__(self, markdown_instance=None, pattern=patterns.HEADER):
         super(HeaderProcessor, self).__init__(markdown_instance)
         self.pattern = re.compile(pattern)
 
@@ -51,7 +55,7 @@ class HeaderProcessor(Preprocessor):
                 # append it flagged as h1 - remove any existing leading '#' symbols
                 new_lines.append('# %s' % x.lstrip('#'))
                 break
-            
+
         # now iterate over the rest and find [ header ] sections
         for line in lines:
             # does the line match our [ ] pattern?
@@ -89,10 +93,31 @@ class NotesPattern(Pattern):
         return el
 
 
+class TagPattern(Pattern):
+    """
+    wrapper class around pattern replacement
+    sets additional attrs, allows us to use the same 'factory' for each pattern
+    """
+    def __init__(self, pattern, markdown_instance=None, tag='span', **attrib):
+        super(TagPattern, self).__init__(pattern, markdown_instance)
+        self.tag = tag
+        self.attrib = attrib
+
+    def handleMatch(self, m):
+        el = etree.Element(self.tag)
+        if self.attrib:
+            for k, v in self.attrib.items():
+                if k == 'cls':
+                    k = 'class'
+                el.set(k, v)
+        el.text = m.group(2)
+        return el
+
+
 class BoxSectionProcessor(BlockProcessor):
     """process the ^| lines representing a box in a chord sheet"""
 
-    def __init__(self, parser, pattern=BOX):
+    def __init__(self, parser, pattern=patterns.BOX):
         super(BoxSectionProcessor, self).__init__(parser)
         self.pattern = re.compile(pattern)
 
@@ -138,14 +163,14 @@ class CollapseChildProcessor(Treeprocessor):
     """
     Find specified consecutive tags inside a <div class='box'> elem,
     default tag is 'p'
-    replace with 
+    replace with
     <div>
     <p>
     p1.text<br />
     ...
     </p>
     </div>
-    """ 
+    """
     def __init__(self, markdown_instance=None, target='div', tclass='box', child_tag='p'):
         """
         """
@@ -199,7 +224,7 @@ class CollapseChildProcessor(Treeprocessor):
                 newbr = etree.SubElement(target, 'br')
                 if len(child.text.strip()) != 0:
                     newbr.tail = child.text
-                
+
             for i in child.getchildren():
                 target.append(i)
 
@@ -210,13 +235,15 @@ class UkeBookExtension(Extension):
     def extendMarkdown(self, md, md_globals):
         # add our extensions...
         # preprocessor
-        md.preprocessors.add('headers', HeaderProcessor(md, HEADER), '<reference')
-        md.inlinePatterns.add('chord', ChordPattern(CHORD, md), '<reference')
+        md.preprocessors.add('junk_cleaner', JunkCleaner(md), '_begin')
+        md.preprocessors.add('headers', HeaderProcessor(md, patterns.HEADER), '<reference')
+        md.inlinePatterns.add('chord', TagPattern(patterns.CHORD, md, 'span', cls='chord'), '<reference')
         # add our 'other stuff in brackets' pattern AFTER chord processing
-        md.inlinePatterns.add('vox', VoxPattern(VOX, md), '>chord')
-        md.inlinePatterns.add('notes', VoxPattern(NOTES, md), '>vox')
+        # md.inlinePatterns.add('vox', VoxPattern(patterns.VOX, md), '>chord')
+        md.inlinePatterns.add('vox', TagPattern(patterns.VOX, md, 'span', cls='vox'), '>chord')
+        md.inlinePatterns.add('notes', TagPattern(patterns.CHORD, md, 'span', cls='notes'), '>vox')
         md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '>empty')
-        md.treeprocessors.add('collapsediv', CollapseChildProcessor(md), '<inline') 
+        md.treeprocessors.add('collapsediv', CollapseChildProcessor(md), '<inline')
 
 def makeExtension(*args, **kwargs):
     return UkeBookExtension(*args, **kwargs)
