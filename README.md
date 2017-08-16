@@ -11,17 +11,17 @@ which is documented [here](https://pythonhosted.org/Markdown/extensions/api.html
 You'll need a python virtual environment, I've only tested with python 2.7 so far (although I'll be updating any non-py3 compatible code eventually) with at least the following installed
 
   * markdown (well, obviously)
-  * jinja2 (for templating) - this is not used properly yet, I have plans for metadata 
+  * jinja2 (for templating) - this is not used "properly" yet, I have plans for metadata and other templating tricks.
 
 ## Outstanding stuff
 As in, stuff I haven't done, rather than the complimentary interpretation
 
-  1. chord support - I really like the stuff Mark already did, but I fancy having a go in python. Because.
-  1. metadata - tags, embedded artist and track info etc, can be used in templating, also goes into the DB Models
-  1. web backend. I've had a play with django for this but I think I'm going to fall back on flask.
+  1. **Chord support** - I really like the stuff Mark already did, but I fancy having a go in python. Because.
+  1. **Metadata** - tags, embedded artist and track info etc, can be used in templating, also goes into the DB Models
+  1. **Web backend**. I've had a play with django for this but I think I'm going to fall back on flask.
      current thinking is to build a REST API MVC and point something javascripty and modern at it.
      I think this also plays well with the phone app side of things
-  1. frontend of your choice
+  1. **frontend** of your choice. Probably all bootstrappy and stuff. Or a phone app. Or a small shell sc
 
 Then we have all the other joys like authentication, access controls, songbook creation. All that wheel reinventing that inveterate tinkerers enjoy
 
@@ -29,7 +29,7 @@ Then we have all the other joys like authentication, access controls, songbook c
 
   1. Create your virtual environment as above
   1. Activate it
-  1. ./ukify.py --help (or whatever one does on windows systems, I haven't got any :) ) 
+  1. `./ukify.py --help` (or whatever one does on windows systems, I haven't got any :) ) 
 
 The commandline parts to ukify don't all work yet. I have some CSS work to do, that's been a while (Eric Meyer here I come again) plus a load of other stuff.
 
