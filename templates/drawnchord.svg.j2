@@ -1,0 +1,75 @@
+<?xml version="1.0" standalone="no"?>
+<?xml-stylesheet type="text/css" href="css/chord.css"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="{{ svg_width|default(100) }}px" height="{{ svg_height|default(130) }}px"
+     viewBox="0 0 {{ svg_width|default(100) }} {{ svg_height|default(130) }}"
+     preserveAspectRatio="meet"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+  <!-- our actual grid/diagram -->
+  <g class="fretboard">
+  {# figure out string spacing and fret width #}
+  {% set sp = board_width / ( stringcount -1 ) %}
+  {% set fw = board_height / fretcount %}
+  <!-- vertical lines (strings)-->
+  {% for s in range(0, stringcount ) %}
+  <line x1="{{ board_x + (sp * s ) }}" y1="{{ board_y }}" x2="{{ board_x + (sp * s ) }}" y2="{{ board_y + board_height }}" stroke="#000" stroke-width="1"/>
+  {% endfor %}
+  <!-- horizontal lines (frets) -->
+  {% for f in range(0, fretcount + 1) %}
+  <line x1="{{ board_x }}" y1="{{ board_y + ( fw * f ) }}" x2="{{ board_x + board_width }}" y2="{{ board_y + ( fw * f ) }}" stroke="#000" stroke-width="1"/>
+  {% endfor %}
+  </g>
+  {#
+  Finger positioning.
+  Barres are elongated rectngles and their anchor is top left
+  Fingers are circles, whose anchor is their center, so these differ by about 1/4 of a fret width, circles being lower.
+  #}
+  <g class="positions">
+    {# starting position for bars and markers #}
+    {% set mkr_y = board_y + (fw / 2) %}
+    {% set barre_y = board_y + (fw / 4) %}
+	{% if barres is defined %}
+      {% for b_pos, b_start, b_end in barres %}
+      {# barre width, number of strings * string spacing (plus the rounding offset#}
+      {% set bw = (b_end - b_start) * sp %}
+      {# x offset - how far in from the left do we start? #}
+      {% set bx_off = (b_start - 1) * sp %}
+      {# each barre is a tuple: fret, firststring(1-4), length(1-4) #}
+      {# set width and position for each item #}
+      <rect x="{{ board_x + bx_off - 3 }}"          {# #}
+            y="{{ mkr_y + ( fw * (b_pos -1))}}"
+            width="{{ bw + 6 }}"
+            height="{{ fw / 2 }}"
+            fill="#000"
+            rx="5"
+            ry="5"
+            />
+      {% endfor %}
+	{% endif %}
+    <!-- normal fingering things TO BE TEMPLATED FOR POSITION -->
+    {% for f in frets|default([]) %}
+    {% if f != 0 %}
+    <circle cx="{{ board_x + ( loop.index0 * sp ) }}"
+            cy="{{ mkr_y + fw/4 + (f * fw) }}"
+            r="{{ fw / 4 }}"
+            />
+    {% endif %}
+    {% endfor %}
+ </g>
+ <g class="chordname">
+ <text x="50%" y="5" text-anchor="middle" dominant-baseline="hanging">{{ name }}</text>
+  </g>
+  {% if startpos != 0 %}
+  <g class="labels" />
+  <!-- Fret numbers on the left, middle-aligned with fret-->
+  <text x="5" y="30" dominant-baseline="central">{{ startpos }}</text>
+  <!-- fret numbers, fingering -->
+  </g>
+  {% endif %}
+</svg>
