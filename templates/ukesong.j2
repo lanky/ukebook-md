@@ -1,12 +1,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <link rel="stylesheet" type="text/css" href="ukebook.css" />
+    <link rel="stylesheet" type="text/css" href="css/ukebook.css" />
+    <title>{{ title|default('') }} - {{ artist|default('') }}</title>
     <!-- # also import javascript stuff here if needed -->
 </head>
 <body>
-<div class="outer">
-{{ rendered_text }}
+<div class="header">
+{% if title is defined  or artist is defined %}
+<h1 class="title">{{ title|default('') }} - {{ artist|default('') }}</h1>
+{% endif %}
+</div>
+<div class="content">
+{{ html }}
+</div>
+<div class="chords">
+{% for chord in chords %}
+<img class="chord_diagram" src="chords/{{ chord }}.gif" alt="{{ chord }}"/>
+{% endfor %}
+</div>
 <div class="footer"></div>
 </div>
 <!-- outer div -->

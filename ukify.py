@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
 from __future__ import print_function, absolute_import, division, unicode_literals
@@ -8,6 +8,9 @@ import ukedown.udn
 
 # jinja2 templating, originially based one the django model.
 from jinja2 import Environment, FileSystemLoader
+
+# for generating summary info
+from bs4 import BeautifulSoup as bs
 
 # the normal boring stuff
 import sys
@@ -42,7 +45,7 @@ def render(template, context, template_dir="templates"):
     Args:
         template(str): name of template file
         context(dict): dictionary of key,value pairs to use inside template
-    
+
     Kwargs:
         template_dir(str): where to look for templates, default is the local 'templates' directory.
 
@@ -54,7 +57,7 @@ def render(template, context, template_dir="templates"):
     return tpl.render(context)
 
 def ukedown_to_html(inputfile):
-    
+
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
     txt = fh.read()
 
@@ -66,8 +69,41 @@ def main(options):
     """
     for f in options.input:
         try:
-            ud = ukedown_to_html(f)
-            out = render("ukesong.j2", {'rendered_text': ud })
+            ctx = {}
+            html = ukedown_to_html(f)
+            # process that with bs4? Find the classes you require?
+            # to generate metadata?
+            soup = bs(html, features="lxml")
+            # find the chords and associate them with diagrams
+            chords = []
+            for crd in [c.text.split().pop(0) for c in soup.findAll('span', {'class': 'chord'})]:
+                # we only want the first word
+                c = crd.split().pop(0)
+
+                # munge filenames, '/' -> 'slash',
+                # '#' -> 'sharp'
+                if '/' in c:
+                    c.replace('/', 'slash')
+                if '#' in c:
+                    c.replace('#', 'sharp')
+                if c not in chords:
+                    chords.append(c)
+            ctx['chords'] = chords
+            # extract first h1 tag and make it the document title, with optional artist
+            # there should only be one of these anyway, even if not, we'll extract the first as song title
+            hdr = soup.h1.extract()
+            if '-' in hdr.text:
+                ctx['title'], ctx['artist'] = hdr.text.split(' - ', 1)
+            else:
+                ctx['title'] = hdr.text.strip()
+
+            # remove it from the document, we'll render it differently
+            hdr.decompose()
+
+            # print(ctx)
+            ctx['html'] = unicode(soup)
+
+            out = render("ukesong.j2", ctx)
             if opts.stdout:
                 print (codecs.encode(out, "utf-8"))
             else:
@@ -77,6 +113,7 @@ def main(options):
 
                 with codecs.open(output, mode='wb', encoding="utf-8") as fd:
                     fd.write(out)
+
 
         except (IOError, OSError), E:
             print ("oops - couldn't render %s (%s)" % (E.filename, E.strerror))
