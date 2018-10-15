@@ -1,0 +1,58 @@
+<?xml version="1.0" standalone="no"?>
+<!-- vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: -->
+<?xml-stylesheet type="text/css" href="css/chord.css"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!--
+{# pass this into jinja 2 with a context (kv pairs, or dict) containing the following entries
+name(str)     - chord name, at the top of the diagram
+diag_w(px)   - width and height of diagram, in pixels
+diag_h(px)   - width and height of diagram, in pixels
+radius(px)   - rounding radius of barres, radius of markers
+position(px) - starting position (if not fret 0). Positions are relative to this.
+                This effectively just puts a number next to fret 0 for info
+Lists of coordinates for the rest, barres and fingers use the 'radius' for some settings
+origin       - coordinates of top left of fretboard (strings[0][0], strings[0][1])
+strings      - list of coords for strings:   [ (x, y1, y2), ]
+frets        - list of coords for frets:     [ (x1, x2, y), ]
+frets        - list of fret heights:
+barres       - list of coords for barres:    [ (x, y, w), ]
+fingers      - list of coords for fingering: [ (x, y) ]
+#}
+-->
+
+<svg width="{{ svg.width }}px" height="{{ svg.height }}px"
+     viewBox="0 0 {{ svg.width }} {{ svg.height }}"
+     preserveAspectRatio="meet"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+{# our fretboard 'group', draws a grid #}
+  <g class="fretboard">
+  {% for s in strings -%}
+  <line x1="{{ s }}" x2="{{ s }}" y1="{{ fboard.top }}" y2="{{ fboard.bottom }}" stroke="#000" stroke-width="1"/>
+  {% endfor -%}
+  {% for f in frets -%}
+  <line x1="{{ fboard.left }}" x2="{{ fboard.right }}" y1="{{ f }}" y2="{{ f }}" stroke="#000" stroke-width="1"/>
+  {% endfor -%}
+  </g>
+  <g class="markers">
+  {% if barre is defined -%}
+  <rect x="{{ barre.left }}" y="{{ barre.top }}" width="{{barre.width}}" height="{{barre.height}}" rx="{{ radius }}" ry="{{ radius }}"/>
+  {% endif -%}
+  {% for f in fingers -%}
+  {% if f != 0 -%}
+  <circle cx="{{strings[loop.index0] }}" cy="{{ f }}" r="{{ radius }}" stroke="#000"/>
+  {% endif -%}
+  {% endfor -%}
+  </g>
+  {# labels etc #}
+  <g class="chordname">
+  <text x="50%" y="5" text-anchor="middle" dominant-baseline="hanging">{{ name }}</text>
+  </g>
+  <g class="labels">
+  </g>
+</svg>
+
