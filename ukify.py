@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
-from __future__ import print_function, absolute_import, division, unicode_literals
+
 import markdown
 import codecs
 import ukedown.udn
@@ -101,7 +101,7 @@ def main(options):
             hdr.decompose()
 
             # print(ctx)
-            ctx['html'] = unicode(soup)
+            ctx['html'] = str(soup)
 
             out = render("ukesong.j2", ctx)
             if opts.stdout:
@@ -115,7 +115,7 @@ def main(options):
                     fd.write(out)
 
 
-        except (IOError, OSError), E:
+        except (IOError, OSError) as E:
             print ("oops - couldn't render %s (%s)" % (E.filename, E.strerror))
 
         except:
