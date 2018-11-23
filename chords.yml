@@ -10,11 +10,15 @@ Bm:
 # perhaps we'll introduce that later
 # note that we've normalised the entries here. (Fsharp, not F#)
 Fsharp:
+  barre: 1
   fingers: [ 2, 0, 1, 0 ]
-  name: "F_sharp_"
+  name: "F#"
 
 E7:
   fingers: [ 1, 2, 0, 2 ]
+
+Em:
+  fingers: [ 0, 4 ,3 ,2 ]
 
 # This YAML format also works
 G:
@@ -74,6 +78,7 @@ E:
   fingers: [ 4, 4, 4, 2 ]
 
 E(2):
-  fingers: [ 4, 4, 4, 7 ]
+  fingers: [ 2, 2, 2, 5 ]
+  position: 2
 
 
