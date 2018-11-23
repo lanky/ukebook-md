@@ -2,7 +2,7 @@
 # patterns for  translating all the horrible 'smart' characters that word etc like to 
 # put in when you just want boring hyphens or quotes or brackets (or whatever)
 # basically  this is a dictionary mapping ord(UNICODE) to UNICODE_REPLACEMENT
-from __future__ import unicode_literals
+
 
 WP_JUNK = {
         # first hyphen characters, there are a few and wordprocessors do love 'em
@@ -20,5 +20,5 @@ WP_JUNK = {
         }
 
 # unicode strings have their own 'translate' method so we just need a table:
-UNICODE_CLEAN_TABLE = dict((ord(k), v) for k,v in WP_JUNK.items())
+UNICODE_CLEAN_TABLE = dict((ord(k), v) for k,v in list(WP_JUNK.items()))
 

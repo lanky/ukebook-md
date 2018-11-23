@@ -4,12 +4,12 @@
 # re.compile(PATTERN, re.UNICODE|re.DOTALL)
 
 # approximation of chords - covers major minor dim aug sus and 7/9/13 etc
-CHORD = ur'\(([A-G][adgijmnsu0-9#b+-]*(?:\s*[\u2013\u2014-]\s*single(?:\s*strums?)?)?)\)'
+CHORD = r'\(([A-G][adgijmnsu0-9#b+-]*(?:\s*[\u2013\u2014-]\s*single(?:\s*strums?)?)?)\)'
 
-DASHES = ur'\u2010\u2011\u2012\u2013\u2014'
+DASHES = r'\u2010\u2011\u2012\u2013\u2014'
 
 # used to split title and artist from our first line
-HYPHENS = ur'\s*(?:-|\u2011|\u2013|\u2014|\u2015)\s*'
+HYPHENS = r'\s*(?:-|\u2011|\u2013|\u2014|\u2015)\s*'
 
 # backing vox - anything in () that is not a chord.
 VOX = r'\(([\w\s]+)\)'

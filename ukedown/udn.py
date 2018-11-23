@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function, absolute_import, unicode_literals
+
 from markdown import Extension
 from markdown.util import etree
 from markdown.preprocessors import Preprocessor
@@ -106,7 +106,7 @@ class TagPattern(Pattern):
     def handleMatch(self, m):
         el = etree.Element(self.tag)
         if self.attrib:
-            for k, v in self.attrib.items():
+            for k, v in list(self.attrib.items()):
                 if k == 'cls':
                     k = 'class'
                 el.set(k, v)
