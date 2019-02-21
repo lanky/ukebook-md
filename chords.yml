@@ -1,4 +1,24 @@
 # vim: set ts=2 sts=2 sw=2 et ci ft=yaml:
+A:
+  fingers: [ 2, 1, 0, 0 ]
+
+Am:
+  fingers: [ 2, 0, 0, 0 ]
+
+A7:
+  fingers: [ 0, 1, 0, 0 ]
+
+Asus4:
+  fingers: [ 0, 2, 2, 0 ]
+
+Bflat:
+  name: "Bb"
+  fingers: [3, 2, 1, 1 ]
+
+Bflat_barre:
+  name: "Bb"
+  fingers:
+
 Bm:
   barre: 1
   fingers:
@@ -6,42 +26,14 @@ Bm:
     - 0
     - 0
     - 0
-# finger positions are ALWAYS relative to barres.
-# perhaps we'll introduce that later
-# note that we've normalised the entries here. (Fsharp, not F#)
-Fsharp:
+
+Bm7:
   barre: 1
-  fingers: [ 2, 0, 1, 0 ]
-  name: "F#"
+  fingers: [ 0, 0, 0, 0 ]
 
-E7:
-  fingers: [ 1, 2, 0, 2 ]
-
-Em:
-  fingers: [ 0, 4 ,3 ,2 ]
-
-# This YAML format also works
-G:
-  fingers: [ 0, 2, 3, 2 ]
-
-Gminor:
-  fingers: [ 0, 2, 3, 1 ]
-
-G7:
-  fingers: [ 0, 2, 1, 2 ]
-
-Gmaj7:
-  fingers: [ 0, 2, 2, 2 ]
-
-A:
-  fingers: [ 2, 1, 0, 0 ]
-
-Am:
-  fingers: [ 2, 0, 0, 0 ]
-
-Bflat:
-  name: "Bb"
-  fingers: [3, 2, 1, 1 ]
+Bm7(2):
+  barre: 1
+  fingers: [ 2, 0, 3, 0 ]
 
 C:
   fingers: [0, 0, 0, 3 ]
@@ -52,6 +44,14 @@ C(2):
 
 Cm:
   fingers: [ 0, 3, 3, 3 ]
+
+Cm_barre:
+  name: "Cm (Barre)"
+  barre: 3
+  fingers: [ 2, 0, 0, 0 ]
+
+Cmaj7:
+  fingers: [ 0, 0, 0, 2 ]
 
 D:
   fingers: [ 2, 2, 2, 0 ]
@@ -81,4 +81,30 @@ E(2):
   fingers: [ 2, 2, 2, 5 ]
   position: 2
 
+
+# finger positions are ALWAYS relative to barres.
+# perhaps we'll introduce that later
+# note that we've normalised the entries here. (Fsharp, not F#)
+E7:
+  fingers: [ 1, 2, 0, 2 ]
+
+Em:
+  fingers: [ 0, 4 ,3 ,2 ]
+
+Fsharp:
+  barre: 1
+  fingers: [ 2, 0, 1, 0 ]
+  name: "F#"
+
+G:
+  fingers: [ 0, 2, 3, 2 ]
+
+Gminor:
+  fingers: [ 0, 2, 3, 1 ]
+
+G7:
+  fingers: [ 0, 2, 1, 2 ]
+
+Gmaj7:
+  fingers: [ 0, 2, 2, 2 ]
 
