@@ -139,7 +139,6 @@ div.footer {
         float: right;
         width: 10%;
         height: 100%;
-        border: 1px dotted gray;
     }
 
     div.content {
@@ -148,7 +147,6 @@ div.footer {
         column-rule-width: 1px;
         column-rule-style: solid;
         column-rule-color: black;
-        border: 1px dotted red;
     }
 }
 
