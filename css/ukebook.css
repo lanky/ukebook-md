@@ -2,7 +2,8 @@
 
 body: {
     font-family: verdana, sans-serif;
-    font-size: medium
+    font-size: medium;
+    width: 100%
 }
 
 h1 {
@@ -108,15 +109,14 @@ div.footer {
     left: 0;
     width: 100%;
     max-height: 10%;
-    height: 0
-
+    height: 0;
+    page-break-after: always;
 }
 
 /* PRINT STYLESHEET */
+
+
 @media print {
-    #editableArea {
-        display: none
-    }
     h1 {
         font-size: 14pt;
         margin-top: 0;
@@ -131,18 +131,35 @@ div.footer {
         margin-top: 0;
         margin-bottom: 0;
     }
+}
+
+@media print and (orientation: portrait){
+    body {
+      width: 21cm;
+      height: 29.7cm;
+      margin: 10mm 10mm 10mm 10mm;
+    }
+
+}
+
+@media print and (orientation: landscape){
+    body {
+      height: 21cm;
+      width: 29.7cm;
+      margin: 10mm 10mm 10mm 10mm;
+    }
 
 }
 
 @media screen and (orientation: landscape) {
-    div.chordlist {
-        float: right;
-        width: 10%;
-        height: 100%;
+    div.chords {
+        /*float: bottom;*/
+        width: 100%;
+        min-height: 10%;
     }
 
     div.content {
-        float: left;
+        /*float: left;*/
         column-count: 2;
         column-rule-width: 1px;
         column-rule-style: solid;
@@ -151,14 +168,15 @@ div.footer {
 }
 
 @media screen and (orientation: portrait) {
-    div.chordlist {
+    div.chords {
         border: 1px dotted gray;
-        width: 10%;
+        min-width: 10%;
         float: right;
         height: 100%;
     }
 
     div.content {
+        float: left;
         column-count: 1;
         border: none;
     }
