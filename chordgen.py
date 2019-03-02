@@ -3,10 +3,26 @@
 
 import os
 import sys
+import re
 import yaml
 import codecs
 from jinja2 import Environment, FileSystemLoader
 import argparse
+
+# two-way mapping of equivalent non-naturals, to allow a chord to be
+# defined in more than one way (possibly to reduce duplication)
+alt_names = {
+        'A#': 'Bb',
+        'Bb': 'A#',
+        'C#': 'Db',
+        'Db': 'C#',
+        'D#': 'Eb',
+        'Eb': 'D#',
+        'F#': 'Gb',
+        'Gb': 'F#',
+        'G#': 'Ab',
+        'Ab': 'G#',
+        }
 
 
 def parse_cmdline(argv):
@@ -18,6 +34,7 @@ def parse_cmdline(argv):
 
     parser.add_argument("chord", nargs="*", help="chord names (from configuration) to render")
     parser.add_argument("-c", "--chordlist", default="chords.yml", help="chord configuration file (YAML)")
+    parser.add_argument("-t", "--template", default="fretboard.j2", help="chord template (jinja2( - used for rendering chords as SVG")
 
     bgrp = parser.add_argument_group("Fretboard Layout", "Customise frets, strings and spacing")
     bgrp.add_argument("-s", "--strings", help="Number of strings to draw", type=int, default=4)
@@ -163,10 +180,40 @@ def overlay(base, chord):
     # string[x] - 0.g* spacing, fret[y] + 0.5*spacing,
     # marker and barre width are 0.5 * spacing
 
-if __name__ == "__main__":
-    # we need to load a config for our chord diagram
-    opts = parse_cmdline(sys.argv[1:])
+def get_alt_name(chord):
+    res = re.match(r'^([ABCDEFG][b#]?)(.*)', chord)
+
+    if res is not None:
+        root, voicing = res.groups()
+        altroot = alt_names.get(root)
+        if altroot is not None:
+            altname = "{}{}".format(altroot, voicing)
+        else:
+            return chord
+
+        return altname
+    return chord
+
+def generate(chordlist, definitions, destdir="chords", template="fretboard.svg.j2"):
+    """
+    Generate chord diagrams based on a definitions file
+
+    Args:
+        chordlist(list [str]): list of chord names to generate
+        definitions(dict): dictionary describing chords (fret positions etc)
+
+    Kwargs:
+        destdir(str): output directory  for chord diagrams
+    """
+    if not os.path.isdir(destdir):
+        try:
+            os.makedirs(destdir)
+        except (IOError, OSError) as E:
+            print("Cannot create output directory {0.filename} (0.strerror}".format(E))
+            destdir = os.path.realpath(os.curdir)
+
     cfg = {}
+
 
     try:
         with codecs.open('fretboard.yml', mode="r", encoding="utf-8") as cfile:
@@ -175,18 +222,45 @@ if __name__ == "__main__":
         raise
 
     env = Environment(loader=FileSystemLoader('templates'))
-    tpl = env.get_template('fretboard.svg.j2')
+    tpl = env.get_template(template)
+
+    missing = set([])
 
     try:
-        chords = yaml.load(codecs.open(opts.chordlist, mode="r", encoding="utf-8"))
-        for label, ch in list(chords.items()):
-            if opts.chord and label not in opts.chord:
+        for chordname in  chordlist:
+            if chordname in definitions:
+                ch = definitions.get(chordname)
+            else:
+                altname = get_alt_name(chordname)
+                ch = definitions.get(chordname)
+
+            if ch is None:
+                missing.add(chordname)
                 continue
-            print("rendering {}".format(label))
+
             if 'name' not in ch:
-                ch['name'] = symbolise(label)
-            with codecs.open("chords/{}.svg".format(label), mode='w', encoding="utf-8") as output:
+                ch['name'] = symbolise(chordname)
+
+            chordfile = chordname.replace('#', '_sharp_')
+
+            with codecs.open("{}/{}.svg".format(destdir, chordfile), mode='w', encoding="utf-8") as output:
                 output.write(tpl.render(merge_ctx(cfg, **ch)))
     except:
+        print("Failed to render {}".format(chordname))
         raise
 
+    return missing
+
+
+
+if __name__ == "__main__":
+    # we need to load a config for our chord diagram
+    opts = parse_cmdline(sys.argv[1:])
+    # load out chord definitions to pass into the templates
+    chorddefs = yaml.load(codecs.open(opts.chordlist, mode="r", encoding="utf-8"))
+
+    # generate diagrams for the list of provided chords
+    # report on any chords that were missing definitions
+    missing = generate(opts.chord, chorddefs, destdir="chords", template=opts.template)
+    if len(missing):
+        print("Could not find definition for chords: \n", "\n".join(missing) )
