@@ -1,84 +1,192 @@
 # vim: set ts=2 sts=2 sw=2 et ci ft=yaml:
-A:
-  fingers: [ 2, 1, 0, 0 ]
+#
+# A#7,A5,A7sus4,Am9,B,B7,Bbmaj7,C#,C#m,C+,C7,Csus4,D7,Dm7,Dsus4,Eb,F,F#,F#dim,F#m,F7,Fm,Fmaj7,G#,Gm,Gm7,Gsus4,Ab,Abm
+# Csus4,D7,Dm7,Dsus4,Eb,F,F#,F#dim,F#m,F7,Fm,Fmaj7,G#,Gm,Gm7,Gsus4
+#
+"G#":
+  barre: 3
+  fingers: [2, 0, 1, 0]
 
-Am:
-  fingers: [ 2, 0, 0, 0 ]
+"G#m":
+  fingers: [4, 3, 4, 2]
+
+Ab:
+  barre: 3
+  fingers: [2, 0, 1, 0]
+
+Abm:
+  fingers: [4, 3, 4, 2]
+
+A:
+  fingers: [2, 1, 0, 0]
 
 A7:
-  fingers: [ 0, 1, 0, 0 ]
+  fingers: [0, 1, 0, 0]
+
+A7sus4:
+  fingers: [0, 2, 0, 0]
+
+Am:
+  fingers: [2, 0, 0, 0]
+
+Am6:
+  fingers: [2, 0, 2, 0]
+
+Am7:
+  fingers: [0, 0, 0, 0]
+
+Am9:
+  fingers: [2, 0, 0, 2]
+
+Am7_2:
+  fingers: [2, 0, 3, 0]
+
+# This is ok for reentrant,
+# inaccurate for low G. C should be lowest tone
+# that would be 5 4 0 0 IIRC
+"Am/C":
+  fingers: [2, 0, 0, 3]
+  name: "Am/C"
+
+Amaj7:
+  fingers: [1, 1, 0, 0]
 
 Asus4:
-  fingers: [ 0, 2, 2, 0 ]
+  fingers: [0, 2, 2, 0]
 
-Bflat:
-  name: "Bb"
-  fingers: [3, 2, 1, 1 ]
+A5:
+  fingers: [2, 4, 0, 0]
 
-Bflat_barre:
+"A+":
+  # 1 3 ♯5
+  # A C# F
+  fingers: [2, 1, 1, 0]
+
+Adim:
+  # 1 ♭3 ♭5
+  # A C E♭  C  E♭
+  fingers: [5, 3, 0, 0]
+
+"A#7":
+  barre: 1
+  fingers: [0, 1, 0, 0]
+
+Bb:
+  fingers: [3, 2, 1, 1]
+
+Bb7:
+  name: "Bb7"
+  barre: 1
+  fingers: [0, 1, 0, 0]
+
+Bbm:
   name: "Bb"
-  fingers:
+  barre: 1
+  fingers: [3, 1, 1, 1]
+
+Bbmaj7:
+  fingers: [2, 2, 1, 1]
+
+B:
+  fingers: [2, 3, 4, 4]
+
+B7:
+  barre: 2
+  fingers: [0, 1, 0, 0]
 
 Bm:
-  barre: 1
-  fingers:
-    - 2
-    - 0
-    - 0
-    - 0
+  barre: 2
+  fingers: [2, 0, 0, 0]
 
 Bm7:
-  barre: 1
-  fingers: [ 0, 0, 0, 0 ]
+  barre: 2
+  fingers: [0, 0, 0, 0]
 
 Bm7(2):
-  barre: 1
-  fingers: [ 2, 0, 3, 0 ]
+  barre: 2
+  fingers: [2, 0, 3, 0]
 
 C:
-  fingers: [0, 0, 0, 3 ]
+  fingers: [0, 0, 0, 3]
 
-C(2):
-  name: C (Barre)
-  fingers: [ 5, 4, 3, 3 ]
+C_2:
+  name: C(2)
+  fingers: [5, 4, 3, 3]
 
 Cm:
-  fingers: [ 0, 3, 3, 3 ]
+  fingers: [0, 3, 3, 3]
+  name: Cm
 
 Cm_barre:
   name: "Cm (Barre)"
   barre: 3
-  fingers: [ 2, 0, 0, 0 ]
+  fingers: [2, 0, 0, 0]
 
 Cmaj7:
-  fingers: [ 0, 0, 0, 2 ]
+  fingers: [0, 0, 0, 2]
+
+C7:
+  fingers: [0, 0, 0, 1]
+
+C6:
+  fingers: [0, 0, 0, 0]
+
+"C+":
+  # 1, 3 ,5#
+  fingers: [1, 0, 0, 3]
+
+Cdim:
+  # 1, b3, b5
+  #         C  Eb F# C
+  fingers: [5, 3, 2, 3]
+
+Csus4:
+  fingers: [0, 0, 1, 3]
+
+"C#":
+  barre: 1
+  fingers: [0, 0, 0, 3]
+  name: "C#"
+
+"C#m":
+  barre: 1
+  fingers: [0, 3, 3, 3]
 
 D:
-  fingers: [ 2, 2, 2, 0 ]
+  fingers: [2, 2, 2, 0]
+
+D7:
+  fingers: [2, 2, 2, 3]
 
 D(2):
-  fingers: [ 2, 2, 2, 5 ]
+  fingers: [2, 2, 2, 5]
+
+Dsus4:
+  fingers: [2, 2, 3, 0]
 
 Dm:
-  fingers: [ 2, 2, 1, 0 ]
+  fingers: [2, 2, 1, 0]
+
+Dm7:
+  fingers: [2, 2, 1, 3]
 
 Dmaj7:
-  fingers: [ 2, 1, 2, 0 ]
+  fingers: [2, 1, 2, 0]
 
-Eflat:
-  fingers: [ 3, 3, 3, 1 ]
+Eb:
+  fingers: [3, 3, 3, 1]
   name: "Eb"
 
-EFlat(2):
-  fingers: [ 2, 2, 2, 5 ]
+Eb(2):
+  fingers: [2, 2, 2, 5]
   name: "Eb"
   position: 1
 
 E:
-  fingers: [ 4, 4, 4, 2 ]
+  fingers: [4, 4, 4, 2]
 
 E(2):
-  fingers: [ 2, 2, 2, 5 ]
+  fingers: [2, 2, 2, 5]
   position: 2
 
 
@@ -86,25 +194,66 @@ E(2):
 # perhaps we'll introduce that later
 # note that we've normalised the entries here. (Fsharp, not F#)
 E7:
-  fingers: [ 1, 2, 0, 2 ]
+  fingers: [1, 2, 0, 2]
 
 Em:
-  fingers: [ 0, 4 ,3 ,2 ]
+  fingers: [0, 4 ,3 ,2]
 
-Fsharp:
+Em7:
+  fingers: [0, 2, 0, 2]
+
+"F#":
   barre: 1
-  fingers: [ 2, 0, 1, 0 ]
-  name: "F#"
+  fingers: [2, 0, 1, 0]
+
+"F#dim":
+  # 1, ♭3, ♭5
+  # F# A C  A C F# C
+  fingers: [2, 0, 2, 3]
+
+"F#m":
+  # F# A C# A C# F# A
+  fingers: [2, 1, 2, 0]
+
+F:
+  fingers: [2, 0, 1, 0]
+
+F7:
+  fingers: [2, 3, 1, 3]
+
+Fm:
+  fingers: [1, 0, 1, 3]
+
+Fmaj7:
+  # 1, 3,  5, 7
+  # F, B♭, D, E
+  #         B♭ F  E  D
+  fingers: [3, 5, 0, 5]
 
 G:
-  fingers: [ 0, 2, 3, 2 ]
+  fingers: [0, 2, 3, 2]
 
-Gminor:
-  fingers: [ 0, 2, 3, 1 ]
+Gsus4:
+  fingers: [0, 2, 3, 3]
+
+Gsus2:
+  fingers: [0, 2, 3, 0]
+
+Gm:
+  fingers: [0, 2, 3, 1]
+
+Gm7:
+  fingers: [0, 2, 2, 1]
 
 G7:
-  fingers: [ 0, 2, 1, 2 ]
+  fingers: [0, 2, 1, 2]
 
 Gmaj7:
-  fingers: [ 0, 2, 2, 2 ]
+  fingers: [0, 2, 2, 2]
+
+"G#":
+  barre: 3
+  fingers: [2, 0, 1, 0]
+
+
 
