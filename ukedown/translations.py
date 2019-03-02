@@ -1,5 +1,5 @@
 ## part of ukedown ##
-# patterns for  translating all the horrible 'smart' characters that word etc like to 
+# patterns for  translating all the horrible 'smart' characters that word etc like to
 # put in when you just want boring hyphens or quotes or brackets (or whatever)
 # basically  this is a dictionary mapping ord(UNICODE) to UNICODE_REPLACEMENT
 
@@ -17,6 +17,7 @@ WP_JUNK = {
         '\u2019': "'", # right single quotation
         '\u201c': '"', # left double quotation
         '\u201d': '"', # right double quotation
+        '\u2026': '...', # ellipsis
         }
 
 # unicode strings have their own 'translate' method so we just need a table:
