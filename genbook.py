@@ -179,7 +179,12 @@ def main(options):
              'missing': set([])}
 
 
+    # context created by analysing input files and options:
     context = analyse_inputs(options.input)
+    context['songbook'] = os.path.basename(options.output)
+    context['stylesheets'] = []
+    context['images'] = []
+
 
     # now generate the chord images from templates
     with open('chords.yml') as cd:
@@ -201,14 +206,25 @@ def main(options):
 
     for img in glob('images/*'):
         shutil.copy2(img, os.path.join(options.output, 'EPUB', 'images'))
+        context['images'].append(img)
 
     env = Environment(loader=FileSystemLoader('templates'))
-    tpl = env.get_template('ukesong_inline.j2')
 
     # now let's generate our songsheets
+    tpl = env.get_template('ukesong_inline.j2')
     for songobj in Bar("Rendering").iter(context['songs']):
         with open(os.path.join(options.output, 'EPUB', 'songs', songobj['filename']), 'w') as sf:
             sf.write(tpl.render(songobj))
+
+    # now generate the other templates for epub
+    tpl = 'nav.xhtml.j2'
+    with open(os.path.join(options.output, 'EPUB', 'nav.xhtml'), 'w') as nav:
+        nav.write(tpl.render(context))
+
+    tpl = 'product.opf.j2'
+    with open(os.path.join(options.output, 'EPUB', 'product.opf'), 'w') as prod:
+        prod.write(tpl.render(context))
+
 
 
 
