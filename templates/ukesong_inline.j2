@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <link rel="stylesheet" type="text/css" href="../css/ukebook.css" />
+    <link rel="stylesheet" type="text/css" href="../css/chord.css" />
     <title>{{ title|default('') }} - {{ artist|default('') }}</title>
     <!-- # also import javascript stuff here if needed -->
 </head>
@@ -16,7 +17,7 @@
 </div>
 <div class="chords">
 {% for chord in chords %}
-<img class="chord_diagram" src="../chords/{{ chord|replace('#', '_sharp_') }}.svg" alt="{{ chord }}"/>
+{% include 'svg/%s.svg' % chord%}
 {% endfor %}
 </div>
 <div class="footer"></div>

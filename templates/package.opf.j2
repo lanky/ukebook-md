@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" prefix="dc: http://purl.org/dc/elements/1.1/"
+         version="3.1" xml:lang="en" unique-identifier="uid">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<dc:identifier id="uid">org.karauke.songbook</dc:identifier>
+		<dc:title>Karauke Songbook</dc:title>
+		<dc:language>en</dc:language>
+		<meta property="dcterms:modified">2019-02-22T15:18:00Z</meta>
+		<dc:creator>Stuart Sears</dc:creator>
+	</metadata>
+	<manifest>
+		<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+		<item id="index" href="songs/index.html" media-type="application/xhtml+xml"/>
+        <!-- All resources in order of discovery and type, I presume-->
+        {% for song in songlist %}
+        <item id="song_{{ song['id'] }}" href="songs/{{ song['filename'] }}" media-type="application/xhtml+xml"/> #}
+        {% endfor %}
+        {% for sht in stylesheets %}
+        <item id="style_{{ '%03d'|format(loop.index) }}" href="css/{{sht}}" media-type="text/css"/>
+        {% endfor %}
+        {% for chord in chordlist %}
+        <item id="{{ chord }}" href="chords/{{ chord }}.svg" media-type="image/svg"/>
+        {% endfor %}
+	</manifest>
+    <spine>
+    <!-- all elements in logical reading order. Basically a list of songs here -->
+        <itemref idref="index"/>
+        {% for song in songlist -%}
+        <itemref idref="song_{{ song['id'] }}"/>
+        {% endfor -%}
+	</spine>
+</package>

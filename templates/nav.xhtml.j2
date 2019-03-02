@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+      <title>{{ songbook }}</title>
+    <meta charset="utf-8"/>
+    <style>
+      ol { list-style-type: none; }
+    </style>
+  </head>
+  <body>
+    <nav epub:type="toc">
+      <ol class="toc">
+        <li><a href="songs/index.html">Table of Contents</a></li>
+        {% for song in songlist %}
+        <li><a href="songs/{{song.filename }}"> {{song.title}}{% if song.artist %} - {{ song.artist }}{% endif %}</a>
+       </li>
+       {% endfor %}
+      </ol>
+    </nav>
+  </body>
+</html>
