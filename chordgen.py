@@ -8,6 +8,7 @@ import yaml
 import codecs
 from jinja2 import Environment, FileSystemLoader
 import argparse
+from progress.bar import Bar
 
 # two-way mapping of equivalent non-naturals, to allow a chord to be
 # defined in more than one way (possibly to reduce duplication)
@@ -34,7 +35,8 @@ def parse_cmdline(argv):
 
     parser.add_argument("chord", nargs="*", help="chord names (from configuration) to render")
     parser.add_argument("-c", "--chordlist", default="chords.yml", help="chord configuration file (YAML)")
-    parser.add_argument("-t", "--template", default="fretboard.j2", help="chord template (jinja2( - used for rendering chords as SVG")
+    parser.add_argument("-t", "--template", default="fretboard.svg.j2", help="chord template (jinja2( - used for rendering chords as SVG")
+    parser.add_argument("-d", "--destdir", default="chords", help="output directory for chord (SVG) files")
 
     bgrp = parser.add_argument_group("Fretboard Layout", "Customise frets, strings and spacing")
     bgrp.add_argument("-s", "--strings", help="Number of strings to draw", type=int, default=4)
@@ -54,13 +56,23 @@ def symbolise(name):
     replace pretend symbols with real ones (unicode ftw)
     """
     translations = {
-            'b': '♭',
-            '#': '♯'
+            'b': '&flat;',
+            '#': '&sharp;',
             }
     tt = { ord(k): v for k, v in list(translations.items()) }
 
     return str(name).translate(tt)
 
+def safe_name(chord):
+    """
+    Translate unsafe characters for filenames (on Linux, at least. May need more for windows)
+    """
+    transtable = {
+            '#': '_sharp_',
+            '/': '_on_',
+            }
+
+    return chord.translate({ ord(k): v for k, v in transtable.items() })
 
 def merge_ctx(base, **kwargs):
     """
@@ -168,18 +180,6 @@ def gen_board(spacing, strings=4, frets=5):
 
     return ctx
 
-def overlay(base, chord):
-    """
-    Generates additional context for chords ( fingering, barre, label etc)
-    Essentially does a dictionary merge
-    """
-    # board = { 'top', 'bottom', 'left', 'right', 'nut' ,'strings', 'frets' }
-    # we need to add "barre", "fingers",
-    # if we have a barre, we need to  define x, y, width, rx, ry
-    # barre position is essentially fret + 0.5 fret
-    # string[x] - 0.g* spacing, fret[y] + 0.5*spacing,
-    # marker and barre width are 0.5 * spacing
-
 def get_alt_name(chord):
     res = re.match(r'^([ABCDEFG][b#]?)(.*)', chord)
 
@@ -226,8 +226,10 @@ def generate(chordlist, definitions, destdir="chords", template="fretboard.svg.j
 
     missing = set([])
 
+    print ("progress")
+    pbar = Bar("{:20}".format("Rendering Chords:"), max=len(chordlist))
     try:
-        for chordname in  chordlist:
+        for chordname in pbar.iter(chordlist):
             if chordname in definitions:
                 ch = definitions.get(chordname)
             else:
@@ -241,7 +243,8 @@ def generate(chordlist, definitions, destdir="chords", template="fretboard.svg.j
             if 'name' not in ch:
                 ch['name'] = symbolise(chordname)
 
-            chordfile = chordname.replace('#', '_sharp_')
+            # replaces characters that cause shell problems
+            chordfile = safe_name(chordname)
 
             with codecs.open("{}/{}.svg".format(destdir, chordfile), mode='w', encoding="utf-8") as output:
                 output.write(tpl.render(merge_ctx(cfg, **ch)))
@@ -257,10 +260,18 @@ if __name__ == "__main__":
     # we need to load a config for our chord diagram
     opts = parse_cmdline(sys.argv[1:])
     # load out chord definitions to pass into the templates
+
+    if not os.path.isdir(opts.destdir):
+        os.makedirs(opts.destdir)
     chorddefs = yaml.load(codecs.open(opts.chordlist, mode="r", encoding="utf-8"))
 
+    if not opts.chord:
+        opts.chord = chorddefs.keys()
+
+    print ("generating chords")
     # generate diagrams for the list of provided chords
     # report on any chords that were missing definitions
-    missing = generate(opts.chord, chorddefs, destdir="chords", template=opts.template)
+    missing = generate(opts.chord, chorddefs, destdir=opts.destdir, template=opts.template)
+
     if len(missing):
         print("Could not find definition for chords: \n", "\n".join(missing) )
