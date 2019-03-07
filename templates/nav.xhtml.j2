@@ -12,7 +12,7 @@
     <nav epub:type="toc">
       <ol class="toc">
         <li><a href="songs/index.html">Table of Contents</a></li>
-        {% for song in songlist %}
+        {% for song in songs %}
         <li><a href="songs/{{song.filename }}"> {{song.title}}{% if song.artist %} - {{ song.artist }}{% endif %}</a>
        </li>
        {% endfor %}

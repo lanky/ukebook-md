@@ -1,19 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" type="text/css" href="css/ukebook.css" />
+    <link rel="stylesheet" type="text/css" href="css/chord.css" />
     <title>{{ Songbook }}</title>
     <!-- # also import javascript stuff here if needed -->
 </head>
 <body>
 <div class="content">
-{% for song in songlist -%}
-  <a class="index" href="{{ song.filename }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} - {{ song.artist }}</a><br/>
+{% for song in songs -%}
+<a class="index" id="song_{{ song.id}}" href="songs/{{ song.filename }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} - {{ song.artist }}</a><br/>
 {% endfor -%}
 </div>
 <!-- outer div -->
 <div class="footer">
-<img src="images/karauke_footer.png", alt="footer image with social media links" width="100%"/>
+<img src="images/karauke_footer.png" alt="footer image with social media links" width="100%"/>
 </div>
 </body>
 </html>
