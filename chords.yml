@@ -106,6 +106,9 @@ Bm7(2):
   barre: 2
   fingers: [2, 0, 3, 0]
 
+Cadd9:
+  fingers: [0, 2, 0, 3]
+
 C:
   fingers: [0, 0, 0, 3]
 
@@ -229,6 +232,9 @@ Fmaj7:
   # F, B♭, D, E
   #         B♭ F  E  D
   fingers: [3, 5, 0, 5]
+
+F/G:
+  fingers: [0, 0, 1, 0]
 
 G:
   fingers: [0, 2, 3, 2]
