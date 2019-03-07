@@ -5,3 +5,4 @@ bookenv*
 *.db
 *.html
 *.svg
+*.log
