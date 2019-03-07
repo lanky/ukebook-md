@@ -1,0 +1,13 @@
+# for those without core.autocrlf set
+* text=auto
+
+# files that are text and should get automagic treatment as above.
+*.py text
+*.css text
+*.j2 text
+*.html text
+*.udn text
+*.svg text
+
+*.png binary
+*.gif binary
