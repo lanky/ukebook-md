@@ -4,7 +4,7 @@
 # re.compile(PATTERN, re.UNICODE|re.DOTALL)
 
 # approximation of chords - covers major minor dim aug sus and 7/9/13 etc
-CHORD = r'\(([A-G][adgijmnsu0-9#b+-]*(?:\s*[\u2013\u2014-]\s*single(?:\s*strums?)?)?)\)'
+CHORD = r'\(([A-G][adgijmnsu0-9#b+-\/]*(?:\s*[\u2013\u2014-]\s*single(?:\s*strums?)?)?)\)'
 
 DASHES = r'\u2010\u2011\u2012\u2013\u2014'
 
@@ -17,7 +17,7 @@ VOX = r'\(([\w\s]+)\)'
 # band/performance instructions - use a differnt delimiter - {}
 NOTES = r'\{([\w\s]+)\}'
 
-# lines that start (and optionally end) with a | character are 
+# lines that start (and optionally end) with a | character are
 # part of boxed paragraphs
 BOX = r'(^|\n)\| *([^ ][^|]*)\|?$'
 
