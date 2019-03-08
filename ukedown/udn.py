@@ -117,7 +117,7 @@ class BoxSectionProcessor(BlockProcessor):
     def __init__(self, parser, pattern=patterns.BOX):
         super(BoxSectionProcessor, self).__init__(parser)
 
-        self.pattern = re.compile(pattern)
+        self.pattern = re.compile(pattern, re.MULTILINE)
 
     def test(self, parent, block):
         return self.pattern.search(block)
