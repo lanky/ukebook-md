@@ -75,7 +75,6 @@ class ChordPattern(Pattern):
         el = etree.Element('span')
         el.attrib['class'] =  'chord'
         el.text = m.group(2)
-
         return el
 
 class VoxPattern(Pattern):
@@ -91,7 +90,6 @@ class NotesPattern(Pattern):
         el.set('class', 'notes')
         el.text = m.group(2)
         return el
-
 
 class TagPattern(Pattern):
     """
@@ -241,7 +239,7 @@ class UkeBookExtension(Extension):
         # add our 'other stuff in brackets' pattern AFTER chord processing
         # md.inlinePatterns.add('vox', VoxPattern(patterns.VOX, md), '>chord')
         md.inlinePatterns.add('vox', TagPattern(patterns.VOX, md, 'span', cls='vox'), '>chord')
-        md.inlinePatterns.add('notes', TagPattern(patterns.CHORD, md, 'span', cls='notes'), '>vox')
+        md.inlinePatterns.add('notes', TagPattern(patterns.NOTES, md, 'span', cls='notes'), '>vox')
         md.parser.blockprocessors.add('box', BoxSectionProcessor(md.parser), '>empty')
         md.treeprocessors.add('collapsediv', CollapseChildProcessor(md), '<inline')
 
