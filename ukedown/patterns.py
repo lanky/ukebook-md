@@ -15,7 +15,7 @@ HYPHENS = r'\s*(?:-|\u2011|\u2013|\u2014|\u2015)\s*'
 VOX = r'\(([\w\s]+)\)'
 
 # band/performance instructions - use a differnt delimiter - {}
-NOTES = r'\{([\w\s]+)\}'
+NOTES = r'\{([\w\s\/]+)\}'
 
 # lines that start (and optionally end) with a | character are
 # part of boxed paragraphs
