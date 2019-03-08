@@ -34,7 +34,6 @@ class JunkCleaner(Preprocessor):
         return [ line.translate(translations.UNICODE_CLEAN_TABLE) for line in lines ]
 
 
-
 class HeaderProcessor(Preprocessor):
     """
     assume first non-blank line is the song title (plus potentially artist)
@@ -117,41 +116,47 @@ class BoxSectionProcessor(BlockProcessor):
 
     def __init__(self, parser, pattern=patterns.BOX):
         super(BoxSectionProcessor, self).__init__(parser)
+
         self.pattern = re.compile(pattern)
 
     def test(self, parent, block):
         return self.pattern.search(block)
 
     def run(self, parent, blocks):
+        """
+        Process a list of blocks (basically, the document split on '\n\n' strings
+        search a block for your regex
+        """
         block = blocks.pop(0)
+        # ^^ this is a chunk of the file, split on '\n\n'.
+        # hopefully we have done this between box sections.
         m = self.pattern.search(block)
         if m:
+            # all text before we matched our pattern (in this instance that's lines
+            # starting with '|' characters
             before = block[:m.start()]  # Lines before box
-            # Pass lines before blockquote in recursively for parsing forst.
+            # Pass lines before blockquote in recursively for parsing first.
+            # parseblocks just runs every blockprocessor over the block
             self.parser.parseBlocks(parent, [before])
             block = '\n'.join(
-                [self.clean(line) for line in block[m.start():].split('\n')]
+                [self.clean(line) for line in block[m.start():].split('\n') if self.pattern.search(line) ]
             )
-        # gets the last element at this level
-        sibling = self.lastChild(parent)
-        if sibling is not None and sibling.tag == 'div' and sibling.get('class') == 'box':
-            # Previous block was also a div
-            quote = sibling
-        else:
-            # This is a new blockquote. Create a new parent element.
-            quote = etree.SubElement(parent, 'div', {'class': 'box'})
+        quote = etree.SubElement(parent, 'div', {'class': 'box'})
         #    quote.set('class', 'box')
         # Recursively parse block with blockquote as parent.
         # change parser state so blockquotes embedded in lists use p tags
         self.parser.state.set('box')
+        # spit block on '\n\n', run all blockprocessors over it and attach output
+        # to the provided parent('quote') (in this case a div)
         self.parser.parseChunk(quote, block)
+
         self.parser.state.reset()
 
     def clean(self, line):
         """ Remove ``|`` from beginning (and possibly end)of a line. """
         m = self.pattern.match(line)
         if line.strip() == "|" or re.match(r'^\| *\|$', line):
-            return "\n"
+            return "\n\n"
         elif m:
             return m.group(2)
         else:
