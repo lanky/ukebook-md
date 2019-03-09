@@ -44,6 +44,7 @@ p {
 
 div.box {
     display: inline-block;
+    margin: 0.5em;
     padding: 5px;
 }
 
@@ -59,6 +60,7 @@ div.box {
 .box > h2 {
     margin-top: 0;
     padding-top: 0;
+    margin-bottom: 0.5em;
 }
 
 /* End box definitions*/
