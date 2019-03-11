@@ -266,8 +266,8 @@ def main(options):
     for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
         logging.info("rendering {artist} - {title} into {filename}".format(**songobj))
         logging.debug("Chords: {chords!r}".format(**songobj))
-        songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index/html")
-        songobj['_next'] = context['index'].get(songobj['next_id'], "../index/html")
+        songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
+        songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
         try:
             with open(os.path.join(options.output, 'EPUB', 'songs', songobj['filename']), 'w') as sf:
                 sf.write(songtemplate.render(songobj, songidx=context['index']))
