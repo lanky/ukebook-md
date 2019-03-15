@@ -35,7 +35,7 @@ def parse_cmdline(argv):
 
     parser.add_argument("chord", nargs="*", help="chord names (from configuration) to render")
     parser.add_argument("-c", "--chordlist", default="chords.yml", help="chord configuration file (YAML)")
-    parser.add_argument("-t", "--template", default="fretboard.svg.j2", help="chord template (jinja2( - used for rendering chords as SVG")
+    parser.add_argument("-t", "--template", default="external_chord.svg.j2", help="chord template (jinja2( - used for rendering chords as SVG")
     parser.add_argument("-d", "--destdir", default="chords", help="output directory for chord (SVG) files")
 
     bgrp = parser.add_argument_group("Fretboard Layout", "Customise frets, strings and spacing")
@@ -194,7 +194,7 @@ def get_alt_name(chord):
         return altname
     return chord
 
-def generate(chordlist, definitions, destdir="chords", template="fretboard.svg.j2"):
+def generate(chordlist, definitions, destdir="chords", template="external_chord.svg.j2"):
     """
     Generate chord diagrams based on a definitions file
 
