@@ -2,7 +2,7 @@
 
 body: {
     font-family: verdana, sans-serif;
-    font-size: medium;
+    font-size: 100%;
     width: 100%
 }
 
@@ -11,7 +11,7 @@ h1 {
     font-weight: bold;
     font=size: 1em;
     text-align: center;
-    float: top
+    float: top;
 }
 
 /* h2 is our 'section' header */
@@ -19,6 +19,7 @@ h2 {
     font-family: verdana, sans-serif;
     font-weight: bold;
     font-size: 1em;
+    padding-bottom: 0.5em;
 }
 
 h2:before {
@@ -39,7 +40,8 @@ p {
     padding: 2px;
     margin: 1px;
     border: 2px solid black;
-    width: auto
+    width: 70%;
+    max-width: 90%;
 }
 
 div.box {
@@ -60,7 +62,8 @@ div.box {
 .box > h2 {
     margin-top: 0;
     padding-top: 0;
-    margin-bottom: 0.5em;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 /* End box definitions*/
@@ -111,12 +114,54 @@ div.footer {
     left: 0;
     width: 100%;
     max-height: 10%;
-    height: 0;
+    height: 10vfh;
+    overflow: auto;
+    background: yellow;
+    border-top: 1px solid black;
     page-break-after: always;
 }
 
-/* PRINT STYLESHEET */
+.footer > a {
+    text-decoration: none;
+    font-family: verdana, sans-serif;
+    font-size: 0.7em;
+}
 
+a.left {
+    float: left;
+    padding: 2px;
+    margin-left: 1em;
+    display: inline-block;
+}
+a.right {
+    float: right;
+    margin-right: 1em;
+    padding: 2px;
+    display: inline-block;
+}
+a.middle {
+    text-align: center;
+    padding: 2px;
+    display: inline-block;
+}
+
+
+
+div.chords {
+    position: absolute;
+    right: 0;
+    top: 10%;
+    overflow: auto;
+    width: auto;
+    max-width: 10vmin;
+    height: auto;
+    max-height: 80%;
+    border-left: 1px dotted black;
+}
+
+/* MEDIA QUERIES FOLLOW THIS POINT */
+
+/* PRINT STYLESHEET */
 
 @media print {
     h1 {
@@ -132,6 +177,32 @@ div.footer {
     .box > h2 {
         margin-top: 0;
         margin-bottom: 0;
+    }
+}
+
+
+/* HANDLE SCREEN ROTATION/RESIZE */
+@media screen and (orientation: landscape) {
+
+    div.content {
+        float: left;
+        column-count: 2;
+        column-rule-width: 1px;
+        column-rule-style: solid;
+        column-rule-color: black;
+        overflow: auto;
+        width: auto;
+    }
+}
+
+@media screen and (orientation: portrait) {
+
+    div.content {
+        float: left;
+        column-count: 1;
+        border: none;
+        overflow: auto;
+        width: auto;
     }
 }
 
@@ -152,38 +223,6 @@ div.footer {
     }
 
 }
-
-@media screen and (orientation: landscape) {
-    div.chords {
-        /*float: bottom;*/
-        width: 100%;
-        min-height: 10%;
-    }
-
-    div.content {
-        /*float: left;*/
-        column-count: 2;
-        column-rule-width: 1px;
-        column-rule-style: solid;
-        column-rule-color: black;
-    }
-}
-
-@media screen and (orientation: portrait) {
-    div.chords {
-        border: 1px dotted gray;
-        min-width: 10%;
-        float: right;
-        height: 100%;
-    }
-
-    div.content {
-        float: left;
-        column-count: 1;
-        border: none;
-    }
-}
-
 
 
 
