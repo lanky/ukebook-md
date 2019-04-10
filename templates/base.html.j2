@@ -1,0 +1,25 @@
+{% block doctype %}
+{# vim: set ts=2 sts=2 sw=2 et ci ft=jinja: #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% endblock %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  {% block head %}
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/ukebook.css" />
+  <link rel="stylesheet" type="text/css" href="../css/chord.css" />
+  {% block localstyles %}{% endblock %}
+  {% block js %}{% endblock %}
+  <title>{% block title %}{{ title }}{% endblock %}</title>
+  {% endblock %}
+</head>
+<body>
+  <div id="container">
+    <div class="header">{% block songheader %}{% endblock %}</div>
+    <div class="content">{% block content %}{% endblock %}</div>
+    <div class="chords">{% block chords %}{% endblock %}</div>
+    <div class="footer">{% block footer %}{% endblock %}</div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,22 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ Songbook }}{% endblock %}
+
+{% block localstyles %}
+<link rel="stylesheet" type="text/css" href="css/index.css"/>
+{% endblock %}
+
+{% block content %}
+{% for song in songs -%}
+      <a class="index" id="song_{{ song.id}}" href="songs/{{ song.filename }}"
+         alt="{{ song.title }} - {{ song.artist }}">
+        {{ song.title }} - {{ song.artist }}
+      </a>
+      <br/>
+{% endfor -%}
+</div>
+<div class="footer">
+<img src="images/karauke_footer.png" alt="footer image with social media links" width="100%"/>
+</div>
+</body>
+</html>
+

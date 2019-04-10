@@ -1,0 +1,23 @@
+{% extends "base.html.j2" %}
+{% block title %}
+{{ title|default('') }} - {{ artist|default('') }}
+{% endblock %}
+{% block songheader %}
+<h1 class="title">{{ title|default('') }} - {{ artist|default('') }}</h1>
+{% endblock %}
+
+{% block content %}
+{{ html }}
+{% endblock %}
+
+{% block chords %}
+  {% for chord in chords %}
+  {% include 'svg/%s.svg'|format(chord) %}
+  {% endfor %}
+{% endblock %}
+
+{% block footer %}
+  <a class="left" href="{{ _prev }}" accesskey="p">previous</a>
+  <a class="middle" href="../index.html" accesskey="i">return to index</a>
+  <a class="right" href="{{ _next }}" accesskey="n">next</a>
+{% endblock %}
