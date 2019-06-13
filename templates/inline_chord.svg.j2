@@ -12,12 +12,13 @@ frets        - list of coords for frets:     [ (x1, x2, y), ]
 frets        - list of fret heights:
 barres       - list of coords for barres:    [ (x, y, w), ]
 fingers      - list of coords for fingering: [ (x, y) ] #}
-<svg width="{{ svg.width }}px"
-     height="{{ svg.height }}px"
+<svg width="100%"
+     height="100%"
      viewBox="0 0 {{ svg.width }} {{ svg.height }}"
      preserveAspectRatio="xMidYMid meet"
      aria-label="{{ name }}"
-     role="img">
+     role="img"
+     class="chord">
 {# our fretboard 'group', draws a grid #}
 <g class="fretboard">
 <!-- vertical lines are strings -->
