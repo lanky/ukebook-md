@@ -1,28 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" type="text/css" href="../css/ukebook.css" />
-    <link rel="stylesheet" type="text/css" href="../css/chord.css" />
-    <title>{{ title|default('') }} - {{ artist|default('') }}</title>
-    <!-- # also import javascript stuff here if needed -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="../css/ukebook.css" />
+  <link rel="stylesheet" type="text/css" href="../css/chord.css" />
+  <title>{{ title|default('') }} - {{ artist|default('') }}</title>
+  <!-- # also import javascript stuff here if needed -->
 </head>
 <body>
 <div class="header">
 {% if title is defined  or artist is defined %}
-<h1 class="title">{{ title|default('') }} - {{ artist|default('') }}</h1>
+  <h1 class="title">{{ title|default('') }} - {{ artist|default('') }}</h1>
 {% endif %}
 </div>
-<div class="content">
-{{ html }}
-</div>
-<div class="chords">
-{% for chord in chords %}
-<img class="chord_diagram" src="../chords/{{ chord|replace('#', '_sharp_') }}.svg" alt="{{ chord }}"/>
-{% endfor %}
-</div>
-<div class="footer"></div>
-<a href="index.html">return to index</a>
+<div class="container">
+  <div class="content">
+  {{ html }}
+  </div>
+  <div class="chords">
+  {% for chord in chords %}
+    <img class="chord_diagram"
+         src="../chords/{{ chord|replace('#', '_sharp_') }}.svg"
+         alt="{{ chord }}"/>
+  {% endfor %}
+  </div>
+  <div class="footer">
+    <a class="left" href="{{ _prev }}" accesskey="p">previous</a>
+    <a class="middle" href="../index.html" accesskey="i">return to index</a>
+    <a class="right" href="{{ _next }}" accesskey="n">next</a>
+  </div>
 </div>
 <!-- outer div -->
 </body>
