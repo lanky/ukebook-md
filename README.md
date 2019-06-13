@@ -15,6 +15,7 @@ The core elements are the 'ukedown' markdown extensions, used to identify chords
 
 ### configuration files
   `chords.yml` - defines fingering, neck position and barres for every known chord. These are used to generate SVG chord diagrams (scalable vector diagrams) which are inserted into each songsheet
+
   `fretboard.yml` - defines a standard ukulele fretboard (for use with an SVG template) - number of strings etc is customisabel, so could also be used for other instruments (guitar etc)
 
 ### utility scripts
