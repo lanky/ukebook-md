@@ -1,35 +1,77 @@
 # ukebook_md
 
 ## Intro
-This is a python implementation of the 'ukedown' ideas put forward by @smudgefarrier as part of the 'ukebook' project hosted here on github by @birdcolour
+This is a toolset including a python implementation of the 'ukedown' ideas put forward by @smudgefarrier as part of the 'ukebook' project hosted here on github by @birdcolour.
+It is intended to be used to manage songbooks for ukulele groups, specifically Karauke, where we have a requirement to produce both 'band' and 'singers' versions of a given song.
 
-Rather than reimplement block parsing and using regex replacements etc, I decided to write an extension 
+Rather than reimplement block parsing and using regex replacements etc, I decided to write an extension
 (or in fact a series of extensions) to the standard [Markdown library](https://github.com/waylan/Python-Markdown/tree/master/markdown)
 which is documented [here](https://pythonhosted.org/Markdown/extensions/api.html)
 
+I've built a toolset to convert directories full of 'ukedown' formatted files to HTML, with index pages and (fairly) responsive CSS. The eng goal will be to build a responsive EPUB 3.1 document, which supports resizing and rotation using CSS page queries
+
+## What's here?
+The core elements are the 'ukedown' markdown extensions, used to identify chords and other elements and generate HTML from them.
+
+### configuration files
+  `chords.yml` - defines fingering, neck position and barres for every known chord. These are used to generate SVG chord diagrams (scalable vector diagrams) which are inserted into each songsheet
+  `fretboard.yml` - defines a standard ukulele fretboard (for use with an SVG template) - number of strings etc is customisabel, so could also be used for other instruments (guitar etc)
+
+### utility scripts
+There are several scripts, the most important being
+`genbook.py`, which generates an almost-EPUB structure (the EPUB paarts need some work) using a directory containing *ukedown* formatted songs (more details on that later) as inputs
+This script calls functions from `chordgen.py` to render SVG documents for each known chord shape (definitions are in  `chords.yml`)
+It generates HTML pages for each song, with inline chord diagrams and an index page with links to them.
+
+
 ## Requirements
-You'll need a python virtual environment, I've only tested with python 2.7 so far (although I'll be updating any non-py3 compatible code eventually) with at least the following installed
+You'll need a python virtual environment, preferably python 3.5+ - the toolset has only been tested with that. There is a `requirements.txt` file in the repo that can be used to generate this. Or you can just install all those packages into a system or user directory, of course.
 
   * markdown (well, obviously)
   * jinja2 (for templating) - this is not used "properly" yet, I have plans for metadata and other templating tricks.
 
-## Outstanding stuff
-As in, stuff I haven't done, rather than the complimentary interpretation
+## Current Functionality
+  * Generation of HTML documents, with links to CSS files, all within an 'EPUB' directory structure
+  * SVG chord diagrams
+  * HTML docs generated from modular jinja2 templates
+  * CSS grid used for a flexible layout - text degrades into multiple columns as the page gets wider.
 
-  1. **Chord support** - I really like the stuff Mark already did, but I fancy having a go in python. Because.
-  1. **Metadata** - tags, embedded artist and track info etc, can be used in templating, also goes into the DB Models
-  1. **Web backend**. I've had a play with django for this but I think I'm going to fall back on flask.
-     current thinking is to build a REST API MVC and point something javascripty and modern at it.
-     I think this also plays well with the phone app side of things
-  1. **frontend** of your choice. Probably all bootstrappy and stuff. Or a phone app. Or a small shell sc
 
-Then we have all the other joys like authentication, access controls, songbook creation. All that wheel reinventing that inveterate tinkerers enjoy
+# Ukedown formatting
+I should really call this something different as it's not just for ukes. Oh well.
+songs are written in plain text format, as used in ukulele wednesdays songbooks, but without unnecessary formatting.
 
-## How to use it as it stands
+There are many examples of these in the `inputs` directory
 
-  1. Create your virtual environment as above
-  1. Activate it
-  1. `./ukify.py --help` (or whatever one does on windows systems, I haven't got any :) ) 
+## supported ukedown-specific markup styles
+
+  * the first non-blank line in a songsheet should contain TITLE - ARTIST. These are used in metadata, for index generation and rendered as `<h1>`
+  * () marks chords, e.g. (C) or (Dsus4). Avoid silliness like (F - Single Strums) or weird unicode chars like downarrows. These result in `<span class="chord">` elements
+  * currently () also marks backing vox, for patterns that are not chords. I shall probably change that to <> or similar to avoid confusion. These map to *italic* elements
+  * [] marks section headers (chorus etc) - these map tp `<h2>` elements
+  * {} mark performance notes, e.g. {single strums} - map to **[bold]** text
+  * `|` at the beginning (and optionally at the end of a line) denotes a 'boxout' - basically a paragraph with borders, not a single cell table. Used for repeated sections
+
+## Current Limitations
+  * multiple boxes must be separated by at least one blank line.
+  * Chords cannot go on the same line as **[section headers]**
+  * hiding chords with CSS (`display: none`) doesn't collapse whitespace, so can mess up text flow.
+
+## Usage
+
+  1. Ensure you have an appropriate python interpreter (python3.5+ ideally, but at least python3 since the updates). Python2 may work, but I've not tested that for ages.
+  1. Create a virtualenv - I'm a huge fan of `virtualenvwrapper` for this, but maybe that's just me.
+  1. `pip install --upgrade -r requirements.txt`
+  1. Create/Add/Remove/Edit songsheets in `inputs` or another directory or your choice
+  1. Generate a songbook using `./genbook.py` (see `genbook.py --help` for more details)
+
+
+# Outstanding/TODO/etc
+  * more automation
+  * Better CSS
+  * Actual proper controllable font scaling (probably requires javascript, which may not work properly in EPUB.)
+
+
 
 The commandline parts to ukify don't all work yet. I have some CSS work to do, that's been a while (Eric Meyer here I come again) plus a load of other stuff.
 
