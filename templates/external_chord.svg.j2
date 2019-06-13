@@ -1,9 +1,7 @@
 <?xml version="1.0" standalone="no"?>
-<!-- vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: -->
 <?xml-stylesheet type="text/css" href="../css/chord.css"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!--
+                     "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 {# pass this into jinja 2 with a context (kv pairs, or dict) containing the following entries
 name(str)     - chord name, at the top of the diagram
 diag_w(px)   - width and height of diagram, in pixels
@@ -19,9 +17,7 @@ frets        - list of fret heights:
 barres       - list of coords for barres:    [ (x, y, w), ]
 fingers      - list of coords for fingering: [ (x, y) ]
 #}
--->
-
-<svg width="{{ svg.width }}px" height="{{ svg.height }}px"
+<svg class="chordimg" width="100%" height="100%"
      viewBox="0 0 {{ svg.width }} {{ svg.height }}"
      preserveAspectRatio="xMidYMid meet"
      xmlns="http://www.w3.org/2000/svg"
@@ -58,3 +54,4 @@ fingers      - list of coords for fingering: [ (x, y) ]
   </g>
 </svg>
 
+{# vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: #}
