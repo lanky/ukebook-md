@@ -8,7 +8,7 @@
     <!-- # also import javascript stuff here if needed -->
 </head>
 <body>
-<div class="content">
+<div class="index">
 {% for song in songs -%}
 <a class="index" id="song_{{ song.id}}" href="songs/{{ song.filename }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} - {{ song.artist }}</a><br/>
 {% endfor -%}
