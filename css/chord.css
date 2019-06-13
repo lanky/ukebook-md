@@ -1,3 +1,6 @@
+svg.chord {
+    width: 7vmin;
+}
 .chordname {
   font-family: Verdana, Helvetica, Sans-Serif;
   text-align: center;
