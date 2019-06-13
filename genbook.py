@@ -51,6 +51,14 @@ def parse_commandline(argv):
         help="Name of Book to build (default is Karauke_YYYY_MM_DD" )
     parser.add_argument("--report", action="store_true", default=False,
         help="Output a report on input directory and available chords. For info only")
+    parser.add_argument("--external", action="store_true", default=False,
+        help="Use external SVG images (reduces duplication)")
+
+    cgrp = parser.add_argument_group("content control", "options to control content creation")
+    cgrp.add_argument("--no-html", action="store_true", default=False,
+        help="Do not rerender HTML pages")
+    cgrp.add_argument("--no-css", action="store_true", default=False,
+        help="Do not replace CSS files in destination")
 
     args = parser.parse_args(argv)
 
@@ -136,6 +144,7 @@ def parse_songsheets(inputdirs):
         songs.update({ os.path.basename(s): os.path.realpath(s) for s in glob(os.path.join(idir, '*.udn')) })
 
     context = {'chords': set([]), 'songs': []}
+    # we would like to maintain chord ordering - chords are listed in the order they appear in the song.
     pbar = Bar("Analysing Content: ".ljust(20), max=len(songs))
     # This will sort items across multiple directories
     for sng, path in sorted(songs.items(), key=itemgetter(0)):
@@ -163,10 +172,14 @@ def parse_songsheets(inputdirs):
         hdr.decompose()
 
         # Now process chords
+        songchords = []
         # funky set comprehensions ftw
-        songchords = { c.text.split().pop(0) for c in soup.findAll('span', {'class': 'chord'}) }
+        for c in soup.findAll('span', {'class': 'chord'}):
+            cname = c.text.split().pop(0).rstrip('*')
+            context['chords'].add(cname)
+            if cname not in songchords:
+                songchords.append(cname)
         # add our chords to the global chordlist
-        context['chords'].update(songchords)
 
         context['songs'].append({ 'filename': song_dest,
                                   'id': song_id,
@@ -192,6 +205,16 @@ def main(options):
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
+    # handle output options
+    if options.external:
+        chord_template = "chord_ext.svg.j2"
+        chord_dir = os.path.join(options.output, 'EPUB', 'chords')
+        song_template = "song_ext.html.j2"
+    else:
+        chord_template = "chord.svg.j2"
+        chord_dir = "templates/svg"
+        song_template = "song.html.j2"
+
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()))
     index = {'songbook': opts.output,
              'songlist': [],
@@ -237,46 +260,65 @@ def main(options):
 
     # now generate the chord images from templates
 
-    missing_chords = chordgen.generate(context['chords'], chord_defs, destdir="templates/svg", template="inline_svg.j2")
+
+
 
     # now we need to create our EPUB layout
-    create_layout(options.output, 'EPUB', 'EPUB/css', 'EPUB/images', 'EPUB/songs', 'META-INF' )
-    css_dir = os.path.join(options.output, 'EPUB','css')
-    chord_dir = os.path.join(options.output, 'EPUB', 'chords')
+    layout_dirs = ['EPUB', 'EPUB/css', 'EPUB/images', 'EPUB/songs', 'META-INF' ]
+    if options.external:
+        layout_dirs.append('EPUB/chords')
+    create_layout(options.output, *layout_dirs)
+    missing_chords = chordgen.generate(context['chords'], chord_defs, destdir=chord_dir, template=chord_template)
 
     # copy styles and templates in
     shutil.copy2('templates/container.xml', os.path.join(options.output, 'META-INF'))
 
-    for stylesheet in glob('css/*.css'):
-        shutil.copy2(stylesheet, css_dir)
-        index['stylesheets'].append(os.path.basename(stylesheet))
+# this section should be refctored to avoid repetition.
+    if not options.no_css:
+        for stylesheet in glob('css/*.css'):
+            dest = os.path.join(options.output, 'EPUB', 'css')
+            if not os.path.isdir(dest):
+                os.makedirs(dest)
+            shutil.copy2(stylesheet, dest)
+            index['stylesheets'].append(os.path.basename(stylesheet))
 
     for img in glob('images/*'):
+        dest = os.path.join(options.output, 'EPUB', 'images')
+        if not os.path.isdir(dest):
+            os.makedirs(dest)
         shutil.copy2(img, os.path.join(options.output, 'EPUB', 'images'))
         context['images'].append(img)
+
+    for scriptfile in glob("js/*.js"):
+        dest = os.path.join(options.output, 'EPUB', 'js')
+        if not os.path.isdir(dest):
+            os.makedirs(dest)
+        shutil.copy2(scriptfile, dest)
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), trim_blocks=True)
 
 
     # now let's generate our songsheets
-    songtemplate = env.get_template('ukesong_inline.j2')
+    st = env.get_template(song_template)
+
     failures = []
     # so, calc prev and next...
-    # simples, generate a   quick index...
-    for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
-        logging.info("rendering {artist} - {title} into {filename}".format(**songobj))
-        logging.debug("Chords: {chords!r}".format(**songobj))
-        songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
-        songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
-        try:
-            with open(os.path.join(options.output, 'EPUB', 'songs', songobj['filename']), 'w') as sf:
-                sf.write(songtemplate.render(songobj, songidx=context['index']))
-        except jinja2.TemplateError as T:
-            logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
-            logging.error("Context: {chords!r}".format(**songobj))
-            failures.append((songobj, T))
-    for f, err in failures:
-        print ("{title} - {artist} -> {filename}".format(**f), err.__class__, err)
+    # simples, generate a quick index...
+    if not options.no_html:
+        for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
+            logging.info("rendering {artist} - {title} into {filename}".format(**songobj))
+            logging.debug("Chords: {chords!r}".format(**songobj))
+            songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
+            songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
+            try:
+                with open(os.path.join(options.output, 'EPUB', 'songs', songobj['filename']), 'w') as sf:
+                    sf.write(st.render(songobj, songidx=context['index']))
+            except jinja2.TemplateError as T:
+                logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
+                logging.error("Context: {chords!r}".format(**songobj))
+                failures.append((songobj, T))
+        for f, err in failures:
+            print ("{title} - {artist} -> {filename}".format(**f), err.__class__, err)
 
 
     # other EPUB structures
