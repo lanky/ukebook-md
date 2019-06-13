@@ -1,0 +1,244 @@
+@charset "utf-8";
+
+body: {
+    font-family: verdana, sans-serif;
+    width: 100%;
+    font-size 0.8em;
+}
+
+a {
+    font-family: verdana, sans-serif;
+    font-style: normal;
+    font-size: 80%;
+}
+
+a.left {
+    float: left;
+    display: block;
+}
+
+a.middle {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    text-align: center;
+    display: block;
+}
+
+a.right {
+    float: right;
+    display: block;
+}
+
+h1 {
+    font-family: verdana, sans-serif;
+    font-weight: bold;
+    font=size: 0.7em;
+    text-align: center;
+    float: top
+}
+
+div.header {
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: block;
+    clear: left right;
+    font-size: 0.8em;
+}
+
+.content {
+    font-size: 1em;
+}
+
+
+/* h2 is our 'section' header */
+h2 {
+    font-family: verdana, sans-serif;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+h2:before {
+    content: "["
+}
+h2:after {
+    content: "]"
+}
+
+p {
+    font-family: verdana, sans-serif;
+    font-weight: normal;
+    padding: 0px;
+}
+
+/* Box call-outs (repeated chorus etc) */
+.box {
+    padding: 2px;
+    margin: 1px;
+    border: 2px solid black;
+    width: auto
+}
+
+div.box {
+    display: inline-block;
+    padding: 5px;
+}
+
+.box > p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.box > p:last-child {
+    margin-bottom: 0;
+}
+
+.box > h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* End box definitions*/
+
+/* chord styling - auto bold and enclose in ()*/
+.chord {
+    font-weight: bold;
+}
+.chord:before {
+    content: "("
+}
+.chord:after {
+    content: ")"
+}
+
+/* End  chord definitions*/
+
+
+/* Performance notes etc */
+.notes {
+    font-weight: bold;
+}
+
+.notes:before {
+    content: "["
+}
+
+.notes:after {
+    content: "]";
+}
+
+
+/* Backing vox, italic with () around them */
+.vox {
+    font-style: italic;
+    font-weight: normal;
+}
+.vox:before {
+    content: '(';
+}
+.vox:after {
+    content: ')';
+}
+
+div.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 10%;
+    height: 5;
+    page-break-after: always;
+    border: 3px solid #73AD21;
+}
+
+/* PRINT STYLESHEET */
+
+
+@media print {
+    h1 {
+        font-size: 14pt;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+    }
+    h2 {
+        font-size: 12pt;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    .box > h2 {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+@media print and (orientation: portrait){
+    body {
+      width: 21cm;
+      height: 29.7cm;
+      margin: 10mm 10mm 10mm 10mm;
+    }
+
+}
+
+@media print and (orientation: landscape){
+    body {
+      height: 21cm;
+      width: 29.7cm;
+      margin: 10mm 10mm 10mm 10mm;
+    }
+    div.chords {
+        position: fixed;
+        right: 0;
+        top: 0;
+        max-width: 10vmin;
+        height: 100%;
+    }
+
+}
+
+/*
+Responsive design for scaling and columns
+Allows zoom and rotation etc
+uses em-widths which are approx
+1em =~16px
+*/
+/* max-width here is approx 991px*/
+@media screen and (min-width: 62em) {
+    div.chords {
+        width: 100%;
+        height: 0;
+        max-height: 10vmin;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+
+    }
+
+    div.content {
+        /*float: left;*/
+        column-count: 2;
+        column-rule-width: 1px;
+        column-rule-style: solid;
+        column-rule-color: black;
+    }
+}
+
+@media screen and (orientation: portrait) {
+    div.chords {
+        border: 1px dotted gray;
+        min-width: 10%;
+        float: right;
+        height: 100%;
+    }
+
+    div.content {
+        float: left;
+        column-count: 1;
+        border: none;
+    }
+}
+
+
+
+
