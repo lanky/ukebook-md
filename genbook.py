@@ -59,6 +59,12 @@ def parse_commandline(argv):
         help="Do not rerender HTML pages")
     cgrp.add_argument("--no-css", action="store_true", default=False,
         help="Do not replace CSS files in destination")
+    cgrp.add_argument("--exclude", action="append",
+        help="exclude the specified paths/files from generated output")
+    cgrp.add_argument("--web", "-w", action="store_const", dest="format", const="web",
+        help="Generate output suitable for serving as a website")
+    cgrp.add_argument("--epub", "-e", action="store_const", dest="format", const="epub",
+        help="Generate output suitable for publishing as an EPUB document (default)")
 
     args = parser.parse_args(argv)
 
@@ -74,9 +80,25 @@ def parse_commandline(argv):
     else:
         print("Output directory {0.output} already exists. Will replace files in it".format(args))
 
+    if not args.format:
+        args.format = "epub"
+
+    if not args.exclude:
+        args.exclude = []
+
+
     return args
 
 def safe_name(chord):
+    """
+    Makes chordnames 'safe' (no shell special chars. Might need expanding for Windows/Mac)
+
+    Args:
+        chord(str): a chordname to manipulate
+
+    Returns:
+        str: chordname with awkward characters replaced
+    """
     # rules:
     # replace '#' with _sharp if at end,
     #                   _sharp_ if not
@@ -131,7 +153,7 @@ def create_layout(destdir, *subdirs):
             print ("Unable to create dir {0.filename} ({0.strerror}".format(E))
             sys.exit(1)
 
-def parse_songsheets(inputdirs):
+def parse_songsheets(inputdirs, exclusions=[]):
     """
     Processes songsheets, returns a context (dict) containing
     song: { id: NNN, title: X, artist: X, chords: [X],
@@ -148,6 +170,9 @@ def parse_songsheets(inputdirs):
     pbar = Bar("Analysing Content: ".ljust(20), max=len(songs))
     # This will sort items across multiple directories
     for sng, path in sorted(songs.items(), key=itemgetter(0)):
+        # skip songs/paths we have specifically excluded
+        if len(exclusions) and ( sng in exclusions or path in exclusions):
+            continue
         # index for nav documents/object ids
         prev_id = "{:03d}".format(pbar.index)
         song_id = "{:03d}".format(pbar.index + 1)
@@ -205,6 +230,7 @@ def main(options):
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
+    print(options)
     # handle output options
     if options.external:
         chord_template = "chord_ext.svg.j2"
@@ -238,10 +264,11 @@ def main(options):
 
 
     # context created by analysing input files and options:
-    context = parse_songsheets(options.input)
+    context = parse_songsheets(options.input, options.exclude)
     context['songbook'] = os.path.basename(options.output)
     context['stylesheets'] = []
     context['images'] = []
+    context['scripts'] = []
 
     with open('chords.yml') as cd:
         chord_defs = yaml.safe_load(cd)
@@ -260,40 +287,43 @@ def main(options):
 
     # now generate the chord images from templates
 
-
-
-
-    # now we need to create our EPUB layout
-    layout_dirs = ['EPUB', 'EPUB/css', 'EPUB/images', 'EPUB/songs', 'META-INF' ]
+    # now we need to create our output layout
+    # could do this in option parsing code?
+    if options.format == 'epub':
+        parent = "EPUB/"
+    if options.format == 'web':
+        parent = ""
+    coredirs = ['css', 'images', 'songs' ]
     if options.external:
-        layout_dirs.append('EPUB/chords')
-    create_layout(options.output, *layout_dirs)
+        coredirs.append('chords')
+
+    layout = [ os.path.join(parent, c) for c in coredirs ]
+    if len(parent):
+        layout.insert(0, parent)
+
+    create_layout(options.output, *layout)
     missing_chords = chordgen.generate(context['chords'], chord_defs, destdir=chord_dir, template=chord_template)
 
     # copy styles and templates in
     shutil.copy2('templates/container.xml', os.path.join(options.output, 'META-INF'))
 
-# this section should be refctored to avoid repetition.
-    if not options.no_css:
-        for stylesheet in glob('css/*.css'):
-            dest = os.path.join(options.output, 'EPUB', 'css')
+    def globcp(pattern, dest, key=None):
+        for item in glob(pattern):
             if not os.path.isdir(dest):
                 os.makedirs(dest)
-            shutil.copy2(stylesheet, dest)
-            index['stylesheets'].append(os.path.basename(stylesheet))
+            shutil.copy2(item, dest)
+            if key is not None:
+                context[key].append(os.path.basename(item))
 
-    for img in glob('images/*'):
-        dest = os.path.join(options.output, 'EPUB', 'images')
-        if not os.path.isdir(dest):
-            os.makedirs(dest)
-        shutil.copy2(img, os.path.join(options.output, 'EPUB', 'images'))
-        context['images'].append(img)
 
-    for scriptfile in glob("js/*.js"):
-        dest = os.path.join(options.output, 'EPUB', 'js')
-        if not os.path.isdir(dest):
-            os.makedirs(dest)
-        shutil.copy2(scriptfile, dest)
+# this section should be refctored to avoid repetition.
+    if not options.no_css:
+        globcp('css/*.css', os.path.join(options.output, parent, 'css'), 'stylesheets')
+
+    globcp('images/*', os.path.join(options.output, parent, 'images'), 'images')
+
+    globcp('js/*.js', os.path.join(options.output, parent, 'js'), 'scripts')
+
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), trim_blocks=True)
 
@@ -311,7 +341,7 @@ def main(options):
             songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
             songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
             try:
-                with open(os.path.join(options.output, 'EPUB', 'songs', songobj['filename']), 'w') as sf:
+                with open(os.path.join(options.output, parent, 'songs', songobj['filename']), 'w') as sf:
                     sf.write(st.render(songobj, songidx=context['index']))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
@@ -323,12 +353,12 @@ def main(options):
 
     # other EPUB structures
     template_maps = {
-        'EPUB/nav.xhtml': 'nav.xhtml.j2',
-        'EPUB/index.html': 'bookindex.j2',
-        'EPUB/package.opf': 'package.opf.j2'
+        os.path.join(parent,'nav.xhtml'): 'nav.xhtml.j2',
+        os.path.join(parent, 'index.html'): 'bookindex.j2',
+        os.path.join(parent, 'package.opf'): 'package.opf.j2'
         }
 
-    for fpath, ftemplate in Bar("EPUB Templates: ".ljust(20)).iter(template_maps.items()):
+    for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(template_maps.items()):
         t = env.get_template(ftemplate)
         with open(os.path.join(options.output, fpath), 'w') as dest:
             dest.write(t.render(context))
