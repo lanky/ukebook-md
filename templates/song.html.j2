@@ -13,7 +13,7 @@
 {% block chords %}
   {% for chord in chords %}
   <article class="chord_diagram">
-  {% include 'svg/%s.svg'|format(chord) %}
+  {% include 'svg/%s.svg'|format(chord|safe_name) %}
   </article>
   {% endfor %}
 {% endblock %}
