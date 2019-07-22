@@ -45,7 +45,7 @@ def parse_commandline(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="name of input directory", nargs="*")
-    parser.add_argument("-s", "--style", choices=['weds', 'belfast', 'karauke', 'singers'], default='weds',
+    parser.add_argument("-s", "--style", default='ukebook',
         help="output style, must correspond to a stylesheet in the css dir")
     parser.add_argument("-o", "--output", default="Karauke_{:%Y-%m-%d}".format(datetime.datetime.now()),
         help="Name of Book to build (default is Karauke_YYYY_MM_DD" )
@@ -53,6 +53,8 @@ def parse_commandline(argv):
         help="Output a report on input directory and available chords. For info only")
     parser.add_argument("--external", action="store_true", default=False,
         help="Use external SVG images (reduces duplication)")
+    parser.add_argument("--css-dir", default="css", help="Path to CSS directory")
+    parser.add_argument("--template-dir", default="templates", help="path to templates directory")
 
     cgrp = parser.add_argument_group("content control", "options to control content creation")
     cgrp.add_argument("--no-html", action="store_true", default=False,
@@ -80,13 +82,26 @@ def parse_commandline(argv):
     else:
         print("Output directory {0.output} already exists. Will replace files in it".format(args))
 
+    if args.style:
+        if not os.path.exists('{}/{}.css'.format(args.css_dir, args.style)):
+            print ("CSS stylesheet {0.style}.css doesn't exist, perhaps you need to specify --css-dir too?".format(args))
+            parser.print_help()
+            sys.exit(1)
+    args.stylesheet = '{}/{}.css'.format(args.css_dir, args.style)
+
+    if not os.path.isdir(args.css_dir):
+        print("CSS directory {0.css_dir} doesn't appear to exist".format(args))
+        sys.exit(1)
+
+    if not os.path.isdir(args.template_dir):
+        print ("Templates directory {0.template_dir} doesn't appear to exist".format(args))
+        sys.exit(1)
+
     if not args.format:
         args.format = "epub"
 
     if not args.exclude:
         args.exclude = []
-
-
     return args
 
 def safe_name(chord):
@@ -315,28 +330,25 @@ def main(options):
             if key is not None:
                 context[key].append(os.path.basename(item))
 
-
-# this section should be refctored to avoid repetition.
+# this section should be refactored to avoid repetition.
     if not options.no_css:
-        globcp('css/*.css', os.path.join(options.output, parent, 'css'), 'stylesheets')
+        globcp('{0.css_dir}/*.css'.format(opts), os.path.join(options.output, parent, 'css'), 'stylesheets')
 
     globcp('images/*', os.path.join(options.output, parent, 'images'), 'images')
 
     globcp('js/*.js', os.path.join(options.output, parent, 'js'), 'scripts')
 
-
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), trim_blocks=True)
-
+    env.filters['safe_name'] = safe_name
 
     # now let's generate our songsheets
     st = env.get_template(song_template)
 
+
     failures = []
-    # so, calc prev and next...
-    # simples, generate a quick index...
     if not options.no_html:
         for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
-            logging.info("rendering {artist} - {title} into {filename}".format(**songobj))
+            logging.info("rendering {title} into {filename}".format(**songobj))
             logging.debug("Chords: {chords!r}".format(**songobj))
             songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
             songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
