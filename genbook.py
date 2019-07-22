@@ -120,8 +120,6 @@ def safe_name(chord):
     # replace '/' with _on_
     return chord.translate({ ord('#'): '_sharp_', ord('/'): '_on_'})
 
-
-
 def render(template, context, template_dir="templates"):
     """
     Creates a custom jinja2 environment and generates the provided template - allows for customisation
@@ -259,25 +257,11 @@ def parse_songsheets(inputdirs, exclusions=[]):
     pbar.finish()
     return context
 
-
-def build_songbook():
-    # render templates for songs
-    pass
-
 def main(options):
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
-    print(options)
     # handle output options
-    if options.external:
-        chord_template = "chord_ext.svg.j2"
-        chord_dir = os.path.join(options.output, 'EPUB', 'chords')
-        song_template = "song_ext.html.j2"
-    else:
-        chord_template = "chord.svg.j2"
-        chord_dir = "templates/svg"
-        song_template = "song.html.j2"
 
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()))
     index = {'songbook': opts.output,
@@ -285,21 +269,6 @@ def main(options):
              'chordlist': set([]),
              'stylesheets': [],
              'missing': set([])}
-    # context  object looks like
-    # { chords: set(),
-    #   songs: [ { filename: str,
-    #              id: 0-padded str(int)
-    #              artist
-    #              title
-    #              chords: list/str
-    #              html: body as html
-    #            } ]
-    #   stylesheets: list, added below
-    #   songbook: output dir
-    #   images: list of filenames
-    #   sources: list of directories containing songsheets
-    # }
-
 
     # context created by analysing input files and options:
     context = parse_songsheets(options.input, options.exclude)
@@ -331,15 +300,27 @@ def main(options):
         parent = "EPUB/"
     if options.format == 'web':
         parent = ""
+
     coredirs = ['css', 'images', 'songs' ]
+
     if options.external:
         coredirs.append('chords')
+        chord_template = "chord_ext.svg.j2"
+        chord_dir = os.path.join(options.output, parent, 'chords')
+        song_template = "song_ext.html.j2"
+    else:
+        chord_template = "chord.svg.j2"
+        chord_dir = "templates/svg"
+        song_template = "song.html.j2"
 
     layout = [ os.path.join(parent, c) for c in coredirs ]
     if len(parent):
         layout.insert(0, parent)
 
+    # create target directories
     create_layout(options.output, *layout)
+
+    # generate all chord diagrams from the songbook context
     missing_chords = chordgen.generate(context['chords'], chord_defs, destdir=chord_dir, template=chord_template)
 
     # copy styles and templates in
