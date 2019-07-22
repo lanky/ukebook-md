@@ -1,0 +1,49 @@
+{% block doctype %}
+{# vim: set ts=2 sts=2 sw=2 et ci ft=jinja: #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% endblock %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  {% block head %}
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="css/{{ book_css|default('pdfprint.css') }}" />
+  {% block localstyles %}{% endblock %}
+  {% block js %}{% endblock %}
+  <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
+  {% endblock %}
+</head>
+<body>
+  {# need to iterate over our sorted songlist here and insert the main elements only (no header etc)#}
+{# generate index first? #}
+<h1 id="indexpage">{{ doc_title|default('Karauke Songbook') }} Index Page</h1>
+<div class="index">
+{% for song in songs %}
+{% if format == 'onepage' %}
+{% set target = '#title_%s'| format(song.id) %}
+{% else %}
+{% set target = song.filename %}
+{% endif %}
+<a class="indexlink" href="{{ target }}">{{ song.title }}{% if song.artist %} ({{ song.artist}}){% endif %}</a><br/>
+{% endfor %}
+</div>
+{% for song in songs %}
+<div class="header">
+  <h1 class="title" id="title_{{ song.id }}">{{ song.title|default('') }} - {{ song.artist|default('') }}</h1>
+</div>
+<div class="content">
+  {{ song.html }}
+</div>
+<div class="chords">
+  {% for chord in song.chords %}
+  <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
+  {% endfor %}
+</div>
+<div class="footer">
+  <a class="left" href="#title_{{ song.prev_id }}" accesskey="p">previous</a>
+  <a class="middle" href="#indexpage" accesskey="i">return to index</a>
+  <a class="right" href="#title_{{ song.next_id }}" accesskey="n">next</a>
+</div>
+{% endfor %}
+</body>
+</html>
+
