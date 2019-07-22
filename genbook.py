@@ -67,6 +67,8 @@ def parse_commandline(argv):
         help="Generate output suitable for serving as a website")
     cgrp.add_argument("--epub", "-e", action="store_const", dest="format", const="epub",
         help="Generate output suitable for publishing as an EPUB document (default)")
+    cgrp.add_argument("--onepage", "-p", action="store_const", dest="format", const="onepage",
+        help="Generate output suitable for publishing as a single page HTML document")
 
     args = parser.parse_args(argv)
 
@@ -202,7 +204,7 @@ def parse_song(songfile: str, songid: int = 1):
     # remove the header from our document
     hdr.decompose()
     # currently all the templates use 'html', so stick to that naming
-    songdata['html'] = content
+    songdata['html'] = ''.join([str(x) for x in soup.body.contents ])
     # every valid ukedown songsheet has a title, and possibly an artist
     songdata['title'] = title.strip()
     if artist is not None:
@@ -252,9 +254,10 @@ def parse_songsheets(inputdirs, exclusions=[]):
         context['songs'].append(sd)
         pbar.next()
         context['index'] = { s['id']: s['filename'] for s in context['songs'] }
-
+        # index is a mapping of title or title (artist) to song id
     pbar.finish()
     return context
+
 
 def main(options):
     """
@@ -275,6 +278,7 @@ def main(options):
     context['stylesheets'] = []
     context['images'] = []
     context['scripts'] = []
+    context['format'] = options.format
 
     with open('chords.yml') as cd:
         chord_defs = yaml.safe_load(cd)
@@ -299,6 +303,8 @@ def main(options):
         parent = "EPUB/"
     if options.format == 'web':
         parent = ""
+    if options.format == 'onepage':
+        parent = ""
 
     coredirs = ['css', 'images', 'songs' ]
 
@@ -312,6 +318,9 @@ def main(options):
         chord_dir = "templates/svg"
         song_template = "song.html.j2"
 
+    if options.format == 'onepage':
+        song_template = 'onepage.html.j2'
+
     layout = [ os.path.join(parent, c) for c in coredirs ]
     if len(parent):
         layout.insert(0, parent)
@@ -323,7 +332,8 @@ def main(options):
     missing_chords = chordgen.generate(context['chords'], chord_defs, destdir=chord_dir, template=chord_template)
 
     # copy styles and templates in
-    shutil.copy2('templates/container.xml', os.path.join(options.output, 'META-INF'))
+    if options.format == 'epub':
+        shutil.copy2('templates/container.xml', os.path.join(options.output, 'META-INF'))
 
     def globcp(pattern, dest, key=None):
         for item in glob(pattern):
@@ -350,6 +360,13 @@ def main(options):
 
     failures = []
     if not options.no_html:
+        if options.format == 'onepage':
+            # generate index then all the other things afterwards?
+            logging.info("rendering sonbook into single-page HTML")
+            with open(os.path.join(options.output, parent, 'index.html'), 'w') as bi:
+                bi.write(st.render(context))
+
+
         for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
             logging.info("rendering {title} into {filename}".format(**songobj))
             logging.debug("Chords: {chords!r}".format(**songobj))
@@ -367,16 +384,19 @@ def main(options):
 
 
     # other EPUB structures
-    template_maps = {
-        os.path.join(parent,'nav.xhtml'): 'nav.xhtml.j2',
-        os.path.join(parent, 'index.html'): 'bookindex.j2',
-        os.path.join(parent, 'package.opf'): 'package.opf.j2'
-        }
+    template_maps = {}
+    if options.format == 'epub':
+        template_maps[os.path.join(parent,'nav.xhtml')] = 'nav.xhtml.j2'
+        template_mps[os.path.join(parent, 'package.opf')] =  'package.opf.j2'
 
-    for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(template_maps.items()):
-        t = env.get_template(ftemplate)
-        with open(os.path.join(options.output, fpath), 'w') as dest:
-            dest.write(t.render(context))
+    if options.format != 'onepage':
+        template_maps[os.path.join(parent, 'index.html')] = 'bookindex.j2',
+
+    if len(template_maps):
+        for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(template_maps.items()):
+            t = env.get_template(ftemplate)
+            with open(os.path.join(options.output, fpath), 'w') as dest:
+                dest.write(t.render(context))
 
 if __name__ == "__main__":
     opts = parse_commandline(sys.argv[1:])
