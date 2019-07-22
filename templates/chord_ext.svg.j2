@@ -1,11 +1,46 @@
-{% extends "chord.svg.j2" %}
-{% block xmlheader %}
 <?xml version="1.0" standalone="no"?>
-<!-- vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: -->
 <?xml-stylesheet type="text/css" href="../css/chord.css"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-                     "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-{% endblock %}
-
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%"
+     height="100%"
+     viewBox="0 0 {{ svg.width }} {{ svg.height }}"
+     preserveAspectRatio="xMidYMid meet"
+     aria-label="{{ name }}"
+     role="img"
+     class="chord_diagram">
+{# our fretboard 'group', draws a grid #}
+<g class="fretboard">
+<!-- vertical lines are strings -->
+{% for s in strings -%}
+<line class="string"
+x1="{{ s }}" x2="{{ s }}" y1="{{ fboard.top }}" y2="{{ fboard.bottom }}"
+stroke="#000"
+stroke-width="1"/>
+{% endfor -%}
+<!-- horizontal lines are frets -->
+{% for f in frets -%}
+<line class="fret"
+ x1="{{ fboard.left }}" x2="{{ fboard.right }}" y1="{{ f }}" y2="{{ f }}"
+ stroke="#000"
+ stroke-width="1"/>
+{% endfor -%}
+</g>
+<g class="markers">
+{% if barre is defined -%}
+<rect x="{{ barre.left }}" y="{{ barre.top }}" width="{{barre.width}}" height="{{barre.height}}" rx="{{ radius }}" ry="{{ radius }}"/>
+{% endif -%}
+{% for f in fingers -%}
+{% if f != 0 -%}
+<circle cx="{{strings[loop.index0] }}" cy="{{ f }}" r="{{ radius }}" stroke="#000"/>
+{% endif -%}
+{% endfor -%}
+</g>
+{# labels etc #}
+<g class="chordname">
+<text x="50%" y="5" text-anchor="middle" dominant-baseline="hanging">{{ name }}</text>
+</g>
+<g class="labels">
+</g>
+</svg>
 {# vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: #}
-
+<!-- vim: set ft=jinja et ts=2 sw=2 sts=2 cindent: -->
