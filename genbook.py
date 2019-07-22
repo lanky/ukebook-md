@@ -168,10 +168,67 @@ def create_layout(destdir, *subdirs):
             print ("Unable to create dir {0.filename} ({0.strerror}".format(E))
             sys.exit(1)
 
+def parse_song(songfile: str, songid: int = 1):
+    """
+    process an individual songsheet to extract content and metadata
+
+    Args:
+        songfile(str): path to songsheet file.
+        songid(int): unique identifier
+
+    Returns:
+        songdata(dict): dictionary representation of a song for use
+                        in templating/reporting
+    """
+    songdata = {
+        'filename': re.sub(r'\.udn$', '.html', songfile),
+        'chords': [],
+        'id': '{:03d}'.format(songid),
+        'next_id': '{:03d}'.format(songid + 1),
+        'prev_id': '{:03d}'.format(songid - 1),
+        }
+    # convert ukedown to HTML - this generates a complete document, we only
+    # need the HTML <body> element, will extract that later
+    content = ukedown_to_html(songfile)
+
+    # process our HTML with BeautifulSoup4
+    soup = bs(content, features='lxml')
+
+    # title and artist are in <h1> tags.
+    hdr = soup.h1.extract()
+    try:
+        title, artist = [ i.strip() for i in hdr.text.split('-', 1) ]
+    except ValueError:
+        title = hdr.text.strip()
+        artist = None
+    # remove the header from our document
+    hdr.decompose()
+    # currently all the templates use 'html', so stick to that naming
+    songdata['html'] = content
+    # every valid ukedown songsheet has a title, and possibly an artist
+    songdata['title'] = title.strip()
+    if artist is not None:
+        songdata['artist'] = artist.strip()
+
+    # now get list of chords used in the song
+    songdata['chords'] = []
+    for c in soup.findAll('span', {'class': 'chord'}):
+        cname = c.text.split().pop(0).rstrip('*')
+        # don't add repeated chords
+        if cname not in songdata['chords']:
+            songdata['chords'].append(cname)
+    print(songdata)
+    return songdata
+
 def parse_songsheets(inputdirs, exclusions=[]):
     """
     Processes songsheets, returns a context (dict) containing
     song: { id: NNN, title: X, artist: X, chords: [X],
+
+    Args:
+        inputdirs(list): list of directories containing input files in
+                         ukedown format
+        exclusions
     """
     songs = {}
     # will merge dirs together, if a song appears twice, last match wins
@@ -188,48 +245,14 @@ def parse_songsheets(inputdirs, exclusions=[]):
         # skip songs/paths we have specifically excluded
         if len(exclusions) and ( sng in exclusions or path in exclusions):
             continue
-        # index for nav documents/object ids
-        prev_id = "{:03d}".format(pbar.index)
-        song_id = "{:03d}".format(pbar.index + 1)
-        next_id = "{:03d}".format(pbar.index + 2)
 
+        # parse the songsheet to get metadata and HTML
+        sd = parse_song(path, pbar.index)
 
-        # basename of outputfile
-        song_dest = re.sub(r'\.udn$', '.html', sng)
+        # add any chords from this song to our global chordlist
+        context['chords'].update(sd['chords'])
 
-        # convert song body to html
-        content = ukedown_to_html(path)
-        # process with bs4
-        soup = bs(content, features="lxml")
-
-        # strip out title/artist, if there is one
-        hdr = soup.h1.extract()
-        try:
-            title, artist = [ i.strip() for i in hdr.text.split('-', 1) ]
-        except ValueError:
-            title = hdr.text.strip()
-
-        hdr.decompose()
-
-        # Now process chords
-        songchords = []
-        # funky set comprehensions ftw
-        for c in soup.findAll('span', {'class': 'chord'}):
-            cname = c.text.split().pop(0).rstrip('*')
-            context['chords'].add(cname)
-            if cname not in songchords:
-                songchords.append(cname)
-        # add our chords to the global chordlist
-
-        context['songs'].append({ 'filename': song_dest,
-                                  'id': song_id,
-                                  'prev_id': prev_id,
-                                  'next_id': next_id,
-                                  'artist': artist.strip(),
-                                  'title': title.strip(),
-                                  'chords': [ safe_name(c) for c in songchords],
-                                  'html': ''.join([str(x) for x in soup.body.contents ])
-                                  })
+        context['songs'].append(sd)
         pbar.next()
         context['index'] = { s['id']: s['filename'] for s in context['songs'] }
 
