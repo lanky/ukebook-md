@@ -6,11 +6,11 @@
 <head>
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" type="text/css" href="../css/ukebook.css" />
-  <link rel="stylesheet" type="text/css" href="../css/chord.css" />
+  <link rel="stylesheet" type="text/css" href="../css/{{ book_css|default('ukebook.css') }}" />
+  <link rel="stylesheet" type="text/css" href="../css/{{ chord_css|default('chord.css') }}" />
   {% block localstyles %}{% endblock %}
   {% block js %}{% endblock %}
-  <title>{% block title %}{{ title }}{% endblock %}</title>
+  <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
   {% endblock %}
 </head>
 <body>

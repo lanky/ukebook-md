@@ -215,7 +215,6 @@ def parse_song(songfile: str, songid: int = 1):
         # don't add repeated chords
         if cname not in songdata['chords']:
             songdata['chords'].append(cname)
-    print(songdata)
     return songdata
 
 def parse_songsheets(inputdirs, exclusions=[]):
