@@ -56,8 +56,8 @@ def symbolise(name):
     replace pretend symbols with real ones (unicode ftw)
     """
     translations = {
-            'b': '&flat;',
-            '#': '&sharp;',
+            'b': '&#x266d;',
+            '#': '&#x266f;',
             }
     tt = { ord(k): v for k, v in list(translations.items()) }
 
