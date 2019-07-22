@@ -1,0 +1,142 @@
+@charset "utf-8";
+
+@page {
+    size: A4 portrait;
+    margin: 0.5cm;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: verdana, "dejavu sans", sans-serif;
+    font-size: 10pt;
+    height: 100%;
+    max-height: 100%;
+}
+
+/* content div, max 2 cols in portrait mode */
+.content {
+   column-width: 31em;
+   column-rule-width: 1px;
+   column-rule-style: solid;
+   column-rule-color: black;
+   column-count: 2;
+   -webkit-column-count: 2;
+   -moz-column-count: 2;
+   column-fill: auto;
+   max-height: 730px;
+   float: left;
+   padding-left: 5px;
+   padding-right: 5px;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+
+h1 {
+    font-size: 1.5em;
+    padding-bottom: 0.2em;
+    padding-left: 5px;
+}
+
+h2 {
+    font-size: 1em;
+    margin: 0;
+    padding: 0;
+}
+
+h2:before {
+    content: "[";
+}
+h2:after {
+    content: "]";
+}
+
+p {
+    padding: 0px;
+    margin-top: 0px;
+}
+
+.chord {
+    font-weight: bold;
+}
+
+.chord:before {
+    content: "(";
+}
+.chord:after {
+    content: ")";
+}
+
+.vox {
+    font-weight: normal;
+    font-style: italic;
+}
+
+.notes {
+    font-style: italic;
+}
+.notes:before {
+    content: "[";
+}
+.notes:after {
+    content: "]";
+}
+
+#container {
+    max-height: 100%;
+}
+
+.chord_diagram {
+    width: 42pt;
+}
+
+.chords {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-height: 100%;
+    float: right;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    max-height: 30px;
+    background: white;
+    page-break-after: always;
+}
+
+.index {
+    column-width: auto;
+    column-rule-width: 1px;
+    column-rule-style: solid;
+    column-rule-color: black;
+    overflow: auto;
+    width: auto;
+    margin: auto;
+}
+
+.chordname {
+  font-family: Verdana, Helvetica, Sans-Serif;
+  text-align: center;
+  font-weight: bold;
+}
+
+.labels {
+  font-size: 0.5em;
+  font-family: Verdana, Helvetica, Sans-Serif;
+}
