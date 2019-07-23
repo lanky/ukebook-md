@@ -1,11 +1,12 @@
 @charset "utf-8";
+@import "ukedown_elements.css";
 
 * {
     box-sizing: border-box;
 }
 
 html {
-    font-family: verdana, helvetica, sans-serif;
+    font-family: verdana, "dejavu sans", helvetica, sans-serif;
     font-size: 1.2vw;
     height: 100vh;
     max-height: 100vh;
@@ -43,32 +44,6 @@ p {
     padding: 0px;
 }
 
-.chord {
-    font-weight: bold;
-}
-
-.chord:before {
-    content: "(";
-}
-.chord:after {
-    content: ")";
-}
-
-.vox {
-    font-weight: normal;
-    font-style: italic;
-}
-
-.notes {
-    font-style: italic;
-}
-.notes:before {
-    content: "[";
-}
-.notes:after {
-    content: "]";
-}
-
 #container {
     max-height: 100vfh;
     display: grid;
@@ -90,12 +65,6 @@ p {
     max-height: 90vh;
 
 }
-
-@media screen and (min-width:600px) {
-
-}
-
-
 
 .chord_diagram {
     width: 7vmin;

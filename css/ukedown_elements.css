@@ -1,0 +1,77 @@
+@charset 'utf-8';
+
+.indexlink {
+    text-decoration: none;
+}
+
+.chord {
+    font-weight: bold;
+}
+
+.chord:before {
+    content: "(";
+}
+.chord:after {
+    content: ")";
+}
+
+.section_header {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.section_header:before {
+    content: '[';
+}
+
+.section_header:after {
+    content: ']';
+}
+
+.vox {
+    font-weight: normal;
+    font-style: italic;
+}
+
+.notes {
+    font-style: italic;
+}
+.notes:before {
+    content: "[";
+}
+.notes:after {
+    content: "]";
+}
+
+/* Box call-outs (repeated chorus etc) */
+.box {
+    padding: 2px;
+    margin: 1px;
+    border: 2px solid black;
+    width: 70%;
+    max-width: 90%;
+}
+
+div.box {
+    display: inline-block;
+    margin: 0.5em;
+    padding: 5px;
+}
+
+.box > p {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.box > p:last-child {
+    margin-bottom: 0;
+}
+
+.box > h2 {
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+/* End box definitions*/

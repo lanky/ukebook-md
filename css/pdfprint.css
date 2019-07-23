@@ -1,4 +1,5 @@
 @charset "utf-8";
+@import 'ukedown_elements.css';
 
 @page {
     size: A4 portrait;
@@ -85,71 +86,7 @@ html {
     max-height: 730px;
 }
 
-.indexlink {
-    text-decoration: none;
-}
-
-body {
-    height: 100%;
-    width: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: auto;
-}
-
-
-h1 {
-    font-size: 1.5em;
-    padding-bottom: 0.2em;
-    padding-left: 5px;
-}
-
-h2 {
-    font-size: 1em;
-    margin: 0;
-    padding: 0;
-}
-
-h2:before {
-    content: "[";
-}
-h2:after {
-    content: "]";
-}
-
-p {
-    padding: 0px;
-    margin-top: 0px;
-}
-
-.chord {
-    font-weight: bold;
-}
-
-.chord:before {
-    content: "(";
-}
-.chord:after {
-    content: ")";
-}
-
-.vox {
-    font-weight: normal;
-    font-style: italic;
-}
-
-.notes {
-    font-style: italic;
-}
-.notes:before {
-    content: "[";
-}
-.notes:after {
-    content: "]";
-}
-
-#container {
+.container {
     max-height: 100%;
     page-break-after: always;
 }
