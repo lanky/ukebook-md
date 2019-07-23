@@ -30,7 +30,10 @@ from progress.bar import Bar
 import argparse
 from glob import glob
 
-logging.basicConfig(format="%(asctime)s %(levelname)-8s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S", filename="bookmaker.log", level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s %(levelname)-8s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S",
+                    filename="bookmaker.log",
+                    level=logging.DEBUG)
 
 
 def parse_commandline(argv):
@@ -343,20 +346,22 @@ def main(options):
             if key is not None:
                 context[key].append(os.path.basename(item))
 
-# this section should be refactored to avoid repetition.
+    # this section should be refactored to avoid repetition.
     if not options.no_css:
         globcp('{0.css_dir}/*.css'.format(opts), os.path.join(options.output, parent, 'css'), 'stylesheets')
 
+    # copy any images we may be using as footers etc
     globcp('images/*', os.path.join(options.output, parent, 'images'), 'images')
 
+    # javascript
     globcp('js/*.js', os.path.join(options.output, parent, 'js'), 'scripts')
 
+    # setup our template environment
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), trim_blocks=True)
     env.filters['safe_name'] = safe_name
 
     # now let's generate our songsheets
     st = env.get_template(song_template)
-
 
     failures = []
     if not options.no_html:
