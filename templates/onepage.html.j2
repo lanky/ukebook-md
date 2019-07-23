@@ -6,7 +6,7 @@
 <head>
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" type="text/css" href="css/{{ book_css|default('pdfprint.css') }}" />
+  <link rel="stylesheet" type="text/css" href="css/{{ book_css|default('pdfprint') }}.css"/>
   {% block localstyles %}{% endblock %}
   {% block js %}{% endblock %}
   <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
@@ -18,7 +18,7 @@
 <h1 id="indexpage">{{ doc_title|default('Karauke Songbook') }} Index Page</h1>
 <div class="index">
 {% for song in songs %}
-{% if format == 'onepage' %}
+{% if link_type == 'internal' %}
 {% set target = '#title_%s'| format(song.id) %}
 {% else %}
 {% set target = song.filename %}

@@ -3,7 +3,7 @@
 {{ title|default('') }} - {{ artist|default('') }}
 {% endblock %}
 {% block songheader %}
-<h1 class="title">{{ title|default('') }} - {{ artist|default('') }}</h1>
+<h1 class="title" id="title_{{ id }}">{{ title|default('') }} - {{ artist|default('') }}</h1>
 {% endblock %}
 
 {% block content %}
