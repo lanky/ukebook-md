@@ -54,20 +54,27 @@ class HeaderProcessor(Preprocessor):
                 # append it flagged as h1 - remove any existing leading '#' symbols
                 new_lines.append('# %s' % x.lstrip('#'))
                 break
+        new_lines.extend(lines)
 
-        # now iterate over the rest and find [ header ] sections
-        for line in lines:
-            # does the line match our [ ] pattern?
-            m = self.pattern.match(line)
-            if m:
-                if m.group(1).strip().startswith('|'):
-                    new_lines.append("| ## %s" % m.group(2).strip())
-                else:
-                    new_lines.append("## %s" % m.group(2).strip())
-            else:
-                new_lines.append(line)
+#         # now iterate over the rest and find [ header ] sections
+#         for line in lines:
+#             # does the line match our [ ] pattern?
+#             m = self.pattern.match(line)
+#             if m:
+#                 if m.group(1).strip().startswith('|'):
+#                     new_lines.append("| ## %s" % m.group(2).strip())
+#                 else:
+#                     new_lines.append("## %s" % m.group(2).strip())
+#             else:
+#                 new_lines.append(line)
         return new_lines
 
+class SectionHeader(Pattern):
+    def handleMatch(self, m):
+        el = etree.Element('span')
+        el.attrib['class'] = 'section_header'
+        el.text = m.group(2)
+        return el
 
 class ChordPattern(Pattern):
     def handleMatch(self, m):
@@ -240,6 +247,7 @@ class UkeBookExtension(Extension):
         # preprocessor
         md.preprocessors.add('junk_cleaner', JunkCleaner(md), '_begin')
         md.preprocessors.add('headers', HeaderProcessor(md, patterns.HEADER), '<reference')
+        md.inlinePatterns.add('section_header', TagPattern(patterns.HEADER, md, 'span', cls='section_header'), '<reference')
         md.inlinePatterns.add('chord', TagPattern(patterns.CHORD, md, 'span', cls='chord'), '<reference')
         # add our 'other stuff in brackets' pattern AFTER chord processing
         # md.inlinePatterns.add('vox', VoxPattern(patterns.VOX, md), '>chord')

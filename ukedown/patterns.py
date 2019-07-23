@@ -23,7 +23,8 @@ NOTES = r'\{([^}]+)\}'
 BOX = r'(^|\n)\| *([^ ][^|]*)\|?$'
 
 # a line containing something encapsulated by [] characters
-HEADER = r'^(.*)\[([^]]+)\](.*)$'
+HEADER = r'\[([^]]+)\]'
 
 # pattern to pickup and "boldify" repetitions
 REPEATS = r'(x\d+)'
+
