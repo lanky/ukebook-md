@@ -2,6 +2,9 @@
 #
 "G/A":
   fingers: [2, 2, 3, 2]
+
+"G/B":
+  fingers: [4, 2, 3, 2]
 #
 # A#7,A5,A7sus4,Am9,B,B7,Bbmaj7,C#,C#m,C+,C7,Csus4,D7,Dm7,Dsus4,Eb,F,F#,F#dim,F#m,F7,Fm,Fmaj7,G#,Gm,Gm7,Gsus4,Ab,Abm
 # Csus4,D7,Dm7,Dsus4,Eb,F,F#,F#dim,F#m,F7,Fm,Fmaj7,G#,Gm,Gm7,Gsus4
@@ -253,10 +256,14 @@ F/G:
 G:
   fingers: [0, 2, 3, 2]
 
+"G/A":
+  fingers: [2, 2, 3, 2]
+
+"G/B":
+  fingers: [4, 2, 3, 2]
+
 GaddA:
   fingers: [4, 2, 3, 0]
-
-G_on_A:
 
 Gsus4:
   fingers: [0, 2, 3, 3]
