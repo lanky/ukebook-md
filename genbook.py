@@ -181,7 +181,7 @@ def parse_song(songfile: str, songid: int = 1):
                         in templating/reporting
     """
     songdata = {
-        'filename': re.sub(r'\.udn$', '.html', songfile),
+        'filename': re.sub(r'\.udn$', '.html', os.path.basename(songfile)),
         'chords': [],
         'id': '{:03d}'.format(songid),
         'next_id': '{:03d}'.format(songid + 1),
@@ -390,7 +390,7 @@ def main(options):
         template_mps[os.path.join(parent, 'package.opf')] =  'package.opf.j2'
 
     if options.format != 'onepage':
-        template_maps[os.path.join(parent, 'index.html')] = 'bookindex.j2',
+        template_maps[os.path.join(parent, 'index.html')] = 'bookindex.j2'
 
     if len(template_maps):
         for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(template_maps.items()):
