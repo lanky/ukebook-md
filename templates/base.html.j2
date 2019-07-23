@@ -6,8 +6,8 @@
 <head>
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" type="text/css" href="../css/{{ book_css|default('ukebook.css') }}" />
-  <link rel="stylesheet" type="text/css" href="../css/{{ chord_css|default('chord.css') }}" />
+  <!-- {{ book_css }} -->
+  <link rel="stylesheet" type="text/css" href="../css/{{ book_css }}.css" />
   {% block localstyles %}{% endblock %}
   {% block js %}{% endblock %}
   <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
