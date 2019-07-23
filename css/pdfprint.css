@@ -12,26 +12,45 @@
 
 html {
     font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 10pt;
+    font-size: 12px;
     height: 100%;
     max-height: 100%;
 }
 
+body {
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+h1 {
+    font-size: 1.2em;
+    padding-bottom: 0.2em;
+    padding-left: 5px;
+}
+
+p {
+    padding: 0px;
+    margin-top: 0px;
+}
+
 .header {
-    page-break-after: always;
+    page-break-before: always;
     width: 100%;
     left: 0;
 }
 
+
 /* content div, max 2 cols in portrait mode */
 .content {
-   column-width: 31em;
+   column-width: auto;
    column-rule-width: 1px;
    column-rule-style: solid;
    column-rule-color: black;
    column-count: 2;
-   -webkit-column-count: 2;
-   -moz-column-count: 2;
    column-fill: auto;
    max-height: 730px;
    float: left;
@@ -46,8 +65,10 @@ html {
     flex-direction: column;
     align-items: flex-start;
     flex-wrap: wrap;
-    max-height: 100%;
+    max-height: 840px;
     float: right;
+    width: 50px;
+    max-width: 100px;
 }
 
 .footer {
@@ -92,17 +113,16 @@ html {
 }
 
 .chord_diagram {
-    width: 42pt;
+    width: 48px;
 }
 
-svg.chord {
-    max-width: 42pt;
-}
-svg.chordname {
+.chordname {
   font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
   text-align: center;
   font-weight: bold;
-  font-size: 10pt;
+  font-size: 8px;
+  padding: 0;
+  margin: 0;
 }
 
 svg.labels {
