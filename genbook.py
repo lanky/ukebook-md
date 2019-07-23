@@ -282,6 +282,7 @@ def main(options):
     context['images'] = []
     context['scripts'] = []
     context['format'] = options.format
+    context['book_css'] = options.style
 
     with open('chords.yml') as cd:
         chord_defs = yaml.safe_load(cd)
@@ -369,17 +370,17 @@ def main(options):
             # generate index then all the other things afterwards?
             logging.info("rendering sonbook into single-page HTML")
             with open(os.path.join(options.output, parent, 'index.html'), 'w') as bi:
-                bi.write(st.render(context))
-
+                bi.write(st.render(context, link_type='internal'))
 
         for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
             logging.info("rendering {title} into {filename}".format(**songobj))
             logging.debug("Chords: {chords!r}".format(**songobj))
             songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
             songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
+            songobj['book_css'] = options.style
             try:
                 with open(os.path.join(options.output, parent, 'songs', songobj['filename']), 'w') as sf:
-                    sf.write(st.render(songobj, songidx=context['index']))
+                    sf.write(st.render(songobj, songidx=context['index'], book_css=context['book_css']))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
                 logging.error("Context: {chords!r}".format(**songobj))
