@@ -8,7 +8,7 @@ from glob import glob
 import re
 from progress.bar import Bar
 from bs4 import BeautifulSoup as bs
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 def parse_cmdline(argv):
@@ -34,10 +34,11 @@ def collate(contentdir, outputfile="output.pdf", fontcfg=FontConfiguration()):
     pages = sorted(glob('{}/songs/*.html'.format(contentdir)))
 
     print ("Rendering index")
-    documents = [ HTML(string=index).render(font_config=fontcfg) ]
+    css = [ CSS(os.path.join(contentdir, 'css', 'pdfprint.css')) ]
+    documents = [ HTML(string=index).render(stylesheets=css, font_config=fontcfg) ]
 
-    for c in Bar("Processing HTML").iter(pages):
-        thisdoc = HTML(c).render(font_config=fontcfg)
+    for pg in Bar("Processing HTML").iter(pages):
+        thisdoc = HTML(pg).render(stylesheets=css, font_config=fontcfg)
         documents.append(thisdoc)
 
     print("combining pages")
