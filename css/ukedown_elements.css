@@ -2,6 +2,8 @@
 
 .indexlink {
     text-decoration: none;
+    font-size: 0.8em;
+    color: inherit;
 }
 
 .chord {
@@ -45,17 +47,13 @@
 
 /* Box call-outs (repeated chorus etc) */
 .box {
-    padding: 2px;
-    margin: 1px;
-    border: 2px solid black;
-    width: 70%;
-    max-width: 90%;
-}
-
-div.box {
-    display: inline-block;
-    margin: 0.5em;
     padding: 5px;
+    margin: 1px;
+    border: 1.5px solid black;
+    width: auto;
+    max-width: 98%;
+    display: inline-block;
+    margin: 2px;
 }
 
 .box > p {
