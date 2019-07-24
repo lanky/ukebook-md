@@ -33,8 +33,15 @@
 <div class="content">
   {{ song.html }}
 </div>
+{% if song.chords|length > 10 %}
+<div class="overflow">
+  {% for chord in song.chords[10:] %}
+  <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
+  {% endfor %}
+</div>
+{% endif %}
 <div class="chords">
-  {% for chord in song.chords %}
+  {% for chord in song.chords[:10] %}
   <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
   {% endfor %}
 </div>

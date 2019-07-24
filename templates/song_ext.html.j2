@@ -1,9 +1,14 @@
 {% extends "song.html.j2" %}
-
+{% if chords|length > 10 %}
+  {% block overflow %}
+<div class="overflow">
+    {% for chord in chords[10:] %}
+<img class="chord_diagram" src="../chords/{{ chord|safe_name }}.svg" alt="{{ chord }}"/>
+    {% endfor %}
+  {% endblock %}
+{%endif %}
 {% block chords %}
-{% for chord in chords %}
-<img class="chord_diagram"
-   src="../chords/{{ chord|safe_name }}.svg"
-   alt="{{ chord }}"/>
-{% endfor %}
+  {% for chord in chords[:10] %}
+<img class="chord_diagram" src="../chords/{{ chord|safe_name }}.svg" alt="{{ chord }}"/>
+  {% endfor %}
 {% endblock %}
