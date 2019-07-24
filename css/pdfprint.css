@@ -12,9 +12,9 @@
 
 html {
     font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 12px;
-    height: 100%;
-    max-height: 100%;
+    font-size: 10px;
+    width: 595px;
+    height: 842px;
 }
 
 body {
@@ -47,16 +47,13 @@ p {
 /* content div, max 2 cols in portrait mode */
 .content {
    column-width: auto;
-   column-rule-width: 1px;
    column-rule-style: solid;
-   column-rule-color: black;
-   column-count: 2;
    column-fill: auto;
    max-height: 730px;
    float: left;
    padding-left: 5px;
    padding-right: 5px;
-   width: 90%;
+   width: 490px;
    max-width: 100%;
 }
 
@@ -71,22 +68,46 @@ p {
     max-width: 100px;
 }
 
+/*
+overflow at bottom in HTML - appears at top in PDF. Huh?
+.overflow {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    height: 75px;
+    width: 540px;
+    align-items: flex-end;
+}
+*/
+.overflow {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-height: 840px;
+    width: 50px;
+    align-items: flex-start;
+    float: right;
+}
+/* footer  can have SVG background images */
 .footer {
     position: fixed;
     left: 0;
+    top: 810px;
     bottom: 0;
     width: 100%;
-    height: auto;
     max-height: 30px;
     background: white;
     page-break-after: always;
-    display: none;
 }
 
-.chordname {
-  font-family: Verdana, Helvetica, Sans-Serif;
-  text-align: center;
-  font-weight: bold;
+.footer img {
+    max-height: 25px;
+    width: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+
 }
 
 .labels {
