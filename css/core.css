@@ -1,0 +1,43 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: verdana, "dejavu sans", helvetica, sans-serif;
+    font-size: 1.2vw;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1em;
+    margin: 0;
+    padding-top: 0.1em;
+    padding-bottom: 0.25em;
+}
+
+h2:before {
+    content: "[";
+}
+h2:after {
+    content: "]";
+}
+
+p {
+    padding: 0px;
+}
+
