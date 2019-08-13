@@ -368,7 +368,7 @@ def main(options):
     if not options.no_html:
         if options.format == 'onepage':
             # generate index then all the other things afterwards?
-            logging.info("rendering sonbook into single-page HTML")
+            logging.info("rendering songbook into single-page HTML")
             with open(os.path.join(options.output, parent, 'index.html'), 'w') as bi:
                 bi.write(st.render(context, link_type='internal'))
 
