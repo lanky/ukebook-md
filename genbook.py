@@ -75,9 +75,6 @@ def parse_commandline(argv):
 
     args = parser.parse_args(argv)
 
-    if len(args.input) == 0:
-        args.input = ['inputs']
-
     if not os.path.isdir(args.output):
         try:
             os.makedirs(args.output)
