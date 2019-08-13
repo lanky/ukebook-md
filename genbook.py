@@ -219,7 +219,7 @@ def parse_song(songfile: str, songid: int = 1):
             songdata['chords'].append(cname)
     return songdata
 
-def parse_songsheets(inputdirs, exclusions=[]):
+def parse_songsheets(inputs, exclusions=[]):
     """
     Processes songsheets, returns a context (dict) containing
     song: { id: NNN, title: X, artist: X, chords: [X],
@@ -231,10 +231,13 @@ def parse_songsheets(inputdirs, exclusions=[]):
     """
     songs = {}
     # will merge dirs together, if a song appears twice, last match wins
-    for idir in inputdirs:
-        if not os.path.isdir(idir):
-            continue
-        songs.update({ os.path.basename(s): os.path.realpath(s) for s in glob(os.path.join(idir, '*.udn')) })
+    for i in inputs:
+        if os.path.isdir(i):
+            # for directories, we search them for .udn files
+            songs.update({ os.path.basename(s): os.path.realpath(s) for s in glob(os.path.join(i, '*.udn')) })
+        else:
+            # for single songsheets, just the file info
+            songs.update({ os.path.basename(i): os.path.realpath(i)})
 
     context = {'chords': set([]), 'songs': []}
     # we would like to maintain chord ordering - chords are listed in the order they appear in the song.
