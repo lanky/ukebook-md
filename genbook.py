@@ -100,7 +100,7 @@ def parse_commandline(argv):
         sys.exit(1)
 
     if not args.format:
-        args.format = "epub"
+        args.format = "web"
 
     if not args.exclude:
         args.exclude = []
