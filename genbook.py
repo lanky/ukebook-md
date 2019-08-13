@@ -64,6 +64,8 @@ def parse_commandline(argv):
         help="Do not rerender HTML pages")
     cgrp.add_argument("--no-css", action="store_true", default=False,
         help="Do not replace CSS files in destination")
+    cgrp.add_argument("--no-index", action="store_true", default=False,
+        help="Do not generate an index page")
     cgrp.add_argument("--exclude", action="append",
         help="exclude the specified paths/files from generated output")
     cgrp.add_argument("--web", "-w", action="store_const", dest="format", const="web",
@@ -369,8 +371,9 @@ def main(options):
         if options.format == 'onepage':
             # generate index then all the other things afterwards?
             logging.info("rendering songbook into single-page HTML")
-            with open(os.path.join(options.output, parent, 'index.html'), 'w') as bi:
-                bi.write(st.render(context, link_type='internal'))
+            if not options.no_index:
+                with open(os.path.join(options.output, parent, 'index.html'), 'w') as bi:
+                    bi.write(st.render(context, link_type='internal'))
 
         for songobj in Bar("Rendering Songs:".ljust(20)).iter(context['songs']):
             logging.info("rendering {title} into {filename}".format(**songobj))
@@ -395,7 +398,7 @@ def main(options):
         template_maps[os.path.join(parent,'nav.xhtml')] = 'nav.xhtml.j2'
         template_maps[os.path.join(parent, 'package.opf')] =  'package.opf.j2'
 
-    if options.format != 'onepage':
+    if options.format != 'onepage' and not options.no_index:
         template_maps[os.path.join(parent, 'index.html')] = 'bookindex.j2'
 
     if len(template_maps):
