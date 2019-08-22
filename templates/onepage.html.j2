@@ -7,7 +7,17 @@
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link rel="stylesheet" type="text/css" href="css/{{ book_css|default('pdfprint') }}.css"/>
-  {% block localstyles %}{% endblock %}
+  {% block localstyles %}
+  <style type="text/css">
+  {% if not show_chords %}
+    .chord { display: none; }
+  {% endif %}
+  {% if not show_diagrams %}
+    .chords { display: none; }
+    .overflow { display: none; }
+  {% endif %}
+  </style>
+  {% endblock %}
   {% block js %}{% endblock %}
   <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
   {% endblock %}
@@ -40,11 +50,13 @@
   {% endfor %}
 </div>
 {% endif %}
+{% if not no_chord_boxes %}
 <div class="chords">
   {% for chord in song.chords[:10] %}
   <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
   {% endfor %}
 </div>
+{% endif %}
 <div class="footer">
   <a class="left" href="#title_{{ song.prev_id }}" accesskey="p">previous</a>
   <a class="middle" href="#indexpage" accesskey="i">return to index</a>
