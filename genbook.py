@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # vim: set ts=4 sts=4 sw=4 et ci ft=python foldmethod=indent:
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
