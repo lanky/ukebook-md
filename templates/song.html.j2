@@ -9,20 +9,23 @@
 {% block content %}
 {{ html }}
 {% endblock %}
-
-{% if chords|length > 10 %}
-{% block overflow %}
-  {% for chord in chords[10:] %}
+<!-- show_diagrams: {{ show_diagrams }} -->
+{% if show_diagrams %}
+  {% if chords|length > 10 %}
+    {% block overflow %}
+      {% for chord in chords[10:] %}
 <article class="chord_diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
-  {% endfor %}
-{% endblock %}
+      {% endfor %}
+    {% endblock %}
+  {% endif %}
+  {% block chords %}
+    {% for chord in chords[:10] %}
+<article class="chord_diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
+    {% endfor %}
+  {% endblock %}
+{% else %}
+<!-- show_diagrams = {{ show_diagrams }} -->
 {% endif %}
-{% block chords %}
-  {% for chord in chords[:10] %}
-<article class="chord_diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
-  {% endfor %}
-{% endblock %}
-
 {% block footer %}
   <a class="left" href="{{ _prev }}" accesskey="p">previous</a>
   <a class="middle" href="../index.html" accesskey="i">return to index</a>

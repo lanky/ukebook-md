@@ -8,7 +8,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- {{ book_css }} -->
   <link rel="stylesheet" type="text/css" href="../css/{{ book_css }}.css" />
-  {% block localstyles %}{% endblock %}
+  {% block localstyles %}
+  <style type="text/css">
+  {% if not show_chords %}
+    .chord { display: none; }
+  {% endif %}
+  {% if not show_diagrams -%}
+    .chords { display: none; }
+    .overflow { display: none; }
+  {% endif %}
+  </style>
+  {% endblock %}
   {% block js %}{% endblock %}
   <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
   {% endblock %}

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: set ts=4 sts=4 sw=4 et ci ft=python foldmethod=indent:
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
 
@@ -56,24 +57,40 @@ def parse_commandline(argv):
         help="Output a report on input directory and available chords. For info only")
     parser.add_argument("--external", action="store_true", default=False,
         help="Use external SVG images (reduces duplication)")
+    parser.add_argument("--png", action="store_true", default=False,
+        help="render SVG diagrams to PNG for portability and PDF embedding (TODO)")
     parser.add_argument("--css-dir", default="css", help="Path to CSS directory")
     parser.add_argument("--template-dir", default="templates", help="path to templates directory")
 
-    cgrp = parser.add_argument_group("content control", "options to control content creation")
+    cgrp = parser.add_argument_group("Content control", "Options to control content creation. Special cases only.")
     cgrp.add_argument("--no-html", action="store_true", default=False,
-        help="Do not rerender HTML pages")
+        help="Do not regenerate HTML pages (test CSS updates for example)")
     cgrp.add_argument("--no-css", action="store_true", default=False,
         help="Do not replace CSS files in destination")
     cgrp.add_argument("--no-index", action="store_true", default=False,
         help="Do not generate an index page")
     cgrp.add_argument("--exclude", action="append",
         help="exclude the specified paths/files from generated output")
-    cgrp.add_argument("--web", "-w", action="store_const", dest="format", const="web",
-        help="Generate output suitable for serving as a website")
-    cgrp.add_argument("--epub", "-e", action="store_const", dest="format", const="epub",
-        help="Generate output suitable for publishing as an EPUB document (default)")
-    cgrp.add_argument("--onepage", "-p", action="store_const", dest="format", const="onepage",
+    cgrp.add_argument("--hide-diagrams", action="store_true", default=False,
+        help="Do not display chord diagrams")
+    cgrp.add_argument("--hide-chords", action="store_true", default=False,
+        help="Do mot display inline chords")
+    cgrp.add_argument("--hide-notes", action="store_true", default=False,
+        help="Do mot display performance notes")
+
+    pgrp = parser.add_argument_group("Pagination and Layout", "options controlling directory structures etc")
+    pgrp.add_argument("-w", "--web", action="store_const", dest="layout", const="web",
+        help="Generate output suitable for serving as a website. This is the default.")
+    pgrp.add_argument("-e", "--epub", action="store_const", dest="layout", const="epub",
+        help="Generate output suitable for publishing as an EPUB document")
+    pgrp.add_argument("-p", "--onepage", action="store_const", dest="layout", const="onepage",
         help="Generate output suitable for publishing as a single page HTML document")
+
+    fgrp = parser.add_argument_group("Output Formats", "Predefined output formats for simplicity")
+    fgrp.add_argument("-k", "--karauke", action="store_const", dest="format",
+        const="karauke", help="Generate a karauke-style book (no chord diagrams)")
+    fgrp.add_argument("-S", "--singers", action="store_const", dest="format", const="singers",
+        help="Hide diagrams, inline chords and performance notes. Lyrics and headings only")
 
     args = parser.parse_args(argv)
 
@@ -108,6 +125,7 @@ def parse_commandline(argv):
         args.exclude = []
     return args
 
+
 def safe_name(chord):
     """
     Makes chordnames 'safe' (no shell special chars. Might need expanding for Windows/Mac)
@@ -123,6 +141,7 @@ def safe_name(chord):
     #                   _sharp_ if not
     # replace '/' with _on_
     return chord.translate({ ord('#'): '_sharp_', ord('/'): '_on_'})
+
 
 def render(template, context, template_dir="templates"):
     """
@@ -142,12 +161,14 @@ def render(template, context, template_dir="templates"):
 
     return tpl.render(context)
 
+
 def ukedown_to_html(inputfile):
 
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
     txt = fh.read()
 
     return markdown.markdown(txt, extensions=['markdown.extensions.nl2br', 'ukedown.udn'])
+
 
 def create_layout(destdir, *subdirs):
     """
@@ -169,6 +190,7 @@ def create_layout(destdir, *subdirs):
         except (IOError, OSError) as E:
             print ("Unable to create dir {0.filename} ({0.strerror}".format(E))
             sys.exit(1)
+
 
 def parse_song(songfile: str, songid: int = 1):
     """
@@ -221,6 +243,7 @@ def parse_song(songfile: str, songid: int = 1):
             songdata['chords'].append(cname)
     return songdata
 
+
 def parse_songsheets(inputs, exclusions=[]):
     """
     Processes songsheets, returns a context (dict) containing
@@ -268,14 +291,12 @@ def main(options):
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
-    # handle output options
-
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()))
-    index = {'songbook': opts.output,
-             'songlist': [],
-             'chordlist': set([]),
-             'stylesheets': [],
-             'missing': set([])}
+ #     index = {'songbook': options.output,
+ #              'songlist': [],
+ #              'chordlist': set([]),
+ #              'stylesheets': [],
+ #              'missing': set([])}
 
     # context created by analysing input files and options:
     context = parse_songsheets(options.input, options.exclude)
@@ -285,6 +306,23 @@ def main(options):
     context['scripts'] = []
     context['format'] = options.format
     context['book_css'] = options.style
+    # standard elements on a page if no options selected
+    context['show_chords'] = True
+    context['show_diagrams'] = True
+    context['show_notes'] = True
+    if options.hide_diagrams:
+        # this is effectively 'karauke band style'
+        context['show_diagrams'] = False
+    elif options.format == "singers":
+        context['show_diagrams'] = False
+        context['show_chords'] = False
+        context['show_notes'] = False
+    elif options.format == 'karauke':
+        context['show_diagrams'] = False
+    else:
+        context['show_diagrams'] = True
+        context['show_chords'] = True
+        context['show_notes'] = True
 
     with open('chords.yml') as cd:
         chord_defs = yaml.safe_load(cd)
@@ -304,12 +342,10 @@ def main(options):
     # now generate the chord images from templates
 
     # now we need to create our output layout
-    # could do this in option parsing code?
-    if options.format == 'epub':
+    # handle any additional layout definitions here
+    if options.layout == 'epub':
         parent = "EPUB/"
-    if options.format == 'web':
-        parent = ""
-    if options.format == 'onepage':
+    else:
         parent = ""
 
     coredirs = ['css', 'images', 'songs' ]
@@ -383,7 +419,12 @@ def main(options):
             songobj['book_css'] = options.style
             try:
                 with open(os.path.join(options.output, parent, 'songs', songobj['filename']), 'w') as sf:
-                    sf.write(st.render(songobj, songidx=context['index'], book_css=context['book_css']))
+                    sf.write(st.render(songobj,
+                             songidx=context['index'],
+                             book_css=context['book_css'],
+                             show_diagrams=context['show_diagrams'],
+                             show_chords=context['show_chords'],
+                             show_notes=context['show_notes']))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
                 logging.error("Context: {chords!r}".format(**songobj))
@@ -407,8 +448,7 @@ def main(options):
             with open(os.path.join(options.output, fpath), 'w') as dest:
                 dest.write(t.render(context))
 
+
 if __name__ == "__main__":
     opts = parse_commandline(sys.argv[1:])
     main(opts)
-
-
