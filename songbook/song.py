@@ -5,6 +5,8 @@ import os
 
 # object-oriented wrapper around song objects
 import codecs
+import re
+import yaml
 import markdown
 import ukedown.udn
 
@@ -35,6 +37,7 @@ class Song(object):
             anything can be customised, most attributes/properties are
             auto-generated, but we sometimes need to override them
             The following are common properties - '*' indicates optional
+            These can also be parsed out of the songsheet itself, using metadata markup
 
             title(str):      Song Title
             title_sort(str): Song title in sortable order
@@ -57,6 +60,8 @@ class Song(object):
         self._filename = src
         self.__parse(markup=self._markup)
 
+        self._meta = {}
+
         self._tags = set([])
 
 
@@ -78,14 +83,47 @@ class Song(object):
             print("Unable to open input file {0.filename} ({0.strerror}".format(E))
             self._markup = None
 
-
-    def __parse(self, markup=None):
+    def __extract_meta(self, markup=None, leader=';'):
         """
-        parses ukedown to set attrs and properties
+        parse out metadata from file,
+        This MUST be done before passing to markdown
+        There doesn't have to be any metadata - should work regardless
+
+        Args:
+            markup(str): content of file, which we will manipulate in place
+            leader(str): leader character - only process lines that begin with this
         """
         if markup is None:
             markup = self._markup
-        raw_html = markdown.markdown(markup,
+        metap = re.compile(r'^{}\s?(.*)'.format(leader), re.I|re.U)
+        metadata = []
+        content = []
+
+        for l in markup.splitlines():
+            res = metap.match(l)
+            if res is not None:
+                metadata.append(res.group(1))
+            else:
+                content.append(l)
+        self._markup = '\n'.join(content)
+        self._metadata = yaml.safe_load('\n'.join(metadata))
+
+
+    def __parse(self, **kwargs):
+        """
+        parses ukedown to set attrs and properties
+        processes metadata entries in file, converts markup content to HTML
+
+        kwargs:
+            properties to set on parsed object, usually passed in from __init__
+            These override self._metadata - so you can set them externally, add tags
+            etc willy-nilly.
+
+        """
+        # strip out any metadata entries from input
+        self.__extract_meta(self._markup)
+
+        raw_html = markdown.markdown(self._markup,
                                      extensions=[
                                        'markdown.extensions.nl2br',
                                        'ukedown.udn']
@@ -117,11 +155,13 @@ class Song(object):
         self._artist = artist
 
         # add processed body text (with headers etc converted)
-        self.body = ''.join([ str(x) for x in soup.body.contents ])
+        self.body = ''.join([ str(x) for x in soup.body.contents ]).strip()
+
+
 
     def render(self, template):
         """
-        Render HTML output
+        Render HTML output - This will need to use the jinja templates.
         """
         pass
 
@@ -130,6 +170,8 @@ class Song(object):
         Generate a PDF songsheet from this song
         """
         pass
+
+# Property-based attribute settings - some are read-only in this interface
 
     @property
     def markup(self):
@@ -188,6 +230,3 @@ class Song(object):
     def clear_tags(self):
         # remoes ALL tags
         self._tags = set([])
-
-
-
