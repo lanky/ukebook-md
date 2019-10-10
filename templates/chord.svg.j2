@@ -16,33 +16,26 @@ barres       - list of coords for barres:    [ (x, y, w), ]
 fingers      - list of coords for fingering: [ (x, y) ]
 #}
 {% block vector %}
-<svg width="100%"
-     height="100%"
-     viewBox="0 0 {{ svg.width }} {{ svg.height }}"
-     preserveAspectRatio="xMidYMid meet"
-     aria-label="{{ name }}"
-     role="img"
+<svg width="100%" height="100%" viewBox="0 0 {{ svg.width }} {{ svg.height }}"
+     preserveAspectRatio="xMidYMid meet" aria-label="{{ name }}" role="img"
      class="chord_diagram">
 {# our fretboard 'group', draws a grid #}
 <g class="fretboard">
 <!-- vertical lines are strings -->
 {% for s in strings -%}
-<line class="string"
-x1="{{ s }}" x2="{{ s }}" y1="{{ fboard.top }}" y2="{{ fboard.bottom }}"
-stroke="#000"
-stroke-width="1"/>
+<line x1="{{ s }}" x2="{{ s }}" y1="{{ fboard.top }}" y2="{{ fboard.bottom }}"
+      stroke="#000" stroke-width="1" class="string"/>
 {% endfor -%}
 <!-- horizontal lines are frets -->
 {% for f in frets -%}
-<line class="fret"
- x1="{{ fboard.left }}" x2="{{ fboard.right }}" y1="{{ f }}" y2="{{ f }}"
- stroke="#000"
- stroke-width="1"/>
+<line x1="{{ fboard.left }}" x2="{{ fboard.right }}" y1="{{ f }}" y2="{{ f }}"
+      stroke="#000" stroke-width="1" class="fret" />
 {% endfor -%}
 </g>
 <g class="markers">
 {% if barre is defined -%}
-<rect x="{{ barre.left }}" y="{{ barre.top }}" width="{{barre.width}}" height="{{barre.height}}" rx="{{ radius }}" ry="{{ radius }}"/>
+<rect x="{{ barre.left }}" y="{{ barre.top }}" width="{{barre.width}}"
+      height="{{barre.height}}" rx="{{ radius }}" ry="{{ radius }}"/>
 {% endif -%}
 {% for f in fingers -%}
 {% if f != 0 -%}
