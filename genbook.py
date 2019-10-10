@@ -310,6 +310,7 @@ def main(options):
     context['show_chords'] = True
     context['show_diagrams'] = True
     context['show_notes'] = True
+    context['ext_chords'] = options.external
     if options.hide_diagrams:
         # this is effectively 'karauke band style'
         context['show_diagrams'] = False
@@ -354,7 +355,7 @@ def main(options):
         coredirs.append('chords')
         chord_template = "chord_ext.svg.j2"
         chord_dir = os.path.join(options.output, parent, 'chords')
-        song_template = "song_ext.html.j2"
+        song_template = "song.html.j2"
     else:
         chord_template = "chord.svg.j2"
         chord_dir = "templates/svg"
@@ -424,6 +425,7 @@ def main(options):
                              book_css=context['book_css'],
                              show_diagrams=context['show_diagrams'],
                              show_chords=context['show_chords'],
+                             ext_chords=context['ext_chords'],
                              show_notes=context['show_notes']))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
