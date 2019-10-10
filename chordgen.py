@@ -228,8 +228,8 @@ def generate(chordlist, definitions, destdir="chords", template="external_chord.
 
     print ("progress")
     pbar = Bar("{:20}".format("Rendering Chords:"), max=len(chordlist))
-    try:
-        for chordname in pbar.iter(chordlist):
+    for chordname in pbar.iter(chordlist):
+        try:
             if chordname in definitions:
                 ch = definitions.get(chordname)
             else:
@@ -248,9 +248,9 @@ def generate(chordlist, definitions, destdir="chords", template="external_chord.
 
             with codecs.open("{}/{}.svg".format(destdir, chordfile), mode='w', encoding="utf-8") as output:
                 output.write(tpl.render(merge_ctx(cfg, **ch)))
-    except:
-        print("Failed to render {}".format(chordname))
-        raise
+        except:
+            print("Failed to render {}".format(chordname))
+            raise
 
     return missing
 
