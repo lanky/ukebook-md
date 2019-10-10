@@ -397,7 +397,7 @@ def main(options):
     globcp('js/*.js', os.path.join(options.output, parent, 'js'), 'scripts')
 
     # setup our template environment
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), trim_blocks=True)
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), lstrip_blocks=True, trim_blocks=True)
     env.filters['safe_name'] = safe_name
 
     # now let's generate our songsheets
