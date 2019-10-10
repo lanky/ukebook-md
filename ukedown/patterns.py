@@ -13,7 +13,8 @@ DASHES = r'\u2010\u2011\u2012\u2013\u2014'
 HYPHENS = r'\s*(?:-|\u2011|\u2013|\u2014|\u2015)\s*'
 
 # backing vox - anything in () that is not a chord.
-VOX = r'\(([\w\s]+)\)'
+VOX = r'\(([\'\w\s]+)\)'
+# VOX = r'\(([^\)]+)\)'
 
 # band/performance instructions - use a different delimiter - {}
 NOTES = r'\{([^}]+)\}'
