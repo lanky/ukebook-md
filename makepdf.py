@@ -38,8 +38,11 @@ def collate(contentdir, outputfile="output.pdf", fontcfg=FontConfiguration()):
     documents = [ HTML(string=index).render(stylesheets=css, font_config=fontcfg) ]
 
     for pg in Bar("Processing HTML").iter(pages):
-        thisdoc = HTML(pg).render(stylesheets=css, font_config=fontcfg)
-        documents.append(thisdoc)
+        try:
+            thisdoc = HTML(pg).render(stylesheets=css, font_config=fontcfg)
+            documents.append(thisdoc)
+        except:
+            print ("Failed to render {}".format(pg))
 
     print("combining pages")
     all_pages = [ page for d in documents for page in d.pages ]
