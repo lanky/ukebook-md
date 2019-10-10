@@ -12,7 +12,7 @@
 
 html {
     font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     width: 595px;
     height: 842px;
 }
@@ -150,3 +150,22 @@ svg.labels {
   font-size: 0.5em;
   font-family: Verdana, Helvetica, Sans-Serif;
 }
+
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: landscape) {
+    html {
+        width: 842px;
+        height: 595px;
+    }
+    .content {
+        column-count: 2;
+        /* A4 is 842 x 595 in landscape */
+        min-width: 740px;
+        max-width: 580px;
+        min-height: 490px;
+        max-height: 550px;
+    }
+}
+
