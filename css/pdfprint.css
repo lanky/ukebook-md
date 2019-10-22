@@ -4,7 +4,23 @@
 @page {
     size: A4 portrait;
     margin: 0.5cm;
+    counter-increment: page;
+
+    @bottom-right-corner {
+        content: counter(page) "/" counter(pages);
+    }
+
+    @bottom-center {
+        content: "Karauke Songbook"
+    }
 }
+
+@page :left {
+    @bottom-left-corner {
+        content: counter(page) "/" counter(pages);
+    }
+}
+
 
 * {
     box-sizing: border-box;
@@ -12,7 +28,7 @@
 
 html {
     font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 11px;
+    font-size: 10pt;
     width: 595px;
     height: 842px;
 }
@@ -29,12 +45,16 @@ body {
 h1 {
     font-size: 1.2em;
     padding-bottom: 0.2em;
+    padding-top: 0.2em;
     padding-left: 5px;
+
+    margin: 0;
 }
 
 p {
     padding: 0px;
     margin-top: 0px;
+    margin-bottom: 0.4em;
 }
 
 .header {
@@ -57,6 +77,7 @@ p {
    max-width: 100%;
 }
 
+/* div on the right of the page for chord diagrams, if we want any*/
 .chords {
     display: flex;
     flex-direction: column;
@@ -68,17 +89,7 @@ p {
     max-width: 100px;
 }
 
-/*
-overflow at bottom in HTML - appears at top in PDF. Huh?
-.overflow {
-    display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: wrap;
-    height: 75px;
-    width: 540px;
-    align-items: flex-end;
-}
-*/
+/* overflow is a second div for extra chords (10+), appears to the left of the normal chord div */
 .overflow {
     display: flex;
     flex-direction: column;
@@ -92,7 +103,6 @@ overflow at bottom in HTML - appears at top in PDF. Huh?
 .footer {
     position: fixed;
     left: 0;
-    top: 810px;
     bottom: 0;
     width: 100%;
     max-height: 30px;
@@ -100,6 +110,7 @@ overflow at bottom in HTML - appears at top in PDF. Huh?
     page-break-after: always;
 }
 
+/* fixed position at bottom of page for branding images, links etc*/
 .footer img {
     max-height: 25px;
     width: auto;
@@ -150,22 +161,3 @@ svg.labels {
   font-size: 0.5em;
   font-family: Verdana, Helvetica, Sans-Serif;
 }
-
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: landscape) {
-    html {
-        width: 842px;
-        height: 595px;
-    }
-    .content {
-        column-count: 2;
-        /* A4 is 842 x 595 in landscape */
-        min-width: 740px;
-        max-width: 580px;
-        min-height: 490px;
-        max-height: 550px;
-    }
-}
-
