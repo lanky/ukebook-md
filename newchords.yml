@@ -1,0 +1,28 @@
+---
+# new-style chord configs
+Em_after_G:
+  title: Em (after G)
+  positions: "x232"
+  fingers: "-132"
+  # let us not forget that strings are 0-indexed
+  extras:
+    - string: 1
+      fret: 4
+      finger: 4
+
+Cm_barre:
+  title: Cm (barre)
+  barre: 3
+  positions: 5333
+  fingers: 3111
+  fret_range: [0, 5]
+
+C_at_7:
+  title: C (7th fret)
+  fingers: [0, 1, 3, 2]
+  positions: [0, 7, 11, 10]
+
+C_at_7_moveable:
+  title: C (7fr)
+  fingers: [0, 1, 3, 2 ]
+  positions: [x, 7, 8, 7]

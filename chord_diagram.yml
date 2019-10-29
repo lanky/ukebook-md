@@ -1,0 +1,41 @@
+drawing:
+    background_color:
+    font_color: black
+    font_family: Verdana
+    # font-size for markers and labels
+    font_size: 16
+    height: 480
+    width: 270
+    spacing: 30
+nut:
+    color: black
+    size: 10
+fret:
+    color: black
+    size: 4
+inlays:
+    color: black
+    radius: 2
+string:
+    # style for string lines
+    color: black
+    size: 4
+    # colour of markers for open and muted/unplayed strings
+    muted_font_color: black
+    open_font_color: black
+    # things we could support
+    # label_font_family
+    # label_font_size
+marker:
+    border_color: black
+    color: black
+    font_color: white
+    radius: 18
+    stroke_width: 2
+    extra_color: red
+title:
+    font_color: black
+    font_family: Verdana
+    font_size: 24
+fret_label:
+    width: 28
