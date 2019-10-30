@@ -8,7 +8,9 @@ import codecs
 import re
 import yaml
 import markdown
+import hashlib
 import ukedown.udn
+import datetime
 
 from bs4 import BeautifulSoup as bs
 
@@ -59,11 +61,10 @@ class Song(object):
         # does nothing yet
         self._filename = src
         self.__parse(markup=self._markup)
-
+        # arbitrary metadata, some of which will have meaning
         self._meta = {}
-
+        # tags are separate
         self._tags = set([])
-
 
         # update with any parameters...
         for key, val in  kwargs.items():
@@ -72,6 +73,8 @@ class Song(object):
         if self._filename is None:
             self._filename = ('{0.title}_-_{0.artist}'.format(self)).lower()
 
+        self._checksum = 'None'
+
     def __load(self, sourcefile):
         """
         utlity function to handle loading from a file-like object
@@ -79,6 +82,12 @@ class Song(object):
         try:
             with codecs.open(sourcefile, mode='r', encoding='utf-8') as src:
                 self._markup = src.read()
+                shasum = hashlib.sha256()
+                shasum.update(self._markup.encode('utf-8'))
+                self._checksum = shasum.hexdigest()
+                print(self.checksum)
+                self.load_time = datetime.datetime.now()
+
         except (IOError, OSError) as E:
             print("Unable to open input file {0.filename} ({0.strerror}".format(E))
             self._markup = None
@@ -230,3 +239,19 @@ class Song(object):
     def clear_tags(self):
         # remoes ALL tags
         self._tags = set([])
+
+    @property
+    def checksum(self):
+        return self._checksum
+
+    @property
+    def meta(self):
+        return self._metadata
+
+    @meta.setter
+    def meta(self, data):
+        # actually updates, not replaces
+        try:
+            self._metadata.update(data)
+        except:
+            raise StandardError("data must be a dict")
