@@ -53,6 +53,8 @@ def parse_commandline(argv):
         help="output style, must correspond to a stylesheet in the css dir")
     parser.add_argument("-o", "--output", default="Karauke_{:%Y-%m-%d}".format(datetime.datetime.now()),
         help="Name of Book to build (default is Karauke_YYYY_MM_DD" )
+    parser.add_argument("-t", "--title", default="Karauke Songbook",
+        help="Title of output document (footers and Index page title)")
     parser.add_argument("--report", action="store_true", default=False,
         help="Output a report on input directory and available chords. For info only")
     parser.add_argument("--external", action="store_true", default=False,
@@ -162,13 +164,41 @@ def render(template, context, template_dir="templates"):
     return tpl.render(context)
 
 
+def parse_meta(markup, leader=';'):
+    """
+    parse out metadata from file,
+    This MUST be done before passing to markdown
+    There doesn't have to be any metadata - should work regardless
+
+    Args:
+        markup(str): content of file, which we will manipulate in place
+        leader(str): leader character - only process lines that begin with this
+    """
+    metap = re.compile(r'^{}\s?(.*)'.format(leader), re.I|re.U)
+    metadata = []
+    content = []
+
+    for l in markup.splitlines():
+        res = metap.match(l)
+        if res is not None:
+            metadata.append(res.group(1))
+        else:
+            content.append(l)
+    _markup = '\n'.join(content)
+    _metadata = yaml.safe_load('\n'.join(metadata))
+
+    return _metadata, _markup
+
 def ukedown_to_html(inputfile):
-
+    """
+    Process a file, produce HTML via ukedown.
+    """
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
-    txt = fh.read()
+    raw_markup = fh.read()
 
-    return markdown.markdown(txt, extensions=['markdown.extensions.nl2br', 'ukedown.udn'])
+    meta, markup = parse_meta(raw_markup, leader=';')
 
+    return markdown.markdown(markup, extensions=['markdown.extensions.nl2br', 'ukedown.udn']), meta
 
 def create_layout(destdir, *subdirs):
     """
@@ -191,7 +221,6 @@ def create_layout(destdir, *subdirs):
             print ("Unable to create dir {0.filename} ({0.strerror}".format(E))
             sys.exit(1)
 
-
 def parse_song(songfile: str, songid: int = 1):
     """
     process an individual songsheet to extract content and metadata
@@ -210,10 +239,13 @@ def parse_song(songfile: str, songid: int = 1):
         'id': '{:03d}'.format(songid),
         'next_id': '{:03d}'.format(songid + 1),
         'prev_id': '{:03d}'.format(songid - 1),
+        'meta': {},
         }
     # convert ukedown to HTML - this generates a complete document, we only
     # need the HTML <body> element, will extract that later
-    content = ukedown_to_html(songfile)
+    content, meta = ukedown_to_html(songfile)
+    if meta is not None:
+        songdata['meta'].update(meta)
 
     # process our HTML with BeautifulSoup4
     soup = bs(content, features='lxml')
@@ -228,7 +260,7 @@ def parse_song(songfile: str, songid: int = 1):
     # remove the header from our document
     hdr.decompose()
     # currently all the templates use 'html', so stick to that naming
-    songdata['html'] = ''.join([str(x) for x in soup.body.contents ])
+    songdata['html'] = ''.join([str(x) for x in soup.body.contents ]).strip()
     # every valid ukedown songsheet has a title, and possibly an artist
     songdata['title'] = title.strip()
     if artist is not None:
@@ -418,15 +450,20 @@ def main(options):
             songobj['_prev'] = context['index'].get(songobj['prev_id'], "../index.html")
             songobj['_next'] = context['index'].get(songobj['next_id'], "../index.html")
             songobj['book_css'] = options.style
+            with codecs.open('/tmp/{filename}.yml'.format(**songobj), mode='w', encoding='utf-8') as dumpfile:
+                dumpfile.write(yaml.safe_dump(songobj))
             try:
                 with open(os.path.join(options.output, parent, 'songs', songobj['filename']), 'w') as sf:
-                    sf.write(st.render(songobj,
+                    content = bs(st.render(songobj,
                              songidx=context['index'],
+                             songbook=context['songbook'],
                              book_css=context['book_css'],
                              show_diagrams=context['show_diagrams'],
                              show_chords=context['show_chords'],
                              ext_chords=context['ext_chords'],
-                             show_notes=context['show_notes']))
+                             show_notes=context['show_notes'],
+                             ), features='lxml')
+                    sf.write(content.prettify(formatter="html5"))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
                 logging.error("Context: {chords!r}".format(**songobj))
