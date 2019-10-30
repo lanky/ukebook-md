@@ -1,8 +1,12 @@
 {% extends "base.html.j2" %}
-{% block title %}{{ Songbook }}{% endblock %}
+{% block title %}{{ songbook }}{% endblock %}
 
 {% block localstyles %}
 <link rel="stylesheet" type="text/css" href="css/index.css"/>
+{% endblock %}
+<h1 class="title" id="title_{{ 000 }}">{{ songbook }} Index</h1>
+{% block songheader %}
+
 {% endblock %}
 
 {% block content %}
