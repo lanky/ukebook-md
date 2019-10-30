@@ -1,0 +1,57 @@
+{% extends "base.html.j2" %}
+
+{% block title %}
+{{ title|default('') }} - {{ artist|default('') }}
+{% endblock %}
+
+{% block songheader %}
+<h1 class="title" id="title_{{ id }}">{{ title|default('') }} - {{ artist|default('') }}</h1>
+{% endblock %}
+
+{% block content %}
+{{ html }}
+{% endblock %}
+
+<!-- show_diagrams: {{ show_diagrams }} -->
+{% if show_diagrams %}
+<!-- show_diagrams = {{ show_diagrams|string }} -->
+  {%- if chords|length > 10 %}
+    {%- block overflow %}
+<div class="overflow">
+<!-- external = {{ ext_chords|string }}-->
+      {% for chord in chords[10:] %}
+        {% if ext_chords %}
+  <img class="chord_diagram" src="../chords/{{ chord|safe_name }}.svg" alt="{{ chord }}"/>
+        {% else %}
+  <article class="chord_diagram">
+{% include 'svg/%s.svg'|format(chord|safe_name) %}
+  </article>
+        {% endif %}
+      {% endfor %}
+</div>
+    {% endblock %}
+  {% endif %}
+
+  {% block chords %}
+<div class="chords">
+    {% for chord in chords[:10] %}
+      {% if ext_chords %}
+  <img class="chord_diagram" src="../chords/{{ chord|safe_name }}.svg" alt="{{ chord }}"/>
+      {% else %}
+  <article class="chord_diagram">
+{% include 'svg/%s.svg'|format(chord|safe_name) %}
+  </article>
+      {% endif %}
+    {% endfor %}
+</div>
+  {% endblock %}
+
+{% else %}
+<!-- show_diagrams = {{ show_diagrams }} -->
+{% endif %}
+
+{% block footer %}
+  <a class="left" href="{{ _prev }}" accesskey="p">previous</a>
+  <a class="middle" href="../index.html" accesskey="i">return to index</a>
+  <a class="right" href="{{ _next }}" accesskey="n">next</a>
+{% endblock %}
