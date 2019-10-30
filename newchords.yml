@@ -11,18 +11,29 @@ Em_after_G:
       finger: 4
 
 Cm_barre:
-  title: Cm (barre)
+  title: Cm
   barre: 3
   positions: 5333
   fingers: 3111
-  fret_range: [0, 5]
+# fret_range: [0, 5]
 
 C_at_7:
-  title: C (7th fret)
+  title: C
   fingers: [0, 1, 3, 2]
-  positions: [0, 7, 11, 10]
+  positions: [0, 7, 8, 7]
+  fret_range: [6, 10]
 
 C_at_7_moveable:
-  title: C (7fr)
+  title: C
   fingers: [0, 1, 3, 2 ]
   positions: [x, 7, 8, 7]
+
+G_to_Gsus4:
+  title: Gsus4 (after G)
+  positions: [ 0, 2, 3, 2 ]
+  fingers: [-, 1, 3, 2]
+  # let us not forget that strings are 0-indexed
+  extras:
+    - string: 3
+      fret: 3
+      finger: 4
