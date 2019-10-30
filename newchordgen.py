@@ -16,7 +16,7 @@ def parse_cmdline(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("chordname", nargs="?",
         help="names of chords (from provided config) to generate. Can be a shell-style wildcard (e.g. Em* for all chords starting with Em)")
-    parser.add_argument("-c", "--config", default="chords.yml",
+    parser.add_argument("-c", "--config", default="newchords.yml",
         help="path to YAML-format config file defining chord layouts")
     parser.add_argument("-s", "--style", default="chord_diagram.yml",
         help="path to YAML-format config file defining fonts etc for resulting diagrams")
@@ -50,8 +50,9 @@ class MultiFingerChord(diagram.UkuleleChord):
         super().__init__(**superargs)
 
         fretted_positions = list(filter(lambda pos: isinstance(pos, int), self.positions))
-        maxfret = max(fretted_positions)
-        minfret = min(fretted_positions)
+        self.maxfret = max(fretted_positions)
+        self.minfret = min([p for p in fretted_positions if p > 0 ])
+        print("min: {} max: {}".format(self.minfret, self.maxfret))
 
         # our additional key for extra fingers
         self.extras = kwargs.get('extras')
@@ -70,9 +71,9 @@ class MultiFingerChord(diagram.UkuleleChord):
             self.fretspec = None
         elif not fspec[0] < fspec[1]:
             self.fretspec = None
-        elif minfret - fspec[0] > 5:
+        elif self.minfret - fspec[0] > 5:
             self.fretspec = None
-        elif maxfret > fspec[1]:
+        elif self.maxfret > fspec[1]:
             print("highest fret is outside fret range")
             self.fretspec = None
         else:
@@ -80,26 +81,38 @@ class MultiFingerChord(diagram.UkuleleChord):
 
 
     def get_fret_range(self):
+        """
+        Work out how many frets to draw and which one to start at
+        we want 5 frets, starting at 0 or self.minfret - 1
+        """
+        # have we overridden this in config?
         if self.fretspec is not None:
-            return self.fretspec
-        fretted_positions = list(filter(lambda pos: isinstance(pos, int), self.positions))
-        if max(fretted_positions) < 5:
-            first_fret = 0
+            fr = self.fretspec
+        # else, calculate based on frets used
+        chord_width = self.maxfret - self.minfret
+        # the chord fits in the first 5 frets
+        if self.maxfret <= 5:
+            fr = (0, 5)
+        elif chord_width <= 4:
+            fr = (self.minfret - 1, self.minfret + 3)
         else:
-            first_fret = min(filter(lambda pos: pos != 0, fretted_positions))
-        return (first_fret, first_fret + 4)
+            fr = (self.minfret, self.maxfret)
+        print("{0} fret range: {1}-{2}".format(self.title, *fr))
+        return fr
 
 
     def draw(self):
         super(MultiFingerChord, self).draw()
-        print(yaml.safe_dump(dict(self.fretboard.layout)))
         if self.extras is not None:
             for e in self.extras:
                 self.fretboard.add_marker(
                         string=e['string'],
                         fret=e['fret'],
-                        label=e['finger']
+                        color=e.get('color'),
+                        label=e['finger'],
+                        font_color=e.get('font_color')
                         )
+
 
 # used to test merging. Can probably be removed
 def dump(adict):
@@ -142,6 +155,7 @@ def main():
     for chordname, cfg in chord_defs.items():
         if options.chordname and not fnmatch.fnmatch(chordname, options.chordname):
             continue
+        print(chordname)
         chord = MultiFingerChord(style=chord_style, **cfg)
         chord.save('{}/{}.svg'.format(options.output, safe_name(chordname)))
 
