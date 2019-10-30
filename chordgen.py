@@ -35,7 +35,8 @@ def parse_cmdline(argv):
 
     parser.add_argument("chord", nargs="*", help="chord names (from configuration) to render")
     parser.add_argument("-c", "--chordlist", default="chords.yml", help="chord configuration file (YAML)")
-    parser.add_argument("-t", "--template", default="external_chord.svg.j2", help="chord template (jinja2( - used for rendering chords as SVG")
+    parser.add_argument("-t", "--template", default="external_chord.svg.j2",
+        help="chord template (jinja2) - used for rendering chords as SVG")
     parser.add_argument("-d", "--destdir", default="chords", help="output directory for chord (SVG) files")
 
     bgrp = parser.add_argument_group("Fretboard Layout", "Customise frets, strings and spacing")
@@ -263,7 +264,7 @@ if __name__ == "__main__":
 
     if not os.path.isdir(opts.destdir):
         os.makedirs(opts.destdir)
-    chorddefs = yaml.load(codecs.open(opts.chordlist, mode="r", encoding="utf-8"))
+    chorddefs = yaml.safe_load(codecs.open(opts.chordlist, mode="r", encoding="utf-8"))
 
     if not opts.chord:
         opts.chord = chorddefs.keys()
