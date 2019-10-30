@@ -6,21 +6,29 @@
 <head>
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <!-- {{ book_css }} -->
+  <!-- {{ songbook.stylesheet }} -->
   <link rel="stylesheet" type="text/css" href="../css/{{ book_css }}.css" />
   {% block localstyles %}
   <style type="text/css">
   {% if not show_chords %}
     .chord { display: none; }
   {% endif %}
+  {% if not show_notes %}
+    .notes { display: none; }
+  {% endif %}
   {% if not show_diagrams -%}
     .chords { display: none; }
     .overflow { display: none; }
   {% endif %}
+  {% if song.meta.font_size %}
+  html {
+      font-size: {{ meta.font_size }};
+  }
+  {% endif %}
   </style>
   {% endblock %}
   {% block js %}{% endblock %}
-  <title>{% block title %}{{ doc_title|default('Karauke Songbook') }}{% endblock %}</title>
+  <title>{% block title %}{{ songbook.title|default('Songbook') }}{% endblock %}</title>
   {% endblock %}
 </head>
 <body>
