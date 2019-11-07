@@ -463,7 +463,7 @@ def main(options):
                              ext_chords=context['ext_chords'],
                              show_notes=context['show_notes'],
                              ), features='lxml')
-                    sf.write(content.prettify(formatter="html5"))
+                    sf.write(str(content))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
                 logging.error("Context: {chords!r}".format(**songobj))
