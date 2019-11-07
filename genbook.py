@@ -454,15 +454,16 @@ def main(options):
                 dumpfile.write(yaml.safe_dump(songobj))
             try:
                 with open(os.path.join(options.output, parent, 'songs', songobj['filename']), 'w') as sf:
-                    content = bs(st.render(songobj,
-                             songidx=context['index'],
-                             songbook=context['songbook'],
-                             book_css=context['book_css'],
-                             show_diagrams=context['show_diagrams'],
-                             show_chords=context['show_chords'],
-                             ext_chords=context['ext_chords'],
-                             show_notes=context['show_notes'],
-                             ), features='lxml')
+                    content = bs(st.render(
+                            song=songobj,
+                            songidx=context['index'],
+                            songbook=context['songbook'],
+                            book_css=context['book_css'],
+                            show_diagrams=context['show_diagrams'],
+                            show_chords=context['show_chords'],
+                            ext_chords=context['ext_chords'],
+                            show_notes=context['show_notes'],
+                            ), features='lxml')
                     sf.write(str(content))
             except jinja2.TemplateError as T:
                 logging.exception("Failed to render template for {title} - {artist}".format(**songobj))
