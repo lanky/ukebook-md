@@ -2,7 +2,7 @@
 
 .indexlink {
     text-decoration: none;
-    font-size: 0.8em;
+    font-size: 0.9em;
     color: inherit;
 }
 
@@ -20,9 +20,9 @@
 .section_header {
     font-weight: bold;
     font-size: 1em;
-    margin-top: 3px;
-    margin-bottom: 3px;
-
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.5em;
 }
 
 .section_header:before {
@@ -48,6 +48,7 @@
 
 .notes {
     font-style: italic;
+    font-weight: bold;
 }
 .notes:before {
     content: "[";
@@ -56,25 +57,32 @@
     content: "]";
 }
 
+p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 /* Box call-outs (repeated chorus etc) */
 .box {
-    padding: 3px;
+    padding: 5px;
     padding-top: 0;
-    margin: 1px;
+    padding-bottom:0;
     border-left: 2px solid black;
     width: auto;
     max-width: 98%;
-    display: inline-block;
     margin: 2px;
+    margin-bottom: 0.5em;
 }
 
 .box > p {
     margin-top: 0;
-    margin-bottom: 1em;
+    margin-bottom: 0;
+    margin-left: 5px;
 }
 
 .box > p:last-child {
     margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .box > h2, .section_header {
