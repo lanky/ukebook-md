@@ -21,7 +21,7 @@
     .overflow { display: none; }
   {% endif %}
   {% if song.meta.font_size %}
-  html {
+  .content {
       font-size: {{ song.meta.font_size }};
   }
   {% endif %}
@@ -35,9 +35,9 @@
   <div class="header">{% block songheader %}{% endblock %}</div>
   <div class="content">{% block content %}{% endblock %}</div>
   {% if show_diagrams %}
-  {% if song.chords|length  > 10 %}
+    {% if song.chords|length  > 10 %}
   <div class="overflow">{% block overflow %}{% endblock %}</div>
-  {% endif %}
+    {% endif %}
   <div class="chords">{% block chords %}{% endblock %}</div>
   {% endif %}
   <div class="footer">{% block footer %}{% endblock %}</div>
