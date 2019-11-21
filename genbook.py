@@ -79,6 +79,11 @@ def parse_commandline(argv):
         help="Do mot display inline chords")
     cgrp.add_argument("--hide-notes", action="store_true", default=False,
         help="Do mot display performance notes")
+    cgrp.add_argument("--refresh", "--update", dest="refresh", action="store_true", default=True,
+        help="only update files changed since the last build. If the output directory exists, this is the default behaviour")
+    cgrp.add_argument("--clean", dest="refresh", action="store_true", default=False,
+        help="remove all files from output dir before building (overrides --update)")
+
 
     pgrp = parser.add_argument_group("Pagination and Layout", "options controlling directory structures etc")
     pgrp.add_argument("-w", "--web", action="store_const", dest="layout", const="web",
@@ -189,14 +194,19 @@ def parse_meta(markup, leader=';'):
 
     return _metadata, _markup
 
+
 def ukedown_to_html(inputfile):
     """
     Process a file, produce HTML via ukedown.
     """
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
     raw_markup = fh.read()
+    mtime = os.path.getmtime(inputfile)
 
     meta, markup = parse_meta(raw_markup, leader=';')
+    if meta is None:
+        meta = {}
+    meta['last_modified'] = int(mtime)
 
     return markdown.markdown(markup, extensions=['markdown.extensions.nl2br', 'ukedown.udn']), meta
 
@@ -221,7 +231,7 @@ def create_layout(destdir, *subdirs):
             print ("Unable to create dir {0.filename} ({0.strerror}".format(E))
             sys.exit(1)
 
-def parse_song(songfile: str, songid: int = 1):
+def parse_song(songfile: str, songid: int = 1) -> dict:
     """
     process an individual songsheet to extract content and metadata
 
@@ -276,7 +286,7 @@ def parse_song(songfile: str, songid: int = 1):
     return songdata
 
 
-def parse_songsheets(inputs, exclusions=[]):
+def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     """
     Processes songsheets, returns a context (dict) containing
     song: { id: NNN, title: X, artist: X, chords: [X],
@@ -305,7 +315,7 @@ def parse_songsheets(inputs, exclusions=[]):
         if len(exclusions) and ( sng in exclusions or path in exclusions):
             continue
 
-        # parse the songsheet to get metadata and HTML
+        # parse the songsheet to get metadata and HTML (sd=songdata)
         sd = parse_song(path, pbar.index)
 
         # add any chords from this song to our global chordlist
@@ -319,16 +329,12 @@ def parse_songsheets(inputs, exclusions=[]):
     return context
 
 
-def main(options):
+def main(options: argparse.Namespace):
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
-    logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()))
- #     index = {'songbook': options.output,
- #              'songlist': [],
- #              'chordlist': set([]),
- #              'stylesheets': [],
- #              'missing': set([])}
+    timestamp = datetime.datetime.now()
+    logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
 
     # context created by analysing input files and options:
     context = parse_songsheets(options.input, options.exclude)
@@ -402,6 +408,9 @@ def main(options):
 
     # create target directories
     create_layout(options.output, *layout)
+    with codecs.open(os.path.join(options.output, '.timestamp'), mode='w', encoding='utf-8') as tsfile:
+        tsfile.write(datetime.datetime.strftime(timestamp, '%s'))
+
 
     # generate all chord diagrams from the songbook context
     missing_chords = chordgen.generate(context['chords'], chord_defs, destdir=chord_dir, template=chord_template)
