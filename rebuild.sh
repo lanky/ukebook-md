@@ -1,5 +1,5 @@
 #!/bin/bash
-export TSTAMP=$(date +%Y%m%d)
+export TSTAMP=$(date +%Y-%m-%d)
 export OUTPUTDIR=~/Documents/generated_books
 WEBONLY=0
 
