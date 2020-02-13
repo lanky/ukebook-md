@@ -6,8 +6,8 @@
 <head>
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <!-- {{ songbook.stylesheet }} -->
-  <link rel="stylesheet" type="text/css" href="../css/{{ book_css }}.css" />
+  <!-- {{ songbook.stylesheet|default('none') }} -->
+  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ book_css }}" />
   {% block localstyles %}
   <style type="text/css">
   {% if not show_chords %}
