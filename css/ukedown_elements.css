@@ -47,7 +47,7 @@
 }
 
 .notes {
-    font-style: italic;
+    font-style: normal;
     font-weight: bold;
 }
 .notes:before {
