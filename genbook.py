@@ -201,6 +201,13 @@ def parse_commandline(argv):
         help="Hide diagrams, inline chords and performance notes. Lyrics and headings only",
     )
 
+    parser.add_argument(
+        "--pdf",
+        action="store_true",
+        default=False,
+        help="Generate a PDF document from the generated HTML"
+    )
+
     args = parser.parse_args(argv)
 
     if not os.path.isdir(args.output):
@@ -415,7 +422,7 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     Args:
         inputdirs(list): list of directories containing input files in
                          ukedown format
-        exclusions
+        exclusions(list):
     """
     songs = {}
     # will merge dirs together, if a song appears twice, last match wins
@@ -454,6 +461,38 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     pbar.finish()
     return context
 
+def make_context(ctx: dict, options: argparse.Namespace) -> dict:
+    """
+    Manage context for templates based on metadat and commandline options
+    """
+    ctx["songbook"] = os.path.basename(options.output)
+    ctx["stylesheets"] = []
+    ctx["images"] = []
+    ctx["scripts"] = []
+    ctx["format"] = options.format
+    ctx["book_css"] = options.style
+    # standard elements on a page if no options selected
+    ctx["show_chords"] = True
+    ctx["show_diagrams"] = True
+    ctx["show_notes"] = True
+    ctx["ext_chords"] = options.external
+    if options.hide_diagrams:
+        # this is effectively 'karauke band style'
+        ctx["show_diagrams"] = False
+    elif options.format == "singers":
+        ctx["show_diagrams"] = False
+        ctx["show_chords"] = False
+        ctx["show_notes"] = False
+    elif options.format == "karauke":
+        ctx["show_diagrams"] = False
+    else:
+        ctx["show_diagrams"] = True
+        ctx["show_chords"] = True
+        ctx["show_notes"] = True
+
+    return ctx
+
+
 
 def main(options: argparse.Namespace):
     """
@@ -462,32 +501,14 @@ def main(options: argparse.Namespace):
     timestamp = datetime.datetime.now()
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
 
+    if len(options.input) == 1 and os.path.isfile(options.input[0]):
+        options.no_index = True
+
     # context created by analysing input files and options:
-    context = parse_songsheets(options.input, options.exclude)
-    context["songbook"] = os.path.basename(options.output)
-    context["stylesheets"] = []
-    context["images"] = []
-    context["scripts"] = []
-    context["format"] = options.format
-    context["book_css"] = options.style
-    # standard elements on a page if no options selected
-    context["show_chords"] = True
-    context["show_diagrams"] = True
-    context["show_notes"] = True
-    context["ext_chords"] = options.external
-    if options.hide_diagrams:
-        # this is effectively 'karauke band style'
-        context["show_diagrams"] = False
-    elif options.format == "singers":
-        context["show_diagrams"] = False
-        context["show_chords"] = False
-        context["show_notes"] = False
-    elif options.format == "karauke":
-        context["show_diagrams"] = False
-    else:
-        context["show_diagrams"] = True
-        context["show_chords"] = True
-        context["show_notes"] = True
+    context = make_context(
+        parse_songsheets(options.input, options.exclude),
+        options
+        )
 
     with open("chords.yml") as cd:
         chord_defs = yaml.safe_load(cd)
