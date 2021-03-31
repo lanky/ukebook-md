@@ -1,7 +1,7 @@
 beautifulsoup4==4.7.1
 bs4==0.0.1
 Jinja2==2.10.1
-lxml==4.3.4
+lxml==4.6.3
 Markdown==3.1.1
 MarkupSafe==1.1.1
 progress==1.5
