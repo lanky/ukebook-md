@@ -110,6 +110,13 @@ p {
     font-size: 0.8em;
 }
 
+.credits {
+    font-size: 0.6em;
+    font-style: italic;
+    text-align: left;
+    display: block;
+}
+
 .labels {
   font-size: 0.5em;
   font-family: Verdana, Helvetica, Sans-Serif;
