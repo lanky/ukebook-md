@@ -97,6 +97,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         const="singers",
         help="Hide diagrams, inline chords and performance notes. Lyrics and headings only",
     )
+    fgrp.add_argument(
+        "-w",
+        "--weds",
+        action="store_const",
+        dest="format",
+        const="ukeweds",
+        help="Show diagrams, inline chords and performance notes",
+    )
 
     opts = parser.parse_args(argv)
 
@@ -144,7 +152,7 @@ def main(opts: argparse.Namespace):
     ctx = {
         "book_css": os.path.basename(opts.stylesheet),
         "css_path": os.path.dirname(opts.stylesheet),
-        "show_diagrams": False,
+        "show_diagrams": opts.format == "ukeweds",
         "show_chords": opts.format != "singers",
         "ext_chords": True,
         "show_notes": opts.format != "singers",
