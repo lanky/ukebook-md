@@ -51,7 +51,7 @@ def parse_commandline(argv):
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="name of input directory", nargs="*")
+    parser.add_argument("input", help="name of input directory", nargs="+")
     parser.add_argument(
         "-s",
         "--style",
