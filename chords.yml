@@ -169,6 +169,9 @@ Csus4:
   barre: 1
   fingers: [0, 3, 3, 3]
 
+"C#dim":
+  fingers: [0, 1, 0, 4]
+
 D:
   fingers: [2, 2, 2, 0]
 
