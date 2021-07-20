@@ -12,11 +12,13 @@ show_help() {
     echo "  -h                Show this help and exit"
     echo "  -l                Generate landscape output"
     echo "  -w                Only generate HTML output, not pdf"
+    echo "  -i INPUTDIR       where to find input documents"
     echo "  -o OUTPUTDIR      where to put generated books/html"
+    echo "  -n PROJECTNAME    Name of book project, basename of INPUTDIR if not provided"
 }
 
 
-while getopts ":hlwo:" opt
+while getopts ":hlwi:o:n:" opt
 do
     case $opt in
         h)
@@ -27,16 +29,27 @@ do
             OUTPUTDIR=${OPTARG}
             shift 2
             ;;
+        i)
+            INPUTDIR=${OPTARG}
+            shift 2
+            ;;
         l)
             LANDSCAPE=1
             ;;
         w)
             WEBONLY=1
             ;;
+        n)
+            PROJECTNAME=${OPTARG}
+            shift 2
+            ;;
     esac
 done
 
 [[ -z ${OUTPUTDIR} ]] && OUTPUTDIR=~/Documents/generated_books
+[[ -z ${INPUTDIR} ]] && INPUTDIR=~/Documents/dev/karauke_udn/current
+
+[[ -z ${PROJECTNAME} ]] && PROJECTNAME=$(basename ${INPUTDIR})
 
 
 
@@ -70,7 +83,7 @@ for BOOKTYPE in ${BOOKTYPES}; do
             FORMAT=karauke
             ;;
     esac
-    ./genbook.py --${FORMAT} -s ${STYLE} ../karauke_udn/current -o ${OUTPUTDIR}/karauke-${BOOKTYPE}-${TSTAMP} &&
+    ./genbook.py --${FORMAT} -s ${STYLE} ${INPUTDIR} -o ${OUTPUTDIR}/karauke-${BOOKTYPE}-${TSTAMP} &&
     if [ ${WEBONLY} -ne 1 ]; then
         ./makepdf.py ${OUTPUTDIR}/karauke-${BOOKTYPE}-${TSTAMP} -o ${OUTPUTDIR}/karauke-${BOOKTYPE}-${TSTAMP}.pdf
     else
