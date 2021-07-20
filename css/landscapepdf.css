@@ -1,0 +1,160 @@
+@charset "utf-8";
+@import 'ukedown_elements.css';
+
+@page {
+    size: A4 landscape;
+    margin: 0.5cm;
+    counter-increment: page;
+
+    @bottom-right-corner {
+        content: counter(page) "/" counter(pages);
+    }
+
+    @bottom-center {
+        content: "Karauke Songbook"
+    }
+}
+
+@page :left {
+    @bottom-left-corner {
+        content: counter(page) "/" counter(pages);
+    }
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: verdana, "dejavu sans", sans-serif;
+    font-size: 11px;
+    width: 595px;
+    height: 842px;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+h1 {
+    font-size: 1.2em;
+    padding-bottom: 0.2em;
+    padding-left: 5px;
+}
+
+p {
+    padding: 0px;
+    margin-top: 0px;
+}
+
+.header {
+    page-break-before: always;
+    width: 100%;
+    left: 0;
+}
+
+
+/* content div, max 2 cols in portrait mode */
+.content {
+   column-width: 50%;
+   column-rule-style: solid;
+   column-fill: auto;
+   max-height: 730px;
+   float: left;
+   padding-left: 5px;
+   padding-right: 5px;
+   width: 490px;
+   max-width: 100%;
+}
+
+/* div on the right of the page for chord diagrams, if we want any*/
+.chords {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-height: 840px;
+    float: right;
+    width: 50px;
+    max-width: 100px;
+}
+
+/* overflow is a second div for extra chords (10+), appears to the left of the normal chord div */
+.overflow {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-height: 840px;
+    width: 50px;
+    align-items: flex-start;
+    float: right;
+}
+/* footer  can have SVG background images */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 30px;
+    background: white;
+    page-break-after: always;
+    margin-top: 5px;
+}
+
+/* fixed position at bottom of page for branding images, links etc*/
+.footer img {
+    max-height: 25px;
+    width: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+
+}
+
+.labels {
+  font-size: 0.5em;
+  font-family: Verdana, Helvetica, Sans-Serif;
+}
+
+/* index page is multi-column*/
+.index {
+    column-width: auto;
+    column-rule-width: 1px;
+    column-rule-style: solid;
+    column-rule-color: black;
+    overflow: auto;
+    width: auto;
+    margin: auto;
+    column-count: 2;
+    max-height: 730px;
+}
+
+.container {
+    max-height: 100%;
+    page-break-after: always;
+}
+
+.chord_diagram {
+    width: 48px;
+}
+
+.chordname {
+  font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
+  text-align: center;
+  font-weight: bold;
+  font-size: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+svg.labels {
+  font-size: 0.5em;
+  font-family: Verdana, Helvetica, Sans-Serif;
+}

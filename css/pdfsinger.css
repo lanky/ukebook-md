@@ -1,0 +1,118 @@
+@charset "utf-8";
+@import 'ukedown_elements.css';
+
+@page {
+    size: A4 portrait;
+    margin: 0.5cm;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: verdana, "dejavu sans", sans-serif;
+    font-size: 12pt;
+    width: 595px;
+    height: 842px;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    font-size: 1rem;
+}
+
+h1 {
+    font-size: 1.2em;
+    padding-bottom: 0.2em;
+    padding-left: 5px;
+}
+
+p {
+    padding: 0px;
+    margin-top: 0px;
+}
+
+.header {
+    page-break-before: always;
+    width: 100%;
+    left: 0;
+    padding: 0;
+    margin: 0;
+}
+
+
+/* content div, max 2 cols in portrait mode */
+.content {
+   column-width: auto;
+   column-rule-style: solid;
+   column-fill: auto;
+   max-height: 730px;
+   float: left;
+   padding-left: 5px;
+   padding-right: 5px;
+   width: 100%;
+   /* parent font size: em */
+   font-size: 1em;
+}
+
+/* footer  can have SVG background images */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    max-height: 30px;
+    background: white;
+    text-align: center;
+    page-break-after: always;
+}
+
+.footer img {
+    max-height: 25px;
+    width: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+/* index page is multi-column*/
+.index {
+    column-width: 290px;
+    column-rule-width: 1px;
+    column-rule-style: solid;
+    column-rule-color: black;
+    overflow: auto;
+    width: 100%;
+    *margin: auto;
+    column-count: 2;
+    max-height: 730px;
+    padding: 5px;
+    float: left;
+    font-size: 1rem;
+}
+
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: landscape) {
+    html {
+        width: 842px;
+        height: 595px;
+    }
+    .content {
+        column-count: 2;
+        /* A4 is 842 x 595 in landscape */
+        width: 100%;
+        min-height: 490px;
+        max-height: 540px;
+    }
+}
+
