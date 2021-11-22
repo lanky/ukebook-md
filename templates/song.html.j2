@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block content %}
+{% if song.meta.capo %}
+<span class="capo">to play along with the original, capo at {{ song.meta.capo }}</span>
+{% endif %}
 {{ song.html }}
 {% endblock %}
 <!-- show_diagrams: {{ show_diagrams }} -->
