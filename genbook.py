@@ -466,6 +466,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     Manage context for templates based on metadat and commandline options
     """
     ctx["songbook"] = os.path.basename(options.output)
+    ctx["book_type"] = options.format
     ctx["stylesheets"] = []
     ctx["images"] = []
     ctx["scripts"] = []
