@@ -8,3 +8,5 @@ progress
 PyYAML
 soupsieve
 weasyprint==53.4
+ukedown==2.0.0
+udn-songbook==1.0.0
