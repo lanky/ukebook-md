@@ -181,6 +181,9 @@ D7:
 D(2):
   fingers: [2, 2, 2, 5]
 
+Dsus2:
+  fingers: [2, 2, 0, 0]
+
 Dsus4:
   fingers: [2, 2, 3, 0]
 
@@ -235,6 +238,9 @@ Em7:
   # F# A C# A C# F# A
   fingers: [2, 1, 2, 0]
 
+"F#7":
+  fingers: [3, 4, 2, 4]
+
 F:
   fingers: [2, 0, 1, 0]
 
@@ -255,6 +261,9 @@ Fmaj7:
 
 F/G:
   fingers: [0, 0, 1, 0]
+
+Fsus4:
+  fingers: [3, 0, 1, 1]
 
 G:
   fingers: [0, 2, 3, 2]
