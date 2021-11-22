@@ -19,7 +19,7 @@ import ukedown.udn
 import jinja2
 from bs4 import BeautifulSoup as bs
 from weasyprint import HTML, CSS
-from weasyprint.fonts import FontConfiguration
+from weasyprint.text.fonts import FontConfiguration
 
 from genbook import parse_song, parse_meta, make_context, ukedown_to_html, safe_name
 

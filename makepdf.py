@@ -9,7 +9,7 @@ import re
 from progress.bar import Bar
 from bs4 import BeautifulSoup as bs
 from weasyprint import HTML, CSS
-from weasyprint.fonts import FontConfiguration
+from weasyprint.text.fonts import FontConfiguration
 
 def parse_cmdline(argv):
     parser = argparse.ArgumentParser(description="Convert a multi-page HTML songbook into PDF")

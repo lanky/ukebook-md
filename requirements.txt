@@ -7,4 +7,4 @@ MarkupSafe
 progress
 PyYAML
 soupsieve
-Weasyprint
+weasyprint==53.4
