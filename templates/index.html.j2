@@ -4,7 +4,7 @@
 {% block localstyles %}
 <link rel="stylesheet" type="text/css" href="css/index.css"/>
 {% endblock %}
-<h1 class="title" id="title_{{ 000 }}">{{ songbook }} Index</h1>
+<h1 class="title" id="title_{{ 000 }}">{{ songbook| default('Karauke Songbook') }} Index</h1>
 {% block songheader %}
 
 {% endblock %}
@@ -13,7 +13,7 @@
 {% for song in songs -%}
       <a class="index" id="song_{{ song.id}}" href="songs/{{ song.filename }}"
          alt="{{ song.title }} - {{ song.artist }}">
-        {{ song.title }} - {{ song.artist }}
+        {{ song.title }}
       </a>
       <br/>
 {% endfor -%}

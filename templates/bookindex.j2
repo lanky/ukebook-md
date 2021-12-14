@@ -15,12 +15,14 @@
 {% else %}
 {% set target='songs/%s'| format(song.filename) %}
 {% endif %}
-<a class="indexlink" id="song_{{ song.id}}" href="{{ target }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} - {{ song.artist }}</a><br/>
+<a class="indexlink" id="song_{{ song.id}}" href="{{ target }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }}</a><br/>
 {% endfor %}
 </div>
 <!-- outer div -->
 <div class="footer">
+{% if songbook.footer_img %}
 <img src="images/karauke_footer.png" alt="footer image with social media links" width="100%"/>
+{% endif %}
 </div>
 </body>
 </html>
