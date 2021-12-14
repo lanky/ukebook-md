@@ -50,7 +50,7 @@ def parse_commandline(argv):
     inserting chord diagrams (can be hidden with CSS)
     """
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=preamble)
     parser.add_argument("input", help="name of input directory", nargs="+")
     parser.add_argument(
         "-s",
@@ -492,7 +492,6 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
         ctx["show_notes"] = True
 
     return ctx
-
 
 
 def main(options: argparse.Namespace):
