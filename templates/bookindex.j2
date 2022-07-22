@@ -15,7 +15,7 @@
 {% else %}
 {% set target='songs/%s'| format(song.filename) %}
 {% endif %}
-<a class="indexlink" id="song_{{ song.id}}" href="{{ target }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} - {{ song.artist }}</a><br/>
+<a class="indexlink" id="song_{{ song.id}}" href="{{ target }}" alt="{{ song.title }} - {{ song.artist }}">{{ song.title }} ({{ song.artist }})</a><br/>
 {% endfor %}
 </div>
 <!-- outer div -->
