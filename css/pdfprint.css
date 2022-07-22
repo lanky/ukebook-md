@@ -125,6 +125,14 @@ p {
     float: right;
 }
 
+.tempo {
+    font-size: 0.6em;
+    font-style: italic;
+    text-align: left;
+    display: block;
+    float: right;
+}
+
 .labels {
   font-size: 0.5em;
   font-family: Verdana, Helvetica, Sans-Serif;
