@@ -4,7 +4,6 @@
 # everything but the kitchen sink to ease portability when reqd.
 
 import markdown
-import ukedown.udn
 
 # local chord generation tool (SVGs)
 import chordgen
@@ -32,6 +31,8 @@ from progress.bar import Bar
 import argparse
 from glob import glob
 
+from udn_songbook import SongBook
+
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -45,7 +46,7 @@ def parse_commandline(argv):
     Define commandline options and arguments
     """
     preamble = """
-    Process a directory of ukedown-formatted song sheets to create an HTML-formatted book.
+    Process a directory of ukedown-format song sheets to create an songbook.
     This will process all files found in the given directory, converting them to HTML,
     inserting chord diagrams (can be hidden with CSS)
     """
@@ -143,7 +144,8 @@ def parse_commandline(argv):
         dest="refresh",
         action="store_true",
         default=True,
-        help="only update files changed since the last build. If the output directory exists, this is the default behaviour",
+        help="""only update files changed since the last build. 
+        If the output directory exists, this is the default behaviour""",
     )
     cgrp.add_argument(
         "--clean",
@@ -205,7 +207,7 @@ def parse_commandline(argv):
         "--pdf",
         action="store_true",
         default=False,
-        help="Generate a PDF document from the generated HTML"
+        help="Generate a PDF document from the generated HTML",
     )
 
     args = parser.parse_args(argv)
@@ -461,6 +463,7 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     pbar.finish()
     return context
 
+
 def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     """
     Manage context for templates based on metadat and commandline options
@@ -505,10 +508,7 @@ def main(options: argparse.Namespace):
         options.no_index = True
 
     # context created by analysing input files and options:
-    context = make_context(
-        parse_songsheets(options.input, options.exclude),
-        options
-        )
+    context = make_context(parse_songsheets(options.input, options.exclude), options)
 
     with open("chords.yml") as cd:
         chord_defs = yaml.safe_load(cd)
