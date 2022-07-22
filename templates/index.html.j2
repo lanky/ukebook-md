@@ -13,7 +13,7 @@
 {% for song in songs -%}
       <a class="index" id="song_{{ song.id}}" href="songs/{{ song.filename }}"
          alt="{{ song.title }} - {{ song.artist }}">
-        {{ song.title }}
+          {{ song.title }} ({{ song.artist }})
       </a>
       <br/>
 {% endfor -%}
