@@ -12,16 +12,12 @@ import yaml
 import datetime
 import logging
 
-
-import markdown
-import ukedown.udn
-
 import jinja2
 from bs4 import BeautifulSoup as bs
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 
-from genbook import parse_song, parse_meta, make_context, ukedown_to_html, safe_name
+from genbook import parse_song, safe_name
 
 """
 Separates out the rendering and PDF conversion for an individual
@@ -60,7 +56,10 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-c", "--css-dir", default="css", help="Default directory for stylesheets",
+        "-c",
+        "--css-dir",
+        default="css",
+        help="Default directory for stylesheets",
     )
 
     parser.add_argument(
@@ -104,6 +103,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         dest="format",
         const="ukeweds",
         help="Show diagrams, inline chords and performance notes",
+    )
+
+    parser.add_argument(
+        "-F",
+        "--family-friendly",
+        action="store_true",
+        default=False,
+        help="Clean up nasty swearing",
     )
 
     opts = parser.parse_args(argv)
@@ -160,7 +167,7 @@ def main(opts: argparse.Namespace):
     }
 
     for song in opts.inputfile:
-        ctx["song"] = parse_song(song)
+        ctx["song"] = parse_song(song, family_friendly=opts.family_friendly)
         # create tempdir for HTML
         # render HTML to PDF using the appropriate stylesheet
         # remove tempdir
