@@ -4,23 +4,27 @@
 @page {
     size: A4 landscape;
     margin: 0.5cm;
-    counter-increment: page;
 
     @bottom-right-corner {
         content: counter(page) "/" counter(pages);
+        padding-right: 10px;
+        font-size: 0.8em;
+        font-style: bold;
     }
 
-    @bottom-center {
+    @top-center {
         content: "Karauke Songbook"
     }
 }
 
+/*
 @page :left {
     @bottom-left-corner {
         content: counter(page) "/" counter(pages);
+        padding-right: 10px;
     }
 }
-
+*/
 
 * {
     box-sizing: border-box;
@@ -28,30 +32,19 @@
 
 html {
     font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 11px;
-    width: 595px;
-    height: 842px;
+    font-size: 14px;
 }
 
-body {
-    height: 100%;
-    width: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: auto;
+h1::before {
+    counter-increment: page;
 }
 
 h1 {
     font-size: 1.2em;
-    padding-bottom: 0.2em;
+    /* padding-bottom: 0.2em; */
     padding-left: 5px;
 }
 
-p {
-    padding: 0px;
-    margin-top: 0px;
-}
 
 .header {
     page-break-before: always;
@@ -61,16 +54,35 @@ p {
 
 
 /* content div, max 2 cols in portrait mode */
+/* portrait in 72dpi is 595x842 pixels */
 .content {
    column-width: 50%;
+   column-count: 2;
    column-rule-style: solid;
+   column-rule-width: 1px;
    column-fill: auto;
-   max-height: 730px;
-   float: left;
-   padding-left: 5px;
-   padding-right: 5px;
-   width: 490px;
+   height: 90vh;
+   padding: 5px;
+   width: 100%;
    max-width: 100%;
+   orphans: 0;
+}
+
+.content > p {
+    padding: 0px;
+    margin-top: 0px;
+    orphans: 0 ;
+}
+
+/* footer  can have SVG background images */
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5vh;
+    page-break-after: always;
+    text-align: center;
 }
 
 /* div on the right of the page for chord diagrams, if we want any*/
@@ -79,7 +91,7 @@ p {
     flex-direction: column;
     align-items: flex-start;
     flex-wrap: wrap;
-    max-height: 840px;
+    max-height: 590px;
     float: right;
     width: 50px;
     max-width: 100px;
@@ -90,21 +102,20 @@ p {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    max-height: 840px;
+    max-height: 590px;
     width: 50px;
     align-items: flex-start;
     float: right;
 }
-/* footer  can have SVG background images */
-.footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    max-height: 30px;
-    background: white;
-    page-break-after: always;
-    margin-top: 5px;
+
+a.middle {
+    font-size: 1em;
+    text-align: center;
+    text-decoration: none;
+}
+
+.section_header {
+    display: inline-block;
 }
 
 /* fixed position at bottom of page for branding images, links etc*/
@@ -126,6 +137,7 @@ p {
 /* index page is multi-column*/
 .index {
     column-width: auto;
+    column-count: 2;
     column-rule-width: 1px;
     column-rule-style: solid;
     column-rule-color: black;
@@ -133,7 +145,15 @@ p {
     width: auto;
     margin: auto;
     column-count: 2;
-    max-height: 730px;
+    max-height: 490px;
+    counter-reset: page
+}
+
+.credits {
+    font-size: 0.6em;
+    font-style: italic;
+    text-align: left;
+    display: block;
 }
 
 .container {
