@@ -7,7 +7,7 @@ import markdown
 import ukedown.udn
 
 # local chord generation tool (SVGs)
-import chordgen
+# from . import chordgen
 
 # jinja2 templating, originially based one the django model.
 # from jinja2 import Environment, FileSystemLoader
@@ -15,6 +15,8 @@ import jinja2
 
 # for generating summary info
 from bs4 import BeautifulSoup as bs
+
+import chordgen
 
 # the normal boring stuff
 import sys
