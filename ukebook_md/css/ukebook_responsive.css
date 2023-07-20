@@ -1,9 +1,10 @@
 @charset "utf-8";
+@import 'ukedown_elements.css';
 
-body: {
+body {
     font-family: verdana, sans-serif;
     width: 100%;
-    font-size 0.8em;
+    font-size: 0.8em;
 }
 
 a {
@@ -33,7 +34,7 @@ a.right {
 h1 {
     font-family: verdana, sans-serif;
     font-weight: bold;
-    font=size: 0.7em;
+    font-size: 0.7em;
     text-align: center;
     float: top
 }
@@ -70,75 +71,6 @@ p {
     font-family: verdana, sans-serif;
     font-weight: normal;
     padding: 0px;
-}
-
-/* Box call-outs (repeated chorus etc) */
-.box {
-    padding: 2px;
-    margin: 1px;
-    border: 2px solid black;
-    width: auto
-}
-
-div.box {
-    display: inline-block;
-    padding: 5px;
-}
-
-.box > p {
-    margin-top: 0;
-    margin-bottom: 1em;
-}
-
-.box > p:last-child {
-    margin-bottom: 0;
-}
-
-.box > h2 {
-    margin-top: 0;
-    padding-top: 0;
-}
-
-/* End box definitions*/
-
-/* chord styling - auto bold and enclose in ()*/
-.chord {
-    font-weight: bold;
-}
-.chord:before {
-    content: "("
-}
-.chord:after {
-    content: ")"
-}
-
-/* End  chord definitions*/
-
-
-/* Performance notes etc */
-.notes {
-    font-weight: bold;
-}
-
-.notes:before {
-    content: "["
-}
-
-.notes:after {
-    content: "]";
-}
-
-
-/* Backing vox, italic with () around them */
-.vox {
-    font-style: italic;
-    font-weight: normal;
-}
-.vox:before {
-    content: '(';
-}
-.vox:after {
-    content: ')';
 }
 
 div.footer {
@@ -204,7 +136,7 @@ uses em-widths which are approx
 1em =~16px
 */
 /* max-width here is approx 991px*/
-@media screen and (min-width: 62em) {
+@media screen and (min-width: 62em) and (orientation: landscape) {
     div.chords {
         width: 100%;
         height: 0;
