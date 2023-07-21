@@ -56,7 +56,10 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-c", "--css-dir", default="css", help="Default directory for stylesheets",
+        "-c",
+        "--css-dir",
+        default="css",
+        help="Default directory for stylesheets",
     )
 
     parser.add_argument(
@@ -91,7 +94,8 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         action="store_const",
         dest="format",
         const="singers",
-        help="Hide diagrams, inline chords and performance notes. Lyrics and headings only",
+        help="""Hide diagrams, inline chords and performance notes.
+                Lyrics and headings only""",
     )
     fgrp.add_argument(
         "-w",
@@ -154,6 +158,7 @@ def main():
         "ext_chords": True,
         "show_notes": opts.format != "singers",
         "songbook": "none",
+        "single": True,
     }
 
     for song in opts.inputfile:
@@ -194,8 +199,8 @@ def main():
             # This is a standalone file, remove links to index and prev/next
             # for link in content.find_all('a'):
             #   link.decompose()
-            content.find("a", {"class": "left"}).decompose()
-            content.find("a", {"class": "right"}).decompose()
+            # content.find("a", {"class": "left"}).decompose()
+            # content.find("a", {"class": "right"}).decompose()
 
             doc = HTML(string=str(content)).render(stylesheets=css, font_config=fontcfg)
 
@@ -218,9 +223,9 @@ def main():
             print("writing PDF to {}".format(pdffile))
 
             doc.write_pdf(pdffile)
-        except jinja2.TemplateError as T:
+        except jinja2.TemplateError:
             logger.exception(
-                "Failed to render template for {title} - {artist}".format(**ctx["song"])
+                f"Failed to render template for {song['title']} - {song['artist']}"
             )
             raise
         if opts.debug:
