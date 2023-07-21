@@ -5,7 +5,6 @@
 import os
 import sys
 import argparse
-import codecs
 import tempfile
 import shutil
 import yaml
@@ -13,15 +12,12 @@ import datetime
 import logging
 
 
-import markdown
-import ukedown.udn
-
 import jinja2
 from bs4 import BeautifulSoup as bs
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 
-from genbook import parse_song, parse_meta, make_context, ukedown_to_html, safe_name
+from genbook import safe_name, parse_song
 
 """
 Separates out the rendering and PDF conversion for an individual
