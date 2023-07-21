@@ -137,7 +137,7 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     return opts
 
 
-def main(opts: argparse.Namespace):
+def main():
     """
     [TODO:description]
 
@@ -145,6 +145,7 @@ def main(opts: argparse.Namespace):
     """
     # generate context for songsheet
     # simplistic as this is for karauke only
+    opts = parse_commandline(sys.argv[1:])
     ctx = {
         "book_css": os.path.basename(opts.stylesheet),
         "css_path": os.path.dirname(opts.stylesheet),
@@ -229,5 +230,4 @@ def main(opts: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    options = parse_commandline(sys.argv[1:])
-    main(options)
+    main()
