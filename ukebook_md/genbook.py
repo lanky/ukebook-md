@@ -4,7 +4,7 @@
 # everything but the kitchen sink to ease portability when reqd.
 
 import markdown
-import ukedown.udn
+# import ukedown.udn
 
 # local chord generation tool (SVGs)
 # from . import chordgen
@@ -34,6 +34,8 @@ from progress.bar import Bar
 import argparse
 from glob import glob
 
+from typing import List, Optional
+
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -42,17 +44,17 @@ logging.basicConfig(
 )
 
 
-def parse_commandline(argv):
+def parse_commandline(argv: List[str]) -> argparse.Namespace:
     """
     Define commandline options and arguments
     """
     preamble = """
-    Process a directory of ukedown-formatted song sheets to create an HTML-formatted book.
-    This will process all files found in the given directory, converting them to HTML,
-    inserting chord diagrams (can be hidden with CSS)
+    Process a directory of ukedown-formatted song sheets to create an HTML-formatted 
+    book. This will process all files found in the given directory, converting them 
+    to HTML, inserting chord diagrams (which can be hidden with CSS)
     """
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=preamble)
     parser.add_argument("input", help="name of input directory", nargs="+")
     parser.add_argument(
         "-s",
@@ -207,7 +209,7 @@ def parse_commandline(argv):
         "--pdf",
         action="store_true",
         default=False,
-        help="Generate a PDF document from the generated HTML"
+        help="Generate a PDF document from the generated HTML",
     )
 
     args = parser.parse_args(argv)
@@ -463,6 +465,7 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     pbar.finish()
     return context
 
+
 def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     """
     Manage context for templates based on metadat and commandline options
@@ -496,11 +499,11 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     return ctx
 
 
-
-def main(options: argparse.Namespace):
+def main():
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
+    options = parse_commandline(sys.argv[1:])
     timestamp = datetime.datetime.now()
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
 
@@ -508,10 +511,7 @@ def main(options: argparse.Namespace):
         options.no_index = True
 
     # context created by analysing input files and options:
-    context = make_context(
-        parse_songsheets(options.input, options.exclude),
-        options
-        )
+    context = make_context(parse_songsheets(options.input, options.exclude), options)
 
     with open("chords.yml") as cd:
         chord_defs = yaml.safe_load(cd)
@@ -664,7 +664,7 @@ def main(options: argparse.Namespace):
     template_maps = {}
     if options.format == "epub":
         template_maps[os.path.join(parent, "nav.xhtml")] = "nav.xhtml.j2"
-        template_mps[os.path.join(parent, "package.opf")] = "package.opf.j2"
+        template_maps[os.path.join(parent, "package.opf")] = "package.opf.j2"
 
     if options.format != "onepage" and not options.no_index:
         template_maps[os.path.join(parent, "index.html")] = "bookindex.j2"
@@ -679,5 +679,4 @@ def main(options: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    opts = parse_commandline(sys.argv[1:])
-    main(opts)
+    main()
