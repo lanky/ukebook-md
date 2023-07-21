@@ -7,7 +7,7 @@
   {% block head %}
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- {{ songbook.stylesheet|default('none') }} -->
-  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ book_css }}" />
+  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ book_css }}.css" />
   {% block localstyles %}
   <style type="text/css">
   {% if not show_chords %}
@@ -31,7 +31,6 @@
   <title>{% block title %}{{ songbook.title|default('Songbook') }}{% endblock %}</title>
   {% endblock %}
 </head>
-<body>
   <div class="header">{% block songheader %}{% endblock %}</div>
   <div class="content">{% block content %}{% endblock %}</div>
   {% if show_diagrams %}
@@ -41,6 +40,5 @@
   <div class="chords">{% block chords %}{% endblock %}</div>
   {% endif %}
   <div class="footer">{% block footer %}{% endblock %}</div>
-</body>
 </html>
 
