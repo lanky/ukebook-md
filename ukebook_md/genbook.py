@@ -522,10 +522,11 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     return ctx
 
 
-def main(options: argparse.Namespace):  # noqa: C901
+def main():  # noqa: C901
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
+    options = parse_commandline(sys.argv[1:])
     timestamp = datetime.datetime.now()
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
 
@@ -614,7 +615,7 @@ def main(options: argparse.Namespace):  # noqa: C901
     # this section should be refactored to avoid repetition.
     if not options.no_css:
         globcp(
-            "{0.css_dir}/*.css".format(opts),
+            "{0.css_dir}/*.css".format(options),
             os.path.join(options.output, parent, "css"),
             "stylesheets",
         )
@@ -704,5 +705,4 @@ def main(options: argparse.Namespace):  # noqa: C901
 
 
 if __name__ == "__main__":
-    opts = parse_commandline(sys.argv[1:])
-    main(opts)
+    main()

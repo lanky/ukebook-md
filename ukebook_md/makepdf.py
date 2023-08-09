@@ -45,14 +45,14 @@ def parse_cmdline(argv):
     return opts
 
 
-def collate(options, fontcfg=FontConfiguration()):
+def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     """
     put together a PDF, using a directory created by genbook.py
     """
     doclist = []
 
     css = [
-        CSS(os.path.join(opts.inputdir, "css", f))
+        CSS(os.path.join(options.inputdir, "css", f))
         for f in options.stylesheets.split(",")
     ]
 
@@ -104,7 +104,11 @@ def process_links(index: Path) -> str:
         return str(idxsoup)
 
 
-if __name__ == "__main__":
+def main():
     opts = parse_cmdline(sys.argv[1:])
 
     collate(opts)
+
+
+if __name__ == "__main__":
+    main()
