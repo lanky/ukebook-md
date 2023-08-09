@@ -29,7 +29,7 @@ def parse_cmdline(argv):
     parser.add_argument(
         "-s",
         "--stylesheets",
-        default="pdfprint.css",
+        default="",
         help="User stylesheets to apply, must be in the 'css' subdir of the book",
     )
 
@@ -51,10 +51,14 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     """
     doclist = []
 
-    css = [
-        CSS(os.path.join(options.inputdir, "css", f))
-        for f in options.stylesheets.split(",")
-    ]
+    if options.stylesheets:
+        css = [
+            CSS(options.inputdir / "css" / f)
+            for f in options.stylesheets.split(",")
+            if options.stylesheets
+        ]
+    else:
+        css = None
 
     # the index page will be a string as I need to correct the links
     print("Rendering index")
