@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "ukebook-md"
+version = "1.0.0"
+description = "tools to build songbooks from UDN files"
+authors = ["Stuart Sears <stuart@sjsears.com>"]
+license = "GPL-3-Or-Later"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+weasyprint = "^59.0"
+ukedown = "^2.1.1"
+lxml = "^4.9.2"
+requests = "^2.28.2"
+beautifulsoup4 = "^4.11.2"
+PyYAML = "^6.0"
+progress = "^1.6"
+pip-tools = "^7.2.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.2.1"
+pre-commit = "^3.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+genbook = "ukebook_md.genbook:main"
+
+# generic python project config
+[tool.pyright]
+# configuration for the pyright syntax checker/linter
+# handles warnings about variables for which we do not yet
+# know the type
+reportOptionalSubscript = false
+reportOptionalIterable = false
+reportOptionalMemberAccess = false
+reportGeneralTypeIssues = false
+
+[tool.black]
+# project-specific black setup
+line-length = 88
+target-version = ['py38', 'py39', 'py310']
+include = '\.pyi?$'
+exclude = '/(\.git|_build|build|dist|\.tox|\.venv)/'
+
+[tool.isort]
+# import-sorting plugin
+profile = "black"
