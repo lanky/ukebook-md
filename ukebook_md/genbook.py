@@ -76,6 +76,11 @@ def parse_commandline(argv):
         help="output style, must correspond to a stylesheet in the css dir",
     )
     parser.add_argument(
+        "-c",
+        "--cover",
+        help="cover image, including extension. Must be in 'images' directory",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         default="Karauke_{:%Y-%m-%d}".format(datetime.datetime.now()),
@@ -691,6 +696,10 @@ def main():  # noqa: C901
     if options.format == "epub":
         template_maps[os.path.join(parent, "nav.xhtml")] = "nav.xhtml.j2"
         template_maps[os.path.join(parent, "package.opf")] = "package.opf.j2"
+
+    if options.cover:
+        template_maps[os.path.join(parent, "cover.html")] = "cover.html.j2"
+        context["cover"] = options.cover
 
     if options.format != "onepage" and not options.no_index:
         template_maps[os.path.join(parent, "index.html")] = "bookindex.j2"

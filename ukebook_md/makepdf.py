@@ -78,6 +78,14 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     else:
         css = None
 
+    # handle a cover page if there is one
+    if (options.inputdir / "cover.html").exists():
+        print("Parsing cover page")
+        cover = parse_cover(options.inputdir / "cover.html")
+        doclist.append(
+            HTML(string=cover, base_url="").render(stylesheets=css, font_config=fontcfg)
+        )
+
     # the index page will be a string as I need to correct the links
     print("Rendering index")
     index = process_links(options.inputdir / "index.html")
@@ -118,6 +126,21 @@ def main():
     opts = parse_cmdline(sys.argv[1:])
 
     collate(opts)
+
+
+def parse_cover(page: Path) -> str:
+    """
+    process the cover page if there is one
+    """
+    with page.open() as pg:
+        content = bs(pg, features="lxml")
+        # all links should point to #index00
+        for a in content.findAll("a"):
+            a["href"] = "#index00"
+        for i in content.findAll("img"):
+            i["src"] = f"file://{page.parent.resolve()}/{i['src']}"
+        print(content)
+        return str(content)
 
 
 if __name__ == "__main__":
