@@ -105,6 +105,13 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         const="ukeweds",
         help="Show diagrams, inline chords and performance notes",
     )
+    parser.add_argument(
+        "-F",
+        "--family-friendly",
+        action="store_true",
+        default=False,
+        help="Clean up nasty swearing",
+    )
 
     opts = parser.parse_args(argv)
 
@@ -161,7 +168,7 @@ def main():
     }
 
     for song in opts.inputfile:
-        ctx["song"] = parse_song(song)
+        ctx["song"] = parse_song(song, family_friendly=opts.family_friendly)
         # create tempdir for HTML
         # render HTML to PDF using the appropriate stylesheet
         # remove tempdir
