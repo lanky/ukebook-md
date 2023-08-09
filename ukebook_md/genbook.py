@@ -40,6 +40,12 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
+SWEARING = {
+    "fuck": "forget",
+    "shit": "shoot",
+    "nigga": "trigger",
+}
+
 
 def parse_commandline(argv):
     """
@@ -118,6 +124,14 @@ def parse_commandline(argv):
     cgrp = parser.add_argument_group(
         "Content control", "Options to control content creation. Special cases only."
     )
+    cgrp.add_argument(
+        "-F",
+        "--family-friendly",
+        action="store_true",
+        default=False,
+        help="Clean up the language for sensitive souls",
+    )
+
     cgrp.add_argument(
         "--no-html",
         action="store_true",
@@ -344,12 +358,19 @@ def parse_meta(markup, leader=";"):
     return _metadata, _markup
 
 
-def ukedown_to_html(inputfile):
+def ukedown_to_html(inputfile, family_friendly: bool = False) -> tuple:
     """
     Process a file, produce HTML via ukedown.
     """
     fh = codecs.open(inputfile, mode="r", encoding="utf-8")
     raw_markup = fh.read()
+    if family_friendly:
+        for k, v in SWEARING.items():
+            if raw_markup.find(k):
+                raw_markup = raw_markup.replace(k, v)
+            if raw_markup.find(k.title()) != -1:
+                raw_markup = raw_markup.replace(k.title(), v.title())
+
     mtime = os.path.getmtime(inputfile)
 
     meta, markup = parse_meta(raw_markup, leader=";")
@@ -387,7 +408,7 @@ def create_layout(destdir, *subdirs):
             sys.exit(1)
 
 
-def parse_song(songfile: str, songid: int = 1) -> dict:
+def parse_song(songfile: str, songid: int = 1, **kwargs) -> dict:
     """
     process an individual songsheet to extract content and metadata
 
@@ -409,7 +430,9 @@ def parse_song(songfile: str, songid: int = 1) -> dict:
     }
     # convert ukedown to HTML - this generates a complete document, we only
     # need the HTML <body> element, will extract that later
-    content, meta = ukedown_to_html(songfile)
+    content, meta = ukedown_to_html(
+        songfile, family_friendly=kwargs.get("family_friendly", False)
+    )
     if meta is not None:
         songdata["meta"].update(meta)
 
@@ -442,7 +465,7 @@ def parse_song(songfile: str, songid: int = 1) -> dict:
     return songdata
 
 
-def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
+def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
     """
     Processes songsheets, returns a context (dict) containing
     song: { id: NNN, title: X, artist: X, chords: [X],
@@ -477,7 +500,9 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
             continue
 
         # parse the songsheet to get metadata and HTML (sd=songdata)
-        sd = parse_song(path, pbar.index)
+        sd = parse_song(
+            path, pbar.index, family_friendly=kwargs.get("family_friendly", False)
+        )
 
         # add any chords from this song to our global chordlist
         context["chords"].update(sd["chords"])
@@ -539,7 +564,12 @@ def main():  # noqa: C901
         options.no_index = True
 
     # context created by analysing input files and options:
-    context = make_context(parse_songsheets(options.input, options.exclude), options)
+    context = make_context(
+        parse_songsheets(
+            options.input, options.exclude, family_friendly=options.family_friendly
+        ),
+        options,
+    )
 
     with open("chords.yml") as cd:
         chord_defs = yaml.safe_load(cd)
