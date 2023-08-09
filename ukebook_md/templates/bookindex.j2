@@ -7,7 +7,7 @@
     <!-- # also import javascript stuff here if needed -->
 </head>
 <body>
-<div class="header" id="title_index"><h1>{{ Songbook }} Index</h1></div>
+    <div class="header" id="index{{ idxpage | default('00') }}"><h1>{{ Songbook }} Index</h1></div>
 <div class="index">
 {% for song in songs %}
 {% if link_type == 'internal' %}
@@ -24,4 +24,3 @@
 </div>
 </body>
 </html>
-
