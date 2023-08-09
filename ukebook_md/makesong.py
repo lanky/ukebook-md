@@ -2,26 +2,23 @@
 # vim: set ts=4 sts=4 sw=4 et ci ft=python foldmethod=indent:
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
-import os
-import sys
 import argparse
 import codecs
-import tempfile
-import shutil
-import yaml
 import datetime
 import logging
-
-
-import markdown
-import ukedown.udn
+import os
+import shutil
+import sys
+import tempfile
 
 import jinja2
+import markdown
+import ukedown.udn
+import yaml
 from bs4 import BeautifulSoup as bs
-from weasyprint import HTML, CSS
+from genbook import make_context, parse_meta, parse_song, safe_name, ukedown_to_html
+from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
-
-from genbook import parse_song, parse_meta, make_context, ukedown_to_html, safe_name
 
 """
 Separates out the rendering and PDF conversion for an individual
@@ -60,7 +57,10 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "-c", "--css-dir", default="css", help="Default directory for stylesheets",
+        "-c",
+        "--css-dir",
+        default="css",
+        help="Default directory for stylesheets",
     )
 
     parser.add_argument(
@@ -141,7 +141,7 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     return opts
 
 
-def main(opts: argparse.Namespace):
+def main():
     """
     [TODO:description]
 
@@ -149,6 +149,7 @@ def main(opts: argparse.Namespace):
     """
     # generate context for songsheet
     # simplistic as this is for karauke only
+    opts = parse_commandline(sys.argv[1:])
     ctx = {
         "book_css": os.path.basename(opts.stylesheet),
         "css_path": os.path.dirname(opts.stylesheet),
@@ -221,7 +222,7 @@ def main(opts: argparse.Namespace):
             print("writing PDF to {}".format(pdffile))
 
             doc.write_pdf(pdffile)
-        except jinja2.TemplateError as T:
+        except jinja2.TemplateError:
             logger.exception(
                 "Failed to render template for {title} - {artist}".format(**ctx["song"])
             )
@@ -233,5 +234,4 @@ def main(opts: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    options = parse_commandline(sys.argv[1:])
-    main(options)
+    main()
