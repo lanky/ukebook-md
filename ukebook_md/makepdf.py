@@ -6,6 +6,7 @@ import os
 import re
 import sys
 from glob import glob
+from pathlib import Path
 
 from bs4 import BeautifulSoup as bs
 from progress.bar import Bar
@@ -34,7 +35,9 @@ def parse_cmdline(argv):
 
     opts = parser.parse_args(argv)
 
-    if not os.path.isdir(opts.inputdir):
+    opts.inputdir = Path(opts.inputdir)
+
+    if not opts.inputdir.exists():
         print("input dir doesn't appear to exist")
         parser.print_help()
         sys.exit(1)
@@ -46,18 +49,20 @@ def collate(options, fontcfg=FontConfiguration()):
     """
     put together a PDF, using a directory created by genbook.py
     """
+    doclist = []
 
-    # the index page will be a string as I need to correct the links
-    index = process_links(os.path.join(options.inputdir, "index.html"))
-
-    pages = sorted(glob("{}/songs/*.html".format(options.inputdir)))
-
-    print("Rendering index")
     css = [
         CSS(os.path.join(opts.inputdir, "css", f))
         for f in options.stylesheets.split(",")
     ]
-    documents = [HTML(string=index).render(stylesheets=css, font_config=fontcfg)]
+
+    # the index page will be a string as I need to correct the links
+    print("Rendering index")
+    index = process_links(options.inputdir / "index.html")
+
+    doclist.append(HTML(string=index).render(stylesheets=css, font_config=fontcfg))
+
+    pages = sorted(options.inputdir.glob("songs/*.html"))
 
     for pg in Bar("Processing HTML").iter(pages):
         with open(pg) as pagecontent:
@@ -73,19 +78,22 @@ def collate(options, fontcfg=FontConfiguration()):
             stylesheets=css, font_config=fontcfg
         )
         #        thisdoc = HTML(pg).render(stylesheets=css, font_config=fontcfg)
-        documents.append(thisdoc)
+        doclist.append(thisdoc)
 
     print("combining pages")
-    all_pages = [page for d in documents for page in d.pages]
-    print("writing PDF to {}".format(opts.output))
-    documents[0].copy(all_pages).write_pdf(opts.output)
+
+    all_pages = [page for d in doclist for page in d.pages]
+
+    print("writing PDF to {}".format(options.output))
+
+    doclist[0].copy(all_pages).write_pdf(options.output, optimize_images=True)
 
 
-def process_links(indexhtml):
+def process_links(index: Path) -> str:
     """
     ensures all links processed are internal. returns str
     """
-    with open(indexhtml) as idx:
+    with index.open() as idx:
         idxsoup = bs(idx, features="lxml")
         for a in idxsoup.findAll("a"):
             if re.match(r"title_\d{3}", a["href"]):
@@ -94,7 +102,6 @@ def process_links(indexhtml):
                 linkid = a["id"].split("_")[1]
                 a["href"] = "#title_{}".format(linkid)
         return str(idxsoup)
-    return None
 
 
 if __name__ == "__main__":
