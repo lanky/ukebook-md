@@ -45,6 +45,24 @@ def parse_cmdline(argv):
     return opts
 
 
+def parse_song(page: Path) -> str:
+    """
+    Separates out the song page parsing.
+    rewrites links  to  point to IDs not HTML files
+    Removes next & prev links
+    """
+    with page.open() as content:
+        linksoup = bs(content, features="lxml")
+        ilink = linksoup.find("a", {"class": "middle"})
+        if ilink is not None:
+            ilink["href"] = "#title_index"
+
+        # remove the forward and back links
+        linksoup.find("a", {"class": "left"}).decompose()
+        linksoup.find("a", {"class": "right"}).decompose()
+        return str(linksoup)
+
+
 def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     """
     put together a PDF, using a directory created by genbook.py
@@ -69,26 +87,14 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     pages = sorted(options.inputdir.glob("songs/*.html"))
 
     for pg in Bar("Processing HTML").iter(pages):
-        with open(pg) as pagecontent:
-            linksoup = bs(pagecontent, features="lxml")
-        ilink = linksoup.find("a", {"class": "middle"})
-        if ilink is not None:
-            ilink["href"] = "#index00"
+        song = HTML(string=parse_song(pg)).render(stylesheets=css, font_config=fontcfg)
+        doclist.append(song)
 
-        linksoup.find("a", {"class": "left"}).decompose()
-        linksoup.find("a", {"class": "right"}).decompose()
-
-        thisdoc = HTML(string=str(linksoup)).render(
-            stylesheets=css, font_config=fontcfg
-        )
-        #        thisdoc = HTML(pg).render(stylesheets=css, font_config=fontcfg)
-        doclist.append(thisdoc)
-
-    print("combining pages")
+    print("collating pages")
 
     all_pages = [page for d in doclist for page in d.pages]
 
-    print("writing PDF to {}".format(options.output))
+    print(f"writing PDF to {options.output}")
 
     doclist[0].copy(all_pages).write_pdf(options.output, optimize_images=True)
 
