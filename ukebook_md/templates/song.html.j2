@@ -35,5 +35,7 @@
   <a class="middle" href="../index.html" accesskey="i">return to index</a>
   <a class="right" href="{{ song._next }}" accesskey="n">next</a>
   {% endif %}
+  {% if show_credits %}
   <span class="credits">{{ song.meta.credits }}</span>
+  {% endif %}
 {% endblock %}

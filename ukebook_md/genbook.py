@@ -3,36 +3,35 @@
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
 
-import markdown
-import ukedown.udn
+import argparse
+import codecs
+import datetime
+import logging
+import os
+import re
+import shutil
 
-# local chord generation tool (SVGs)
-# from . import chordgen
+# the normal boring stuff
+import sys
+from glob import glob
+from operator import itemgetter
 
 # jinja2 templating, originially based one the django model.
 # from jinja2 import Environment, FileSystemLoader
 import jinja2
+import markdown
+import ukedown.udn
+import yaml
 
 # for generating summary info
 from bs4 import BeautifulSoup as bs
+from progress.bar import Bar
 
 import chordgen
 
-# the normal boring stuff
-import sys
-import os
-import datetime
-import shutil
-import codecs
-import yaml
-import re
-from operator import itemgetter
-import logging
+# local chord generation tool (SVGs)
+# from . import chordgen
 
-from progress.bar import Bar
-
-import argparse
-from glob import glob
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s - %(message)s",
@@ -47,12 +46,28 @@ def parse_commandline(argv):
     Define commandline options and arguments
     """
     preamble = """
-    Process a directory of ukedown-formatted song sheets to create an HTML-formatted book.
-    This will process all files found in the given directory, converting them to HTML,
-    inserting chord diagrams (can be hidden with CSS)
+    Process one or more directories (or files)  containing ukedown-formatted song sheets
+
+    Creates an HTML diretory structure representing a songbook
+
+    * Process all files found in the source directories
+    * Parse any metadata
+    * Create a directory structure and populate it
+    * Render songsheets as HTML
+    * Create an index page with links to the songsheets
+    * insert chord diagrams / names if desired
+
+    Several built-in formats are available:
+
+    "Karauke": inline chord names, no diagrams
+    "Singers": neither chord names  nor diagrams, just lyrics
+
+    Default is to include all of these artifacts
     """
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=preamble, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("input", help="name of input directory", nargs="+")
     parser.add_argument(
         "-s",
@@ -140,6 +155,12 @@ def parse_commandline(argv):
         help="Do mot display performance notes",
     )
     cgrp.add_argument(
+        "--hide-credits",
+        action="store_true",
+        default=False,
+        help="Do mot display artist/composer credits",
+    )
+    cgrp.add_argument(
         "--refresh",
         "--update",
         dest="refresh",
@@ -207,7 +228,7 @@ def parse_commandline(argv):
         "--pdf",
         action="store_true",
         default=False,
-        help="Generate a PDF document from the generated HTML"
+        help="Generate a PDF document from the generated HTML",
     )
 
     args = parser.parse_args(argv)
@@ -306,12 +327,12 @@ def parse_meta(markup, leader=";"):
     metadata = []
     content = []
 
-    for l in markup.splitlines():
-        res = metap.match(l)
+    for line in markup.splitlines():
+        res = metap.match(line)
         if res is not None:
             metadata.append(res.group(1))
         else:
-            content.append(l)
+            content.append(line)
     _markup = "\n".join(content)
     _metadata = yaml.safe_load("\n".join(metadata))
 
@@ -463,6 +484,7 @@ def parse_songsheets(inputs: list, exclusions: list = []) -> dict:
     pbar.finish()
     return context
 
+
 def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     """
     Manage context for templates based on metadat and commandline options
@@ -478,6 +500,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     ctx["show_chords"] = True
     ctx["show_diagrams"] = True
     ctx["show_notes"] = True
+    ctx["show_credits"] = True
     ctx["ext_chords"] = options.external
     if options.hide_diagrams:
         # this is effectively 'karauke band style'
@@ -486,9 +509,12 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
         ctx["show_diagrams"] = False
         ctx["show_chords"] = False
         ctx["show_notes"] = False
+        ctx["show_credits"] = False
     elif options.format == "karauke":
         ctx["show_diagrams"] = False
+        ctx["show_credits"] = False
     else:
+        ctx["show_credits"] = True
         ctx["show_diagrams"] = True
         ctx["show_chords"] = True
         ctx["show_notes"] = True
@@ -496,8 +522,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     return ctx
 
 
-
-def main(options: argparse.Namespace):
+def main(options: argparse.Namespace):  # noqa: C901
     """
     main script entrypoint, expects an 'options' object from argparse.ArgumentParser
     """
@@ -508,10 +533,7 @@ def main(options: argparse.Namespace):
         options.no_index = True
 
     # context created by analysing input files and options:
-    context = make_context(
-        parse_songsheets(options.input, options.exclude),
-        options
-        )
+    context = make_context(parse_songsheets(options.input, options.exclude), options)
 
     with open("chords.yml") as cd:
         chord_defs = yaml.safe_load(cd)
@@ -571,6 +593,9 @@ def main(options: argparse.Namespace):
     missing_chords = chordgen.generate(
         context["chords"], chord_defs, destdir=chord_dir, template=chord_template
     )
+
+    if len(missing_chords):
+        print("Cannot find definitions for chords", "\n".join(missing_chords))
 
     # copy styles and templates in
     if options.format == "epub":
@@ -664,7 +689,7 @@ def main(options: argparse.Namespace):
     template_maps = {}
     if options.format == "epub":
         template_maps[os.path.join(parent, "nav.xhtml")] = "nav.xhtml.j2"
-        template_mps[os.path.join(parent, "package.opf")] = "package.opf.j2"
+        template_maps[os.path.join(parent, "package.opf")] = "package.opf.j2"
 
     if options.format != "onepage" and not options.no_index:
         template_maps[os.path.join(parent, "index.html")] = "bookindex.j2"
