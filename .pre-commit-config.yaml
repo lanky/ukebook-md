@@ -39,3 +39,29 @@ repos:
     hooks:
       - id: curlylint
         files: \.j2
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.0.1" # Use the sha or tag you want to point at
+    hooks:
+      - id: prettier
+        files: \.css
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml
+    rev: v1.1.0
+    hooks:
+      - id: forbid-html-img-without-alt-text
+      - id: forbid-non-std-html-attributes
+      - id: detect-missing-css-classes
+        args:
+          - --css-files-dir
+          - css
+          - --html-files-dir
+          - templates
+      - id: html-tags-blacklist
+      - id: html-attributes-blacklist
+
+  - repo: https://github.com/pre-commit/mirrors-csslint
+    rev: 'v1.0.5'  # Use the sha / tag you want to point at
+    hooks:
+      - id: csslint
+        files: \.css
