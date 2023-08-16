@@ -55,7 +55,7 @@ def parse_song(page: Path) -> str:
         linksoup = bs(content, features="lxml")
         ilink = linksoup.find("a", {"class": "middle"})
         if ilink is not None:
-            ilink["href"] = "#title_index"
+            ilink["href"] = "#index00"
 
         # remove the forward and back links
         linksoup.find("a", {"class": "left"}).decompose()
