@@ -3,7 +3,6 @@
 # -*- coding: utf-8 -*-
 # everything but the kitchen sink to ease portability when reqd.
 import argparse
-import codecs
 import datetime
 import logging
 import os
@@ -12,11 +11,9 @@ import sys
 import tempfile
 
 import jinja2
-import markdown
-import ukedown.udn
 import yaml
 from bs4 import BeautifulSoup as bs
-from genbook import make_context, parse_meta, parse_song, safe_name, ukedown_to_html
+from genbook import parse_song, safe_name
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
 
