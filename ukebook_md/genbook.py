@@ -4,8 +4,6 @@
 """Generate songbook in HTML format from provided ukedown inputs."""
 
 import argparse
-import codecs
-import datetime
 import logging
 import os
 import re
@@ -13,9 +11,10 @@ import shutil
 
 # the normal boring stuff
 import sys
+from datetime import datetime
 from glob import glob
 from operator import itemgetter
-from pathlib import Path
+from pathlib import Path, PosixPath
 from typing import List, Tuple
 
 # jinja2 templating, originially based one the django model.
@@ -26,13 +25,20 @@ import yaml
 
 # for generating summary info
 from bs4 import BeautifulSoup as bs
-from progress.bar import Bar
+from progress.bar import Bar  # type: ignore
 
 import chordgen
 
+
 # local chord generation tool (SVGs)
 # from . import chordgen
+def path_representer(dumper, data):
+    """Create custom representer for pathlib.Path objects."""
+    return dumper.represent_scalar("tag:yaml.org,2002:str", str(data))
 
+
+yaml.representer.SafeRepresenter.add_representer(PosixPath, path_representer)
+yaml.representer.SafeRepresenter.add_representer(Path, path_representer)
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s - %(message)s",
@@ -73,7 +79,7 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=preamble, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("input", help="name of input directory", nargs="+")
+    parser.add_argument("input", type=Path, help="name of input directory", nargs="+")
     parser.add_argument(
         "-s",
         "--style",
@@ -83,12 +89,14 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
     parser.add_argument(
         "-c",
         "--cover",
+        type=Path,
         help="cover image, including extension. Must be in 'images' directory",
     )
     parser.add_argument(
         "-o",
         "--output",
-        default="Karauke_{:%Y-%m-%d}".format(datetime.datetime.now()),
+        type=Path,
+        default="Karauke_{:%Y-%m-%d}".format(datetime.now()),
         help="Name of Book to build (default is Karauke_YYYY_MM_DD",
     )
     parser.add_argument(
@@ -415,8 +423,8 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
         songdata(dict): dictionary representation of a song for use
                         in templating/reporting
     """
-    songdata = {
-        "filename": re.sub(r"\.udn$", ".html", os.path.basename(songfile)),
+    songdata: dict = {
+        "filename": songfile.with_suffix(".html"),
         "chords": [],
         "id": "{:03d}".format(songid),
         "next_id": "{:03d}".format(songid + 1),
@@ -472,18 +480,12 @@ def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
     """
     songs = {}
     # will merge dirs together, if a song appears twice, last match wins
-    for i in inputs:
-        if os.path.isdir(i):
-            # for directories, we search them for .udn files
-            songs.update(
-                {
-                    os.path.basename(s): os.path.realpath(s)
-                    for s in glob(os.path.join(i, "*.udn"))
-                }
-            )
+    for src in inputs:
+        if src.is_dir():
+            songs.update({p.name: p for p in src.glob("*.udn")})
         else:
             # for single songsheets, just the file info
-            songs.update({os.path.basename(i): os.path.realpath(i)})
+            songs.update({src.name: src})
 
     context = {"chords": set([]), "songs": []}
     # we would like to maintain chord ordering - chords are listed in the order they appear in the song.
@@ -520,7 +522,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
         context(dict): updated context ready to pass to a template
 
     """
-    ctx["songbook"] = os.path.basename(options.output)
+    ctx["songbook"] = options.output.name
     ctx["book_type"] = options.format
     ctx["stylesheets"] = []
     ctx["images"] = []
@@ -556,10 +558,10 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
 def main():  # noqa: C901
     """Run all the pretty things."""
     options = parse_commandline(sys.argv[1:])
-    timestamp = datetime.datetime.now()
+    timestamp = datetime.now()
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
 
-    if len(options.input) == 1 and os.path.isfile(options.input[0]):
+    if len(options.input) == 1 and options.input[0].is_file():
         options.no_index = True
 
     # context created by analysing input files and options:
@@ -594,35 +596,32 @@ def main():  # noqa: C901
     # now we need to create our output layout
     # handle any additional layout definitions here
     if options.layout == "epub":
-        parent = "EPUB/"
-    else:
-        parent = ""
+        options.output = options.output / "EPUB"
 
     coredirs = ["css", "images", "songs"]
+
+    if options.debug:
+        coredirs.append("debug")
 
     if options.external:
         coredirs.append("chords")
         chord_template = "chord_ext.svg.j2"
-        chord_dir = os.path.join(options.output, parent, "chords")
-        song_template = "song.html.j2"
+        chord_dir = options.output / "chords"
+        song_template = Path("song.html.j2")
     else:
-        chord_template = "chord.svg.j2"
-        chord_dir = "templates/svg"
-        song_template = "song.html.j2"
+        chord_template = Path("chord.svg.j2")
+        chord_dir = Path("templates/svg")
+        song_template = Path("song.html.j2")
 
     if options.format == "onepage":
-        song_template = "onepage.html.j2"
+        song_template = Path("onepage.html.j2")
 
-    layout = [os.path.join(parent, c) for c in coredirs]
-    if len(parent):
-        layout.insert(0, parent)
+    layout = [options.output / c for c in coredirs]
 
     # create target directories
     create_layout(options.output, *layout)
-    with codecs.open(
-        os.path.join(options.output, ".timestamp"), mode="w", encoding="utf-8"
-    ) as tsfile:
-        tsfile.write(datetime.datetime.strftime(timestamp, "%s"))
+    tsfile = options.output / ".timestamp"
+    tsfile.write_text(timestamp.strftime("%s"))
 
     # generate all chord diagrams from the songbook context
     missing_chords = chordgen.generate(
@@ -634,9 +633,7 @@ def main():  # noqa: C901
 
     # copy styles and templates in
     if options.format == "epub":
-        shutil.copy2(
-            "templates/container.xml", os.path.join(options.output, "META-INF")
-        )
+        shutil.copy2("templates/container.xml", options.output / "META-INF")
 
     def globcp(pattern, dest, key=None):
         for item in glob(pattern):
@@ -650,15 +647,15 @@ def main():  # noqa: C901
     if not options.no_css:
         globcp(
             "{0.css_dir}/*.css".format(options),
-            os.path.join(options.output, parent, "css"),
+            options.output / "css",
             "stylesheets",
         )
 
     # copy any images we may be using as footers etc
-    globcp("images/*", os.path.join(options.output, parent, "images"), "images")
+    globcp("images/*", options.output / "images", "images")
 
     # javascript
-    globcp("js/*.js", os.path.join(options.output, parent, "js"), "scripts")
+    globcp("js/*.js", options.output / "js", "scripts")
 
     # setup our template environment
     env = jinja2.Environment(
@@ -669,7 +666,7 @@ def main():  # noqa: C901
     env.filters["safe_name"] = safe_name
 
     # now let's generate our songsheets
-    st = env.get_template(song_template)
+    st = env.get_template(song_template.name)
 
     failures = []
     if not options.no_html:
@@ -677,10 +674,9 @@ def main():  # noqa: C901
             # generate index then all the other things afterwards?
             logging.info("rendering songbook into single-page HTML")
             if not options.no_index:
-                with open(
-                    os.path.join(options.output, parent, "index.html"), "w"
-                ) as bi:
-                    bi.write(st.render(context, link_type="internal"))
+                (options.output / "index.html").write_text(
+                    st.render(context, link_type="internal")
+                )
 
         for songobj in Bar("Rendering Songs:".ljust(20)).iter(context["songs"]):
             logging.info("rendering {title} into {filename}".format(**songobj))
@@ -688,29 +684,32 @@ def main():  # noqa: C901
             songobj["_prev"] = context["index"].get(songobj["prev_id"], "../index.html")
             songobj["_next"] = context["index"].get(songobj["next_id"], "../index.html")
             songobj["book_css"] = options.style
-            with codecs.open(
-                "/tmp/{filename}.yml".format(**songobj), mode="w", encoding="utf-8"
-            ) as dumpfile:
-                dumpfile.write(yaml.safe_dump(songobj))
+            songobj["context"] = context
+            if options.debug:
+                dumpfile = (
+                    options.output
+                    / "debug"
+                    / songobj["filename"].with_suffix(".yml").name
+                )
+                dumpfile.write_text(yaml.safe_dump(songobj))
             try:
-                with open(
-                    os.path.join(options.output, parent, "songs", songobj["filename"]),
-                    "w",
-                ) as sf:
-                    content = bs(
-                        st.render(
-                            song=songobj,
-                            songidx=context["index"],
-                            songbook=context["songbook"],
-                            book_css=context["book_css"],
-                            show_diagrams=context["show_diagrams"],
-                            show_chords=context["show_chords"],
-                            ext_chords=context["ext_chords"],
-                            show_notes=context["show_notes"],
-                        ),
-                        features="lxml",
-                    )
-                    sf.write(str(content))
+                sf = options.output / "songs" / songobj["filename"].name
+                print(sf)
+                content = bs(
+                    st.render(
+                        song=songobj,
+                        #                         songidx=context["index"],
+                        #                         songbook=context["songbook"],
+                        #                         book_css=context["book_css"],
+                        #                         show_diagrams=context["show_diagrams"],
+                        #                         show_chords=context["show_chords"],
+                        #                         ext_chords=context["ext_chords"],
+                        #                         show_notes=context["show_notes"],
+                        **context,
+                    ),
+                    features="lxml",
+                )
+                sf.write_text(str(content))
             except jinja2.TemplateError as T:
                 logging.exception(
                     "Failed to render template for {title} - {artist}".format(**songobj)
@@ -723,23 +722,22 @@ def main():  # noqa: C901
     # other EPUB structures
     template_maps = {}
     if options.format == "epub":
-        template_maps[os.path.join(parent, "nav.xhtml")] = "nav.xhtml.j2"
-        template_maps[os.path.join(parent, "package.opf")] = "package.opf.j2"
+        template_maps["nav.xhtml"] = "nav.xhtml.j2"
+        template_maps["package.opf"] = "package.opf.j2"
 
     if options.cover:
-        template_maps[os.path.join(parent, "cover.html")] = "cover.html.j2"
+        template_maps["cover.html"] = "cover.html.j2"
         context["cover"] = options.cover
 
     if options.format != "onepage" and not options.no_index:
-        template_maps[os.path.join(parent, "index.html")] = "bookindex.j2"
+        template_maps["index.html"] = "bookindex.j2"
 
     if len(template_maps):
         for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(
             template_maps.items()
         ):
             t = env.get_template(ftemplate)
-            with open(os.path.join(options.output, fpath), "w") as dest:
-                dest.write(t.render(context))
+            (options.output / fpath).write_text(t.render(context))
 
 
 if __name__ == "__main__":
