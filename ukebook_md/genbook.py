@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # vim: set ts=4 sts=4 sw=4 et ci ft=python foldmethod=indent:
 # -*- coding: utf-8 -*-
-# everything but the kitchen sink to ease portability when reqd.
+"""Generate songbook in HTML format from provided ukedown inputs."""
 
 import argparse
 import codecs
@@ -15,12 +15,13 @@ import shutil
 import sys
 from glob import glob
 from operator import itemgetter
+from pathlib import Path
+from typing import List, Tuple
 
 # jinja2 templating, originially based one the django model.
 # from jinja2 import Environment, FileSystemLoader
 import jinja2
 import markdown
-import ukedown.udn
 import yaml
 
 # for generating summary info
@@ -47,10 +48,8 @@ SWEARING = {
 }
 
 
-def parse_commandline(argv):
-    """
-    Define commandline options and arguments
-    """
+def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
+    """Define commandline options and arguments."""
     preamble = """
     Process one or more directories (or files)  containing ukedown-formatted song sheets
 
@@ -297,8 +296,10 @@ def parse_commandline(argv):
 
 
 def safe_name(chord):
-    """
-    Makes chordnames 'safe' (no shell special chars. Might need expanding for Windows/Mac)
+    """Make chordnames 'safe'.
+
+    - removes shell special chars
+    - Might need expanding for Windows/Mac
 
     Args:
         chord(str): a chordname to manipulate
@@ -314,8 +315,7 @@ def safe_name(chord):
 
 
 def render(template, context, template_dir="templates"):
-    """
-    Creates a custom jinja2 environment and generates the provided template - allows for customisation
+    """Load and render the provided template.
 
     Args:
         template(str): name of template file
@@ -333,8 +333,8 @@ def render(template, context, template_dir="templates"):
 
 
 def parse_meta(markup, leader=";"):
-    """
-    parse out metadata from file,
+    """Parse out metadata from UDN file.
+
     This MUST be done before passing to markdown
     There doesn't have to be any metadata - should work regardless
 
@@ -358,11 +358,9 @@ def parse_meta(markup, leader=";"):
     return _metadata, _markup
 
 
-def ukedown_to_html(inputfile, family_friendly: bool = False) -> tuple:
-    """
-    Process a file, produce HTML via ukedown.
-    """
-    fh = codecs.open(inputfile, mode="r", encoding="utf-8")
+def ukedown_to_html(inputfile: Path, family_friendly: bool = False) -> Tuple[str, dict]:
+    """Process a file, produce HTML via ukedown."""
+    fh = inputfile.open()
     raw_markup = fh.read()
     if family_friendly:
         for k, v in SWEARING.items():
@@ -387,9 +385,7 @@ def ukedown_to_html(inputfile, family_friendly: bool = False) -> tuple:
 
 
 def create_layout(destdir, *subdirs):
-    """
-    Basic wrapper around os.makedirs to create our cnntainer layout
-    """
+    """Create required directories for output."""
     if not os.path.isdir(destdir):
         try:
             os.makedirs(destdir)
@@ -408,9 +404,8 @@ def create_layout(destdir, *subdirs):
             sys.exit(1)
 
 
-def parse_song(songfile: str, songid: int = 1, **kwargs) -> dict:
-    """
-    process an individual songsheet to extract content and metadata
+def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
+    """Process an individual songsheet to extract content and metadata.
 
     Args:
         songfile(str): path to songsheet file.
@@ -466,14 +461,14 @@ def parse_song(songfile: str, songid: int = 1, **kwargs) -> dict:
 
 
 def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
-    """
-    Processes songsheets, returns a context (dict) containing
-    song: { id: NNN, title: X, artist: X, chords: [X],
+    """Process songsheets.
 
     Args:
         inputdirs(list): list of directories containing input files in
                          ukedown format
         exclusions(list):
+    Returns:
+        context(dict): artist, title, chords etc parsed from songsheet
     """
     songs = {}
     # will merge dirs together, if a song appears twice, last match wins
@@ -516,8 +511,14 @@ def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
 
 
 def make_context(ctx: dict, options: argparse.Namespace) -> dict:
-    """
-    Manage context for templates based on metadat and commandline options
+    """Generate a template context dict.
+
+    Args:
+        ctx(dict): simple context parsed from songsheet
+        options(argparse.Namespace): commandline options
+    Returns:
+        context(dict): updated context ready to pass to a template
+
     """
     ctx["songbook"] = os.path.basename(options.output)
     ctx["book_type"] = options.format
@@ -553,9 +554,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
 
 
 def main():  # noqa: C901
-    """
-    main script entrypoint, expects an 'options' object from argparse.ArgumentParser
-    """
+    """Run all the pretty things."""
     options = parse_commandline(sys.argv[1:])
     timestamp = datetime.datetime.now()
     logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
