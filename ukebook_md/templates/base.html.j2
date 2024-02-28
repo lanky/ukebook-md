@@ -20,7 +20,13 @@
     .chords { display: none; }
     .overflow { display: none; }
   {% endif %}
-  {% if song.meta.font_size %}
+  <!-- orientation: {{ orientation }} -->
+  {% if orientation == "landscape" and song.meta.landscape_font_size %}
+  // LANDSCAPE #
+  .content {
+    font-size: {{ song.meta.landscape_font_size }};
+  }
+  {% elif song.meta.font_size %}
   .content {
       font-size: {{ song.meta.font_size }};
   }
