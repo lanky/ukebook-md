@@ -1,0 +1,33 @@
+---
+# vim: set ts=2 sts=2 sw=2 et cindent ft=yaml:
+# a yaml description of a chord diagram
+#
+# position and dimensions of the fretboard
+fboard:
+  # px from top of image
+  top: 30
+  # px from top of image - effectively stops 10px from bottom
+  bottom: 120
+  # start 15 px in from the left
+  left: 15
+  # stop 69px in from the left (31 from the right)
+  right: 69
+  # determines grid layout, would allow this to work for other instruments too
+  strings: 4
+  frets: 5
+
+# canvas size
+svg:
+  # was 100, but that leaves a large gap on the right (for fingering etc)
+  width: 84
+  height: 130
+
+# where to put the chord name
+title:
+  left: "50%"
+  top: 5
+
+# other things to calculate
+# barres
+# fingers
+# radius
