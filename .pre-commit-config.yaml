@@ -64,4 +64,6 @@ repos:
     rev: 'v1.0.5'  # Use the sha / tag you want to point at
     hooks:
       - id: csslint
+        args:
+          - --ignore=import
         files: \.css
