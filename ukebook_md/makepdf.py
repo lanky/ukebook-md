@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 et ci nu ft=python:
+"""Convert a PDF book from an HTML songbook."""
+
 import argparse
-import os
 import re
 import sys
-from glob import glob
 from pathlib import Path
 
 from bs4 import BeautifulSoup as bs
@@ -15,15 +15,18 @@ from weasyprint.text.fonts import FontConfiguration
 
 
 def parse_cmdline(argv):
+    """Process commandline options and arguments."""
     parser = argparse.ArgumentParser(
         description="Convert a multi-page HTML songbook into PDF"
     )
-    parser.add_argument("inputdir", help="top-level directory containing HTML")
+    parser.add_argument(
+        "inputdir", type=Path, help="top-level directory containing HTML"
+    )
     parser.add_argument(
         "-o",
         "--output",
-        default="output.pdf",
-        help="""Name of PDF file to generate (default: output.pdf).
+        type=Path,
+        help="""Name of PDF file to generate (default: INPUTDIR.pdf)
                 This will be silently replaced if it already exists.""",
     )
     parser.add_argument(
@@ -35,21 +38,22 @@ def parse_cmdline(argv):
 
     opts = parser.parse_args(argv)
 
-    opts.inputdir = Path(opts.inputdir)
-
     if not opts.inputdir.exists():
         print("input dir doesn't appear to exist")
         parser.print_help()
         sys.exit(1)
 
+    if not opts.output:
+        opts.output = opts.inputdir.with_suffix(".pdf")
+
     return opts
 
 
 def parse_song(page: Path) -> str:
-    """
-    Separates out the song page parsing.
-    rewrites links  to  point to IDs not HTML files
-    Removes next & prev links
+    """Parse an individual songsheet.
+
+    - Rewrites links  to  point to IDs not HTML files
+    - Removes next & prev links
     """
     with page.open() as content:
         linksoup = bs(content, features="lxml")
@@ -64,9 +68,7 @@ def parse_song(page: Path) -> str:
 
 
 def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
-    """
-    put together a PDF, using a directory created by genbook.py
-    """
+    """Convert a directory of HTML pages to a PDF document."""
     doclist = []
 
     if options.stylesheets:
@@ -108,9 +110,7 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
 
 
 def process_links(index: Path) -> str:
-    """
-    ensures all links processed are internal. returns str
-    """
+    """Ensure all document links are internal."""
     with index.open() as idx:
         idxsoup = bs(idx, features="lxml")
         for a in idxsoup.findAll("a"):
@@ -123,15 +123,14 @@ def process_links(index: Path) -> str:
 
 
 def main():
+    """Run all the pretty things."""
     opts = parse_cmdline(sys.argv[1:])
 
     collate(opts)
 
 
 def parse_cover(page: Path) -> str:
-    """
-    process the cover page if there is one
-    """
+    """Process the cover page if there is one."""
     with page.open() as pg:
         content = bs(pg, features="lxml")
         # all links should point to #index00
