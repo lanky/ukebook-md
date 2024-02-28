@@ -461,23 +461,30 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
         songdata["meta"].update(meta)
 
     # process our HTML with BeautifulSoup4
-    soup = bs(content, features="lxml")
+    soup: bs = bs(content, features="lxml")
 
     # title and artist are in <h1> tags.
-    hdr = soup.h1.extract()
-    try:
-        title, artist = [i.strip() for i in hdr.text.split("-", 1)]
-    except ValueError:
-        title = hdr.text.strip()
-        artist = None
-    # remove the header from our document
-    hdr.decompose()
+    hdr = soup.h1
+    if hdr is not None:
+        try:
+            title, artist = [i.strip() for i in hdr.text.split("-", 1)]
+        except ValueError:
+            title = hdr.text.strip()
+            artist = None
+        # remove the header from our document
+        hdr.decompose()
+    else:
+        title = "Unknown Title"
+        artist = "Unknown Artist"
     # currently all the templates use 'html', so stick to that naming
-    songdata["html"] = "".join([str(x) for x in soup.body.contents]).strip()
-    # every valid ukedown songsheet has a title, and possibly an artist
-    songdata["title"] = title.strip()
-    if artist is not None:
-        songdata["artist"] = artist.strip()
+    if soup.body is not None:
+        songdata["html"] = "".join([str(x) for x in soup.body.contents]).strip()
+        # every valid ukedown songsheet has a title, and possibly an artist
+        songdata["title"] = title.strip()
+        if artist is not None:
+            songdata["artist"] = artist.strip()
+    else:
+        songdata["html"] = ""
 
     # now get list of chords used in the song
     songdata["chords"] = []
@@ -508,7 +515,7 @@ def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
             # for single songsheets, just the file info
             songs.update({src.name: src})
 
-    context = {"chords": set([]), "songs": []}
+    context: dict = {"chords": set([]), "songs": []}
     # we would like to maintain chord ordering - chords are listed in the order they appear in the song.
     pbar = Bar("Analysing Content: ".ljust(20), max=len(songs))
     # This will sort items across multiple directories
