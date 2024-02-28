@@ -247,7 +247,8 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         action="store_const",
         dest="format",
         const="singers",
-        help="Hide diagrams, inline chords and performance notes. Lyrics and headings only",
+        help="""Hide diagrams, inline chords and performance notes. """
+        """Lyrics and headings only""",
     )
 
     parser.add_argument(
@@ -255,6 +256,23 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         action="store_true",
         default=False,
         help="Generate a PDF document from the generated HTML",
+    )
+
+    parser.add_argument(
+        "-l",
+        "--landscape",
+        action="store_const",
+        dest="orientation",
+        const="landscape",
+        help="""This will be a landscape-format book. """
+        """You still need to provide a suitable stylesheet""",
+    )
+
+    parser.add_argument(
+        "-D",
+        "--debug",
+        action="store_true",
+        help="Produce debug output in songbook directory",
     )
 
     args = parser.parse_args(argv)
@@ -300,6 +318,9 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
 
     if not args.exclude:
         args.exclude = []
+
+    if not args.orientation:
+        args.orientation = "portrait"
     return args
 
 
@@ -535,6 +556,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     ctx["show_notes"] = True
     ctx["show_credits"] = True
     ctx["ext_chords"] = options.external
+    ctx["orientation"] = options.orientation
     if options.hide_diagrams:
         # this is effectively 'karauke band style'
         ctx["show_diagrams"] = False
