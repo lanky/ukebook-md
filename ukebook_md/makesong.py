@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # vim: set ts=4 sts=4 sw=4 et ci ft=python foldmethod=indent:
 # -*- coding: utf-8 -*-
-# everything but the kitchen sink to ease portability when reqd.
+"""Render an individual songsheet to PDF."""
+
 import argparse
 import datetime
 import logging
@@ -35,7 +36,7 @@ logger.addHandler(h)
 
 
 def parse_commandline(argv: list) -> argparse.Namespace:
-    """process commandline options and arguments
+    """Process commandline options and arguments.
 
     parses provided options and sanity-checks them
 
@@ -146,11 +147,7 @@ def parse_commandline(argv: list) -> argparse.Namespace:
 
 
 def main():
-    """
-    [TODO:description]
-
-    :param opts [TODO:type]: [TODO:description]
-    """
+    """Run all the pretty things."""
     # generate context for songsheet
     # simplistic as this is for karauke only
     opts = parse_commandline(sys.argv[1:])
