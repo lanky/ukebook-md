@@ -757,17 +757,9 @@ def main():  # noqa: C901
                 dumpfile.write_text(yaml.safe_dump(songobj))
             try:
                 sf = options.output / "songs" / songobj["filename"].name
-                print(sf)
                 content = bs(
                     st.render(
                         song=songobj,
-                        #                         songidx=context["index"],
-                        #                         songbook=context["songbook"],
-                        #                         book_css=context["book_css"],
-                        #                         show_diagrams=context["show_diagrams"],
-                        #                         show_chords=context["show_chords"],
-                        #                         ext_chords=context["ext_chords"],
-                        #                         show_notes=context["show_notes"],
                         **context,
                     ),
                     features="lxml",
