@@ -453,8 +453,8 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
         "filename": songfile.with_suffix(".html"),
         "chords": [],
         "id": f"{songid:03d}",
-        "next_id": f"{songid + 1:3d}",
-        "prev_id": f"{songid - 1:3d}",
+        "next_id": f"{songid + 1:03d}",
+        "prev_id": f"{songid - 1:03d}",
         "meta": {},
     }
     # convert ukedown to HTML - this generates a complete document, we only
