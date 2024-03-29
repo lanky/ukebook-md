@@ -64,6 +64,8 @@ def parse_song(page: Path) -> str:
         # remove the forward and back links
         linksoup.find("a", {"class": "left"}).decompose()
         linksoup.find("a", {"class": "right"}).decompose()
+        for i in linksoup.findAll("img"):
+            i["src"] = f"file://{page.parent.resolve()}/{i['src']}"
         return str(linksoup)
 
 
@@ -119,6 +121,8 @@ def process_links(index: Path) -> str:
             else:
                 linkid = a["id"].split("_")[1]
                 a["href"] = "#title_{}".format(linkid)
+        for i in idxsoup.findAll("img"):
+            i["src"] = f"file://{index.parent.resolve()}/{i['src']}"
         return str(idxsoup)
 
 
