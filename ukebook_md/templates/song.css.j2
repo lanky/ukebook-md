@@ -1,0 +1,16 @@
+// vim: set ft=jinja.css :
+@charset "utf-8";
+/* song-specific customisations */
+{% if orientation == "landscape" -%}
+  {% if meta.landscape_font_size -%}
+.content {
+  font-size: {{ meta.landscape_font_size }};
+}
+  {% endif -%}
+{% else -%}
+  {% if meta.font_size -%}
+.content {
+  font-size: {{ meta.font_size }};
+}
+  {% endif %}
+{% endif -%}
