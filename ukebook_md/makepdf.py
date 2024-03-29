@@ -100,7 +100,15 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
     pages = sorted(options.inputdir.glob("songs/*.html"))
 
     for pg in Bar("Processing HTML").iter(pages):
-        song = HTML(string=parse_song(pg)).render(stylesheets=css, font_config=fontcfg)
+        localstyle = options.inputdir / "css" / pg.with_suffix(".css").name
+        if localstyle.exists():
+            stylesheets = css + [CSS(localstyle)]
+        else:
+            stylesheets = css
+
+        song = HTML(string=parse_song(pg), base_url=pg).render(
+            stylesheets=stylesheets, font_config=fontcfg
+        )
         doclist.append(song)
 
     print("collating pages")
