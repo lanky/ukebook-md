@@ -32,7 +32,8 @@ def parse_cmdline(argv):
     parser.add_argument(
         "-s",
         "--stylesheets",
-        default="",
+        action="append",
+        type=Path,
         help="User stylesheets to apply, must be in the 'css' subdir of the book",
     )
 
@@ -75,8 +76,8 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
 
     if options.stylesheets:
         css = [
-            CSS(options.inputdir / "css" / f)
-            for f in options.stylesheets.split(",")
+            CSS(options.inputdir / "css" / f.with_suffix(".css").name)
+            for f in options.stylesheets
             if options.stylesheets
         ]
     else:
