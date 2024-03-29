@@ -703,6 +703,7 @@ def main():  # noqa: C901
 
     # now let's generate our songsheets
     st = env.get_template(song_template.name)
+    css_template = env.get_template("song.css.j2")
 
     failures = []
     if not options.no_html:
@@ -721,6 +722,32 @@ def main():  # noqa: C901
             songobj["_next"] = context["index"].get(songobj["next_id"], "../index.html")
             songobj["book_css"] = options.style
             songobj["context"] = context
+            if (
+                "font_size" in songobj["meta"]
+                or "landscape_font_size" in songobj["meta"]
+            ):
+                song_style = (
+                    options.output
+                    / "css"
+                    / songobj["filename"].with_suffix(".css").name
+                )
+                try:
+                    song_style.write_text(
+                        css_template.render(
+                            orientation=context["orientation"], meta=songobj["meta"]
+                        )
+                    )
+                except jinja2.TemplateError:
+                    print(
+                        yaml.safe_dump(
+                            {
+                                "orientation": context["orientation"],
+                                "meta": songobj["meta"],
+                            }
+                        )
+                    )
+                    raise
+
             if options.debug:
                 dumpfile = (
                     options.output
