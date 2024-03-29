@@ -785,7 +785,7 @@ def main():  # noqa: C901
         context["cover"] = options.cover
 
     if options.format != "onepage" and not options.no_index:
-        template_maps["index.html"] = "bookindex.j2"
+        template_maps["index.html"] = "index.html.j2"
 
     if len(template_maps):
         for fpath, ftemplate in Bar("Other Templates: ".ljust(20)).iter(
