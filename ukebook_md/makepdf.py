@@ -142,13 +142,13 @@ def main():
     collate(opts)
 
 
-def parse_cover(page: Path) -> str:
+def parse_cover(page: Path, link_target="#index00") -> str:
     """Process the cover page if there is one."""
     with page.open() as pg:
         content = bs(pg, features="lxml")
         # all links should point to #index00
         for a in content.findAll("a"):
-            a["href"] = "#index00"
+            a["href"] = link_target
         for i in content.findAll("img"):
             i["src"] = f"file://{page.parent.resolve()}/{i['src']}"
         print(content)
