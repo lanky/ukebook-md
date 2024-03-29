@@ -1,5 +1,5 @@
 @charset "utf-8";
-@import "ukedown_inverse.css";
+@import url(ukedown_inverse.css);
 
 @page {
   background-color: black;
@@ -7,16 +7,16 @@
   margin: 0.5cm;
   size: A4 landscape;
 
-  @bottom-right {
+  /*  @bottom-right {
     content: counter(page) "/" counter(pages);
     font-size: 0.8em;
     font-weight: bold;
-    /*    padding-right: 10px; */
   }
 
   @top-center {
     content: "Karauke Songbook";
   }
+*/
 }
 
 * {
@@ -24,9 +24,10 @@
 }
 
 html {
+  background-color: black;
   color: white;
   font-family: verdana, "dejavu sans", sans-serif;
-  font-size: 14px;
+  font-size: 14pt;
 }
 
 h1::before {
@@ -37,12 +38,26 @@ h1 {
   font-size: 1.2em;
   /* padding-bottom: 0.2em; */
   padding-left: 5px;
+  text-align: center;
 }
 
 .header {
   left: 0;
   page-break-before: always;
   width: 100%;
+}
+
+.branding {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.branding img {
+  height: 3cm;
+  float: right;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 /* content div, max 2 cols in portrait mode */
@@ -55,7 +70,7 @@ h1 {
   column-width: auto;
   height: 90vh;
   max-width: 100%;
-  orphans: 0;
+  orphans: 4;
   padding: 5px;
   width: 100%;
 }
@@ -75,6 +90,7 @@ h1 {
   position: fixed;
   text-align: center;
   width: 100%;
+  margin-top: 2px;
 }
 
 /* div on the right of the page for chord diagrams, if we want any*/
@@ -101,9 +117,10 @@ h1 {
 }
 
 a.middle {
-  font-size: 1em;
+  font-size: 0.8em;
   text-align: center;
   text-decoration: none;
+  color: gray;
 }
 
 .section_header {
@@ -138,6 +155,7 @@ a.middle {
   max-height: 490px;
   overflow: auto;
   width: auto;
+  font-size: 11pt;
 }
 
 .credits {
