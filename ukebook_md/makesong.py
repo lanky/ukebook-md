@@ -10,6 +10,7 @@ import os
 import shutil
 import sys
 import tempfile
+from pathlib import Path
 
 import jinja2
 import yaml
@@ -46,7 +47,9 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         "render a songsheet to PDF from a ukedown source file"
     )
-    parser.add_argument("inputfile", nargs="+", help="one or more songsheets to render")
+    parser.add_argument(
+        "inputfile", nargs="+", type=Path, help="one or more songsheets to render"
+    )
     parser.add_argument(
         "-s",
         "--style",
