@@ -18,7 +18,6 @@ from pathlib import Path, PosixPath
 from typing import List, Tuple
 
 # jinja2 templating, originially based one the django model.
-# from jinja2 import Environment, FileSystemLoader
 import jinja2
 import markdown
 import yaml
