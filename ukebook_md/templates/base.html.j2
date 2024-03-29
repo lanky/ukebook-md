@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- {{ songbook.stylesheet|default('none') }} -->
   <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ book_css }}.css" />
+  <link rel="stylesheet" type="text/css" href="{{ css_path | default('../css') }}/{{ song.filename.with_suffix('.css').name }}"/>
   {% block localstyles %}
   <style type="text/css">
   {% if not show_chords %}
@@ -20,23 +21,13 @@
     .chords { display: none; }
     .overflow { display: none; }
   {% endif %}
-  <!-- orientation: {{ orientation }} -->
-  {% if orientation == "landscape" and song.meta.landscape_font_size %}
-  // LANDSCAPE #
-  .content {
-    font-size: {{ song.meta.landscape_font_size }};
-  }
-  {% elif song.meta.font_size %}
-  .content {
-      font-size: {{ song.meta.font_size }};
-  }
-  {% endif %}
   </style>
   {% endblock %}
   {% block js %}{% endblock %}
   <title>{% block title %}{{ songbook.title|default('Songbook') }}{% endblock %}</title>
   {% endblock %}
 </head>
+  <div class="branding">{% block branding %}{% endblock %}</div>
   <div class="header">{% block songheader %}{% endblock %}</div>
   <div class="content">{% block content %}{% endblock %}</div>
   {% if show_diagrams %}
