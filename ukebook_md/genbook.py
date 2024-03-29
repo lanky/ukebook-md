@@ -27,7 +27,7 @@ import yaml
 from bs4 import BeautifulSoup as bs
 from progress.bar import Bar  # type: ignore
 
-import chordgen
+from ukebook_md import chordgen
 
 
 # local chord generation tool (SVGs)

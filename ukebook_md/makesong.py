@@ -15,9 +15,10 @@ from pathlib import Path
 import jinja2
 import yaml
 from bs4 import BeautifulSoup as bs
-from genbook import parse_song, safe_name
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
+
+from ukebook_md.genbook import parse_song, safe_name
 
 """
 Separates out the rendering and PDF conversion for an individual
