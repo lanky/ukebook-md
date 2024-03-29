@@ -123,9 +123,14 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         default=False,
         help="render SVG diagrams to PNG for portability and PDF embedding (TODO)",
     )
-    parser.add_argument("--css-dir", default="css", help="Path to CSS directory")
     parser.add_argument(
-        "--template-dir", default="templates", help="path to templates directory"
+        "--css-dir", default="css", type=Path, help="Path to CSS directory"
+    )
+    parser.add_argument(
+        "--template-dir",
+        default="templates",
+        type=Path,
+        help="path to templates directory",
     )
 
     cgrp = parser.add_argument_group(
@@ -277,9 +282,9 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
 
     args = parser.parse_args(argv)
 
-    if not os.path.isdir(args.output):
+    if not args.output.is_dir():
         try:
-            os.makedirs(args.output)
+            args.output.mkdir(exist_ok=True, parents=True)
         except (IOError, OSError) as E:
             print(
                 "Unable to create output directory {0.filename}: {0.strerror}".format(E)
@@ -293,7 +298,7 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         )
 
     if args.style:
-        if not os.path.exists("{}/{}.css".format(args.css_dir, args.style)):
+        if not (args.css_dir / f"{args.style}.css").exists():
             print(
                 "CSS stylesheet {0.style}.css doesn't exist, perhaps you need to specify --css-dir too?".format(
                     args
@@ -534,7 +539,9 @@ def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
 
         context["songs"].append(sd)
         pbar.next()
-        context["index"] = {s["id"]: s["filename"] for s in context["songs"]}
+        context["index"] = {
+            s["id"]: Path("../songs") / s["filename"].name for s in context["songs"]
+        }
         # index is a mapping of title or title (artist) to song id
     pbar.finish()
     return context
