@@ -5,6 +5,9 @@
 {% block songheader %}
 <h1 class="title" id="title_{{ song.id }}">{{ song.title|default('') }} - {{ song.artist|default('') }}</h1>
 {% endblock %}
+{% block branding %}
+  <img src="../images/karauke_logo.png" alt="Karauke Logo - you sing, we play ukulele"/>
+{% endblock %}
 
 {% block content %}
 {% if song.meta.capo %}
