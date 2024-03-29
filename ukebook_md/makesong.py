@@ -65,6 +65,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-i",
+        "--image-dir",
+        type=Path,
+        help="location of images to include in document",
+        default="..",
+    )
+
+    parser.add_argument(
         "-o",
         "--output",
         default=os.path.realpath(os.curdir),
@@ -166,6 +174,7 @@ def main():
 
     for song in opts.inputfile:
         ctx["song"] = parse_song(song, family_friendly=opts.family_friendly)
+        ctx["image_dir"] = opts.image_dir
         # create tempdir for HTML
         # render HTML to PDF using the appropriate stylesheet
         # remove tempdir
