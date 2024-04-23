@@ -17,7 +17,7 @@ from operator import itemgetter
 from pathlib import Path, PosixPath
 from typing import List, Tuple
 
-# jinja2 templating, originially based one the django model.
+# jinja2 templating, originally based on the django model.
 import jinja2
 import markdown
 import yaml
