@@ -92,7 +92,7 @@ p {
   max-height: 30px;
   background: white;
   text-align: center;
-  page-break-after: always;
+  /* page-break-after: always; */
 }
 
 .footer img {
@@ -148,6 +148,19 @@ p {
 svg.labels {
   font-size: 0.5em;
   font-family: Verdana, Helvetica, Sans-Serif;
+}
+/* logo, watermark etc */
+.branding {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.branding img {
+  height: 3cm;
+  float: right;
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
