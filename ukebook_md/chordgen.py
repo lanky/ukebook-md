@@ -16,7 +16,7 @@ from jinja2 import (
     Environment,
     FileSystemLoader,
 )
-from progress.bar import Bar
+from progress.bar import Bar  # type: ignore
 
 # two-way mapping of equivalent non-naturals, to allow a chord to be
 # defined in more than one way (possibly to reduce duplication)
