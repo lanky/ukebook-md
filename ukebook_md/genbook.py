@@ -123,11 +123,14 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         help="render SVG diagrams to PNG for portability and PDF embedding (TODO)",
     )
     parser.add_argument(
-        "--css-dir", default="css", type=Path, help="Path to CSS directory"
+        "--css-dir",
+        default=Path(__file__).parent / "css",
+        type=Path,
+        help="Path to CSS directory",
     )
     parser.add_argument(
         "--template-dir",
-        default="templates",
+        default=Path(__file__).parent / "templates",
         type=Path,
         help="path to templates directory",
     )
@@ -279,6 +282,13 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         help="Produce debug output in songbook directory",
     )
 
+    parser.add_argument(
+        "--chordlist",
+        default=Path(__file__).parent / "chords.yml",
+        type=Path,
+        help="chord configuration file (YAML)",
+    )
+
     args = parser.parse_args(argv)
 
     if not args.output.is_dir():
@@ -296,6 +306,7 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
             )
         )
 
+    # TODO: fix this to use internal stylesheets.
     if args.style:
         if not (args.css_dir / f"{args.style}.css").exists():
             print(
@@ -607,9 +618,6 @@ def main():  # noqa: C901
         options,
     )
 
-    with open("chords.yml") as cd:
-        chord_defs = yaml.safe_load(cd)
-
     if options.report:
         print(
             """
@@ -644,7 +652,7 @@ def main():  # noqa: C901
         chord_dir = options.output / "chords"
         song_template = Path("song.html.j2")
     else:
-        chord_template = Path("chord.svg.j2")
+        chord_template = "chord.svg.j2"
         chord_dir = Path("templates/svg")
         song_template = Path("song.html.j2")
 
@@ -658,9 +666,11 @@ def main():  # noqa: C901
     tsfile = options.output / ".timestamp"
     tsfile.write_text(timestamp.strftime("%s"))
 
+    chorddefs = yaml.safe_load(options.chordlist.read_text())
+
     # generate all chord diagrams from the songbook context
     missing_chords = chordgen.generate(
-        context["chords"], chord_defs, destdir=chord_dir, template=chord_template
+        context["chords"], chorddefs, destdir=chord_dir, template=chord_template
     )
 
     if len(missing_chords):
@@ -694,7 +704,7 @@ def main():  # noqa: C901
 
     # setup our template environment
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader("templates"),
+        loader=jinja2.FileSystemLoader(options.template_dir),
         lstrip_blocks=True,
         trim_blocks=True,
     )

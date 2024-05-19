@@ -44,7 +44,7 @@ def parse_cmdline(argv: List[str]):
     parser.add_argument(
         "-c",
         "--chordlist",
-        default="chords.yml",
+        default=Path(__file__).parent / "chords.yml",
         type=Path,
         help="chord configuration file (YAML)",
     )
@@ -87,9 +87,7 @@ def parse_cmdline(argv: List[str]):
     opts = parser.parse_args(argv)
 
     if not opts.chordlist.exists():
-        raise argparse.ArgumentError(
-            "no such file or directory: {}".format(opts.chordlist)
-        )
+        raise argparse.ArgumentError(f"no such file or directory: {opts.chordlist}")
 
     return opts
 
@@ -271,7 +269,9 @@ def generate(
     cfg: dict = {}
 
     try:
-        cfg.update(yaml.safe_load(Path("fretboard.yml").read_text()))
+        cfg.update(
+            yaml.safe_load((Path(__file__).parent / "fretboard.yml").read_text())
+        )
     except (IOError, OSError):
         print("unable to load fretboard template, aborting")
         sys.exit(5)
@@ -279,15 +279,16 @@ def generate(
     env = Environment(
         loader=ChoiceLoader(
             [
-                FileSystemLoader("templates"),
+                FileSystemLoader(Path(__file__).parent / "templates"),
             ]
         )
     )
-    tpl = env.get_template(template.name)
+    tpl = env.get_template(template)
 
     missing = set([])
 
     print("progress")
+    print(definitions)
     pbar = Bar("{:20}".format("Rendering Chords:"), max=len(chordlist))
     try:
         for chordname in pbar.iter(chordlist):
@@ -327,7 +328,7 @@ def main():
     if not opts.destdir.is_dir():
         opts.destdir.mkdir(exist_ok=True, parents=True)
 
-    chorddefs = yaml.safe_load(opts.chordlist.open(mode="r", encoding="utf-8"))
+    chorddefs = yaml.safe_load(opts.chordlist.read_text())
 
     if not opts.chord:
         opts.chord = chorddefs.keys()
