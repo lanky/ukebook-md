@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ukebook-md"
-version = "1.0.1"
+version = "1.0.2"
 description = "tools to build songbooks from UDN files"
 authors = ["Stuart Sears <stuart@sjsears.com>"]
 license = "GPL-3-Or-Later"
