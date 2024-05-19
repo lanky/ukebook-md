@@ -1,7 +1,0 @@
-pre-commit
-pytest
-pip-tools
-black
-isort
-flake8
-poetry
