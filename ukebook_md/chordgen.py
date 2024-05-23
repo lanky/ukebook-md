@@ -1,21 +1,16 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Generate SVG chord images."""
 
-# , PackageLoader
 import argparse
-import codecs
+
+# , PackageLoader
 import re
 import sys
 from pathlib import Path
 from typing import List
 
 import yaml
-from jinja2 import (
-    ChoiceLoader,
-    Environment,
-    FileSystemLoader,
-)
+from jinja2 import ChoiceLoader, Environment, FileSystemLoader
 from progress.bar import Bar  # type: ignore
 
 # two-way mapping of equivalent non-naturals, to allow a chord to be
@@ -87,7 +82,10 @@ def parse_cmdline(argv: List[str]):
     opts = parser.parse_args(argv)
 
     if not opts.chordlist.exists():
-        raise argparse.ArgumentError(f"no such file or directory: {opts.chordlist}")
+        raise argparse.ArgumentError(
+            message=f"no such file or directory: {opts.chordlist}",
+            argument=opts.chordlist,
+        )
 
     return opts
 
@@ -186,13 +184,13 @@ def merge_ctx(base: dict, **kwargs) -> dict:
     return context
 
 
-def gen_board(spacing: float, strings: int = 4, frets: int = 5) -> dict:
+def gen_board(spacing: float, string_count: int = 4, fret_count: int = 5) -> dict:
     """Generate a diagram based on spacing of strings and frets.
 
     An attempt to generate an entire chord diagram based on spacing of
     strings and frets.
     Predicated on
-    1. width: (strings +1 ) * spacing
+    1. width: (strings + 1 ) * spacing
     2. height: (frets + 3) * spacing
     3. origin is x: spacing, y: 2* spacing
     4. margins are 1* spacing, except top: 2* spacing
@@ -200,34 +198,47 @@ def gen_board(spacing: float, strings: int = 4, frets: int = 5) -> dict:
     This should centre the fretboard horizontally
     """
     # margin calculations (used for coords)
-    ctx = {}
-    # top of fretboard
-    tm = 2 * spacing
-    # left of board
-    lm = spacing
-    # right of board ( end of frets)
-    rm = strings * spacing
-    # bottom of board (end of strings)
-    bm = tm + (frets * spacing)
+    # top of fretboard (distance from top of diagram)
+    top = 2 * spacing
+    # left of board (distance from left of diagram)
+    left = spacing
+    # right of board ( distance from right of diagram)
+    right = string_count * spacing
+    # bottom of board (distance from bottom of diagram)
+    bottom = top + (fret_count * spacing)
 
-    ctx["width"] = rm + spacing
-    ctx["height"] = bm + spacing
+    return {
+        "width": right + spacing,
+        "height": bottom + spacing,
+        "left": left,
+        "right": right,
+        "top": top,
+        "bottom": bottom,
+        "strings": [left + (spacing * i) for i in range(string_count)],
+        "frets": [top + (spacing * i) for i in range(fret_count + 1)],
+        "nut": top,
+    }
 
-    ctx["top"] = tm
-    ctx["bottom"] = bm
-    ctx["left"] = lm
-    ctx["right"] = rm
+    #     ctx["width"] = rm + spacing
+    #     ctx["height"] = bm + spacing
+
+    #     ctx["top"] = tm
+    #     ctx["bottom"] = bm
+    #     ctx["left"] = lm
+    #     ctx["right"] = rm
 
     # calculate coords for each string (vertical lines)
     # each one has x1, y1, x2, y2 elements, 2 of which are static.
-    ctx["strings"] = [lm + (spacing * i) for i in range(strings)]
+    # ctx["strings"] = [lm + (spacing * i) for i in range(strings)]
     # each  string will have coords x1=s, x2=s, y1=top, y2=bottom
     # mark the nut differently, it'll have a thicker line
     # fret 0: [ y1=f, y2=f, x1=left, x2=right]
-    ctx["nut"] = tm
-    ctx["frets"] = [tm + (spacing * i) for i in range(frets + 1)]
 
-    return ctx
+
+#     ctx["nut"] = tm
+#     ctx["frets"] = [tm + (spacing * i) for i in range(frets + 1)]
+
+#     return ctx
 
 
 def get_alt_name(chord: str) -> str:
@@ -238,7 +249,7 @@ def get_alt_name(chord: str) -> str:
         root, voicing = res.groups()
         altroot = alt_names.get(root)
         if altroot is not None:
-            altname = "{}{}".format(altroot, voicing)
+            altname = f"{altroot}{voicing}"
         else:
             return chord
 
@@ -264,7 +275,7 @@ def generate(
     if not destdir.is_dir():
         try:
             destdir.mkdir(exist_ok=True, parents=True)
-        except (IOError, OSError) as E:
+        except OSError as E:
             print(f"Cannot create output directory {E.filename} ({E.strerror})")
     cfg: dict = {}
 
@@ -272,7 +283,7 @@ def generate(
         cfg.update(
             yaml.safe_load((Path(__file__).parent / "fretboard.yml").read_text())
         )
-    except (IOError, OSError):
+    except OSError:
         print("unable to load fretboard template, aborting")
         sys.exit(5)
 
@@ -288,7 +299,6 @@ def generate(
     missing = set([])
 
     print("progress")
-    print(definitions)
     pbar = Bar("{:20}".format("Rendering Chords:"), max=len(chordlist))
     try:
         for chordname in pbar.iter(chordlist):
@@ -306,14 +316,12 @@ def generate(
                 ch["name"] = symbolise(chordname)
 
             # replaces characters that cause shell problems
-            chordfile = safe_name(chordname)
+            chordfile = (destdir / safe_name(chordname)).with_suffix(".svg")
 
-            with codecs.open(
-                "{}/{}.svg".format(destdir, chordfile), mode="w", encoding="utf-8"
-            ) as output:
-                output.write(tpl.render(merge_ctx(cfg, **ch)))
-    except:
-        print("Failed to render {}".format(chordname))
+            chordfile.write_text(tpl.render(merge_ctx(cfg, **ch)))
+
+    except OSError:
+        print(f"Failed to render {chordname}")
         raise
 
     return missing
