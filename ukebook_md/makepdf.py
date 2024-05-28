@@ -44,6 +44,9 @@ def parse_cmdline(argv):
         parser.print_help()
         sys.exit(1)
 
+    if not opts.stylesheets:
+        opts.stylesheets = [Path("portrait")]
+
     if not opts.output:
         opts.output = opts.inputdir.with_suffix(".pdf")
 
