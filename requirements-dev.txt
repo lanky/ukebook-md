@@ -24,7 +24,7 @@ fonttools[woff]==4.51.0
     # via weasyprint
 html5lib==1.1
     # via weasyprint
-idna==3.4
+idna==3.7
     # via requests
 jinja2==3.1.4
     # via ukebook-md (pyproject.toml)
