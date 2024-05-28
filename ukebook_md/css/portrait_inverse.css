@@ -1,0 +1,189 @@
+@charset "utf-8";
+@import "ukedown_inverse.css";
+
+@page {
+  size: A4 portrait;
+  margin: 0.5cm;
+  background-color: black;
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: black;
+  color: white;
+  font-family: verdana, "dejavu sans", sans-serif;
+  font-size: 12pt;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+h1 {
+  font-size: 14pt;
+  padding-bottom: 0.2em;
+  padding-left: 5px;
+  text-align: center;
+}
+
+p {
+  padding: 0px;
+  margin-top: 0px;
+}
+
+.header {
+  page-break-before: always;
+  width: 100%;
+  left: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* content div, max 2 cols in portrait mode */
+.content {
+  column-width: auto;
+  column-rule-style: solid;
+  column-fill: auto;
+  max-height: 730px;
+  float: left;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: 100%;
+}
+
+.chords {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-height: 840px;
+  float: right;
+  width: 50px;
+  max-width: 100px;
+  position: fixed;
+  right: 0;
+}
+
+.overflow {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 840px;
+  width: 50px;
+  align-items: flex-start;
+  float: right;
+  position: fixed;
+  right: 50px;
+}
+
+/* footer  can have SVG background images */
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  max-height: 30px;
+  background: black;
+  color: white;
+  text-align: center;
+  /* page-break-after: always; */
+}
+
+.footer img {
+  max-height: 25px;
+  width: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+}
+
+.footer a {
+  font-size: 0.8em;
+  color: gray;
+  text-decoration: none;
+}
+
+.labels {
+  font-size: 0.5em;
+  font-family: Verdana, Helvetica, Sans-Serif;
+}
+
+/* index page is multi-column*/
+.index {
+  column-width: 50vw;
+  column-rule-width: 1px;
+  column-rule-style: solid;
+  column-rule-color: white;
+  background-color: inherit;
+  /*overflow: auto; */
+  width: 100%;
+  margin: auto;
+  column-count: 2;
+  max-height: 730px;
+  padding: 5px;
+}
+
+.container {
+  max-height: 100%;
+  page-break-after: always;
+}
+
+.chord_diagram {
+  width: 48px;
+}
+
+.chordname {
+  font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
+  text-align: center;
+  font-weight: bold;
+  font-size: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+svg.labels {
+  font-size: 0.5em;
+  font-family: Verdana, Helvetica, Sans-Serif;
+}
+
+/* logo, watermark etc */
+.branding {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.branding img {
+  height: 3cm;
+  float: right;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+  html {
+    width: 842px;
+    height: 595px;
+  }
+
+  .content {
+    column-count: 2;
+    /* A4 is 842 x 595 in landscape */
+    width: 100%;
+    min-height: 490px;
+    max-height: 540px;
+  }
+}
