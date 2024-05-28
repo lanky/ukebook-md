@@ -15,7 +15,7 @@ from datetime import datetime
 from glob import glob
 from operator import itemgetter
 from pathlib import Path, PosixPath
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # jinja2 templating, originally based on the django model.
 import jinja2
@@ -95,7 +95,7 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         "-o",
         "--output",
         type=Path,
-        default="Karauke_{:%Y-%m-%d}".format(datetime.now()),
+        default=f"Karauke_{datetime.now():%Y-%m-%d}",
         help="Name of Book to build (default is Karauke_YYYY_MM_DD",
     )
     parser.add_argument(
@@ -199,7 +199,8 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         dest="refresh",
         action="store_true",
         default=True,
-        help="only update files changed since the last build. If the output directory exists, this is the default behaviour",
+        help="only update files changed since the last build. "
+        "If the output directory exists, this is the default behaviour",
     )
     cgrp.add_argument(
         "--clean",
@@ -294,38 +295,30 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
     if not args.output.is_dir():
         try:
             args.output.mkdir(exist_ok=True, parents=True)
-        except (IOError, OSError) as E:
-            print(
-                "Unable to create output directory {0.filename}: {0.strerror}".format(E)
-            )
+        except OSError as E:
+            print(f"Unable to create output directory {E.filename}: {E.strerror}")
             sys.exit(1)
     else:
         print(
-            "Output directory {0.output} already exists. Will replace files in it".format(
-                args
-            )
+            f"Output directory {args.output} already exists. Will replace files in it"
         )
 
     # TODO: fix this to use internal stylesheets.
-    if args.style:
-        if not (args.css_dir / f"{args.style}.css").exists():
-            print(
-                "CSS stylesheet {0.style}.css doesn't exist, perhaps you need to specify --css-dir too?".format(
-                    args
-                )
-            )
-            parser.print_help()
-            sys.exit(1)
-    args.stylesheet = "{}/{}.css".format(args.css_dir, args.style)
+    if args.style and not (args.css_dir / f"{args.style}.css").exists():
+        print(
+            f"CSS stylesheet {args.style}.css doesn't exist, "
+            "perhaps you need to specify --css-dir too?"
+        )
+        parser.print_help()
+        sys.exit(1)
+    args.stylesheet = f"{args.css_dir}/{args.style}.css"
 
     if not os.path.isdir(args.css_dir):
-        print("CSS directory {0.css_dir} doesn't appear to exist".format(args))
+        print(f"CSS directory {args.css_dir} doesn't appear to exist")
         sys.exit(1)
 
     if not os.path.isdir(args.template_dir):
-        print(
-            "Templates directory {0.template_dir} doesn't appear to exist".format(args)
-        )
+        print(f"Templates directory {args.template_dir} doesn't appear to exist")
         sys.exit(1)
 
     if not args.format:
@@ -366,7 +359,8 @@ def render(template, context, template_dir="templates"):
         context(dict): dictionary of key,value pairs to use inside template
 
     Kwargs:
-        template_dir(str): where to look for templates, default is the local 'templates' directory.
+        template_dir(str): where to look for templates,
+                           default is the local 'templates' directory.
 
     """
     j2env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
@@ -386,7 +380,7 @@ def parse_meta(markup, leader=";"):
         markup(str): content of file, which we will manipulate in place
         leader(str): leader character - only process lines that begin with this
     """
-    metap = re.compile(r"^{}\s?(.*)".format(leader), re.I | re.U)
+    metap = re.compile(rf"^{leader}\s?(.*)", re.I | re.U)
     metadata = []
     content = []
 
@@ -433,18 +427,18 @@ def create_layout(destdir, *subdirs):
     if not os.path.isdir(destdir):
         try:
             os.makedirs(destdir)
-        except (IOError, OSError) as E:
-            print("Unable to create dir {0.filename} ({0.strerror}".format(E))
+        except OSError as E:
+            print(f"Unable to create dir {E.filename} ({E.strerror}")
             sys.exit(1)
     for sd in subdirs:
         d = os.path.join(destdir, sd)
         if os.path.isdir(d):
             continue
-        print("creating {}".format(d))
+        print(f"creating {d}")
         try:
             os.makedirs(d)
-        except (IOError, OSError) as E:
-            print("Unable to create dir {0.filename} ({0.strerror}".format(E))
+        except OSError as E:
+            print(f"Unable to create dir {E.filename} ({E.strerror}")
             sys.exit(1)
 
 
@@ -482,7 +476,7 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
     hdr = soup.h1
     if hdr is not None:
         try:
-            title, artist = [i.strip() for i in hdr.text.split("-", 1)]
+            title, artist = (i.strip() for i in hdr.text.split("-", 1))
         except ValueError:
             title = hdr.text.strip()
             artist = None
@@ -511,7 +505,7 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
     return songdata
 
 
-def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
+def parse_songsheets(inputs: list, exclusions: Optional[List[Path]], **kwargs) -> dict:
     """Process songsheets.
 
     Args:
@@ -531,12 +525,13 @@ def parse_songsheets(inputs: list, exclusions: list = [], **kwargs) -> dict:
             songs.update({src.name: src})
 
     context: dict = {"chords": set([]), "songs": []}
-    # we would like to maintain chord ordering - chords are listed in the order they appear in the song.
+    # we would like to maintain chord ordering
+    # chords are listed in the order they appear in the song.
     pbar = Bar("Analysing Content: ".ljust(20), max=len(songs))
     # This will sort items across multiple directories
     for sng, path in sorted(songs.items(), key=itemgetter(0)):
         # skip songs/paths we have specifically excluded
-        if len(exclusions) and (sng in exclusions or path in exclusions):
+        if exclusions is not None and (sng in exclusions or path in exclusions):
             continue
 
         # parse the songsheet to get metadata and HTML (sd=songdata)
@@ -605,7 +600,7 @@ def main():  # noqa: C901
     """Run all the pretty things."""
     options = parse_commandline(sys.argv[1:])
     timestamp = datetime.now()
-    logging.info("Book Generation Started at {:%Y-%m-%d %H:%M:%S}".format(timestamp))
+    logging.info(f"Book Generation Started at {timestamp:%Y-%m-%d %H:%M:%S}")
 
     if len(options.input) == 1 and options.input[0].is_file():
         options.no_index = True
@@ -691,7 +686,7 @@ def main():  # noqa: C901
     # this section should be refactored to avoid repetition.
     if not options.no_css:
         globcp(
-            "{0.css_dir}/*.css".format(options),
+            f"{options.css_dir}/*.css",
             options.output / "css",
             "stylesheets",
         )
