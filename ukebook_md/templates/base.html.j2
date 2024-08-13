@@ -21,6 +21,11 @@
     .chords { display: none; }
     .overflow { display: none; }
   {% endif %}
+  {% if song.meta.font_size %}
+    .content {
+      font-size: {{ song.meta.font_size }};
+    }
+  {% endif %}
   </style>
   {% endblock %}
   {% block js %}{% endblock %}
