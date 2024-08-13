@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ukebook-md"
-version = "1.0.3"
+version = "1.1.0"
 description = "tools to build songbooks from UDN files"
 authors = ["Stuart Sears <stuart@sjsears.com>"]
 license = "GPL-3-Or-Later"
@@ -17,8 +17,8 @@ progress = "^1.6"
 pip-tools = "^7.2.0"
 jinja2 = "^3.1.4"
 poetry-plugin-export = "^1.8.0"
-
 dynaconf = "^3.2.5"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pre-commit = "^3.1.1"
@@ -27,6 +27,15 @@ mypy = "^1.9.0"
 types-pyyaml = "^6.0.12.20240311"
 types-beautifulsoup4 = "^4.12.0.20240229"
 pip-tools = "^7.4.1"
+sphinx-pyproject = "^0.3.0"
+sphinx = "^7.3.7"
+myst = "^1.0.4"
+
+[tool.sphinx-pyproject]
+extensions = [
+  "sphinx.ext.autodoc",
+  "sphinx.ext.napoleon",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
