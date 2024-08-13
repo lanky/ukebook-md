@@ -122,17 +122,39 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
         default=False,
         help="render SVG diagrams to PNG for portability and PDF embedding (TODO)",
     )
-    parser.add_argument(
-        "--css-dir",
-        default=Path(__file__).parent / "css",
-        type=Path,
-        help="Path to CSS directory",
+    assetgrp = parser.add_argument_group(
+        "Assets",
+        "Locations for custom images, scripts, stylesheets and templates. "
+        "Defaults are included in this package.",
     )
-    parser.add_argument(
-        "--template-dir",
-        default=Path(__file__).parent / "templates",
+    assetgrp.add_argument(
+        "--topdir",
         type=Path,
-        help="path to templates directory",
+        default=Path(__file__).parent,
+        help="Parent dir for static content - "
+        "will look for 'css', 'images', 'scripts' etc under this.",
+    )
+    assetgrp.add_argument(
+        "--css",
+        type=Path,
+        help="Path to CSS directory. Defaults to CSS dir under --topdir",
+    )
+    assetgrp.add_argument(
+        "--templates",
+        type=Path,
+        help="path to templates directory, if you have custom templates. "
+        "The default templates will be loaded from this pacage, if not",
+    )
+    assetgrp.add_argument(
+        "--scripts",
+        type=Path,
+        help="path to scripts directory, defaults to TOPDIR/scripts",
+    )
+
+    assetgrp.add_argument(
+        "--images",
+        type=Path,
+        help="path to images directory, defaults to TOPDIR/images",
     )
 
     cgrp = parser.add_argument_group(
@@ -303,22 +325,31 @@ def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
             f"Output directory {args.output} already exists. Will replace files in it"
         )
 
+    if not args.css:
+        args.css = args.topdir / "css"
+
+    if not args.images:
+        args.images = args.topdir / "images"
+
+    if not args.scripts:
+        args.scripts = args.topdir / "scripts"
+
     # TODO: fix this to use internal stylesheets.
-    if args.style and not (args.css_dir / f"{args.style}.css").exists():
+    if args.style and not (args.css / f"{args.style}.css").exists():
         print(
             f"CSS stylesheet {args.style}.css doesn't exist, "
             "perhaps you need to specify --css-dir too?"
         )
         parser.print_help()
         sys.exit(1)
-    args.stylesheet = f"{args.css_dir}/{args.style}.css"
+    args.stylesheet = f"{args.css}/{args.style}.css"
 
-    if not os.path.isdir(args.css_dir):
-        print(f"CSS directory {args.css_dir} doesn't appear to exist")
+    if not os.path.isdir(args.css):
+        print(f"CSS directory {args.css} doesn't appear to exist")
         sys.exit(1)
 
-    if not os.path.isdir(args.template_dir):
-        print(f"Templates directory {args.template_dir} doesn't appear to exist")
+    if args.templates and not args.templates.is_dir():
+        print(f"Templates directory {args.templates} doesn't appear to exist")
         sys.exit(1)
 
     if not args.format:
@@ -485,6 +516,10 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
     else:
         title = "Unknown Title"
         artist = "Unknown Artist"
+    # let metadata override the header line, if we have any
+    title = meta.get("title", title)
+    artist = meta.get("artist", artist)
+
     # currently all the templates use 'html', so stick to that naming
     if soup.body is not None:
         songdata["html"] = "".join([str(x) for x in soup.body.contents]).strip()
@@ -684,22 +719,22 @@ def main():  # noqa: C901
                 context[key].append(os.path.basename(item))
 
     # this section should be refactored to avoid repetition.
-    if not options.no_css:
-        globcp(
-            f"{options.css_dir}/*.css",
-            options.output / "css",
-            "stylesheets",
-        )
+    if options.css and not options.no_css:
+        shutil.copytree(options.css, options.output / "css", dirs_exist_ok=True)
 
-    # copy any images we may be using as footers etc
-    globcp("images/*", options.output / "images", "images")
-
-    # javascript
-    globcp("js/*.js", options.output / "js", "scripts")
+    if options.images.exists():
+        shutil.copytree(options.images, options.output / "images", dirs_exist_ok=True)
+    if options.scripts.exists():
+        shutil.copytree(options.scripts, options.output / "scripts", dirs_exist_ok=True)
 
     # setup our template environment
+    loaders = [
+        jinja2.PackageLoader("ukebook_md"),
+    ]
+    if options.templates and options.templates.is_dir():
+        loaders.insert(0, jinja2.FileSystemLoader(options.templates))
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(options.template_dir),
+        loader=jinja2.ChoiceLoader(loaders),
         lstrip_blocks=True,
         trim_blocks=True,
     )
@@ -743,12 +778,10 @@ def main():  # noqa: C901
                     )
                 except jinja2.TemplateError:
                     print(
-                        yaml.safe_dump(
-                            {
-                                "orientation": context["orientation"],
-                                "meta": songobj["meta"],
-                            }
-                        )
+                        yaml.safe_dump({
+                            "orientation": context["orientation"],
+                            "meta": songobj["meta"],
+                        })
                     )
                     raise
 
