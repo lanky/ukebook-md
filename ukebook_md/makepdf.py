@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # vim: set ts=4 sts=4 sw=4 et ci nu ft=python:
 """Convert a PDF book from an HTML songbook."""
 
@@ -50,6 +49,9 @@ def parse_cmdline(argv):
     if not opts.output:
         opts.output = opts.inputdir.with_suffix(".pdf")
 
+    if not opts.stylesheets:
+        opts.stylesheets = [Path("portrait")]
+
     return opts
 
 
@@ -73,11 +75,12 @@ def parse_song(page: Path) -> str:
         return str(linksoup)
 
 
-def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
+def collate(options: argparse.Namespace, fontcfg: FontConfiguration):
     """Convert a directory of HTML pages to a PDF document."""
     doclist = []
 
     if options.stylesheets:
+        print(options.stylesheets)
         css = [
             CSS(options.inputdir / "css" / f.with_suffix(".css").name)
             for f in options.stylesheets
@@ -104,10 +107,7 @@ def collate(options: argparse.Namespace, fontcfg=FontConfiguration()):
 
     for pg in Bar("Processing HTML").iter(pages):
         localstyle = options.inputdir / "css" / pg.with_suffix(".css").name
-        if localstyle.exists():
-            stylesheets = css + [CSS(localstyle)]
-        else:
-            stylesheets = css
+        stylesheets = css + [CSS(localstyle)] if localstyle.exists() else css
 
         song = HTML(string=parse_song(pg), base_url=pg).render(
             stylesheets=stylesheets, font_config=fontcfg
@@ -132,7 +132,7 @@ def process_links(index: Path) -> str:
                 continue
             else:
                 linkid = a["id"].split("_")[1]
-                a["href"] = "#title_{}".format(linkid)
+                a["href"] = f"#title_{linkid}"
         for i in idxsoup.findAll("img"):
             i["src"] = f"file://{index.parent.resolve()}/{i['src']}"
         return str(idxsoup)
@@ -142,7 +142,7 @@ def main():
     """Run all the pretty things."""
     opts = parse_cmdline(sys.argv[1:])
 
-    collate(opts)
+    collate(opts, FontConfiguration())
 
 
 def parse_cover(page: Path, link_target="#index00") -> str:
