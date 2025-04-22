@@ -15,7 +15,6 @@ from datetime import datetime
 from glob import glob
 from operator import itemgetter
 from pathlib import Path, PosixPath
-from typing import List, Optional, Tuple
 
 # jinja2 templating, originally based on the django model.
 import jinja2
@@ -53,7 +52,7 @@ SWEARING = {
 }
 
 
-def parse_commandline(argv: List[str] = sys.argv[1:]) -> argparse.Namespace:
+def parse_commandline(argv: list[str] = sys.argv[1:]) -> argparse.Namespace:
     """Define commandline options and arguments."""
     preamble = """
     Process one or more directories (or files)  containing ukedown-formatted song sheets
@@ -427,7 +426,7 @@ def parse_meta(markup, leader=";"):
     return _metadata, _markup
 
 
-def ukedown_to_html(inputfile: Path, family_friendly: bool = False) -> Tuple[str, dict]:
+def ukedown_to_html(inputfile: Path, family_friendly: bool = False) -> tuple[str, dict]:
     """Process a file, produce HTML via ukedown."""
     fh = inputfile.open()
     raw_markup = fh.read()
@@ -540,7 +539,7 @@ def parse_song(songfile: Path, songid: int = 1, **kwargs) -> dict:
     return songdata
 
 
-def parse_songsheets(inputs: list, exclusions: Optional[List[Path]], **kwargs) -> dict:
+def parse_songsheets(inputs: list, exclusions: list[Path] | None, **kwargs) -> dict:
     """Process songsheets.
 
     Args:
