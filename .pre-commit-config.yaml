@@ -59,10 +59,13 @@ repos:
       - id: html-tags-blacklist
       - id: html-attributes-blacklist
 
-  - repo: https://github.com/pre-commit/mirrors-csslint
-    rev: 'v1.0.5'  # Use the sha / tag you want to point at
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v14.4.0
     hooks:
-      - id: csslint
-        args:
-          - --ignore=import
-        files: \.css$
+      - id: stylelint
+        args: ["--fix"]
+        additional_dependencies:
+        - stylelint-config-alphabetical-order@1.0.0
+        - stylelint-config-standard@38.0.0
+        - stylelint-config-recommended@16.0.0
+        - stylelint@16.19.0
