@@ -7,7 +7,6 @@ import argparse
 import re
 import sys
 from pathlib import Path
-from typing import List
 
 import yaml
 from jinja2 import ChoiceLoader, Environment, FileSystemLoader
@@ -29,7 +28,7 @@ alt_names = {
 }
 
 
-def parse_cmdline(argv: List[str]):
+def parse_cmdline(argv: list[str]):
     """Process commandline options and arguments."""
     parser = argparse.ArgumentParser()
 
@@ -258,7 +257,7 @@ def get_alt_name(chord: str) -> str:
 
 
 def generate(
-    chordlist: List[str],
+    chordlist: list[str],
     definitions: dict,
     destdir: Path = Path("chords"),
     template: str = "external_chord.svg.j2",
@@ -288,11 +287,9 @@ def generate(
         sys.exit(5)
 
     env = Environment(
-        loader=ChoiceLoader(
-            [
-                FileSystemLoader(Path(__file__).parent / "templates"),
-            ]
-        )
+        loader=ChoiceLoader([
+            FileSystemLoader(Path(__file__).parent / "templates"),
+        ])
     )
     tpl = env.get_template(template)
 
