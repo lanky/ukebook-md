@@ -1,0 +1,43 @@
+line-length = 88
+indent-width = 4
+target-version = "py310"
+
+[format]
+quote-style = "double"
+docstring-code-format = true
+preview = true
+
+[lint]
+fixable = ["ALL"]
+select = [
+    "E",   # pycodestyle  Errors
+    "F",   # pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "I"    # isort
+]
+extend-select = [
+    "B", # bugbear
+    "I" # isort
+]
+extend-fixable = [
+    "I" # allow ruff to reorder imports
+]
+
+ignore = [
+    "B006", # mutable argument defaults
+    "B904", # raise without from
+]
+exclude = ["*pyi"]
+# don't fix unused imports
+unfixable = [
+    "F401" # unused imports
+]
+
+[lint.flake8-annotations]
+allow-star-arg-any = true
+suppress-dummy-args = true
+
+[lint.pydocstyle]
+convention = "google"
