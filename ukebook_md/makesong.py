@@ -15,8 +15,8 @@ from pathlib import Path
 import jinja2
 import yaml
 from bs4 import BeautifulSoup as bs
-from weasyprint import CSS, HTML
-from weasyprint.text.fonts import FontConfiguration
+from weasyprint import CSS, HTML  # type: ignore[import-untyped]
+from weasyprint.text.fonts import FontConfiguration  # type: ignore[import-untyped]
 
 from ukebook_md.genbook import parse_song, safe_name
 
@@ -54,14 +54,15 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     parser.add_argument(
         "-s",
         "--style",
-        default="pdfprint",
+        default="portrait",
         help="Stylesheet, without extension, or path to a custom file",
     )
 
     parser.add_argument(
         "-c",
         "--css-dir",
-        default="css",
+        type=Path,
+        default=Path("css"),
         help="Default directory for stylesheets",
     )
 
@@ -70,13 +71,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         "--image-dir",
         type=Path,
         help="location of images to include in document",
-        default="..",
+        default=Path(__file__).parent,
     )
 
     parser.add_argument(
         "-o",
         "--output",
-        default=os.path.realpath(os.curdir),
+        type=Path,
+        default=Path.cwd(),
         help="output directory for rendered PDFs, defaults to current dir",
     )
 
@@ -86,6 +88,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         action="store_true",
         default=False,
         help="print debug info from parsing",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        default=False,
+        help="forcibly overwrite output file if it exists.",
     )
 
     fgrp = parser.add_argument_group(
@@ -105,7 +115,8 @@ def parse_commandline(argv: list) -> argparse.Namespace:
         action="store_const",
         dest="format",
         const="singers",
-        help="Hide diagrams, inline chords and performance notes. Lyrics and headings only",
+        help="Hide diagrams, inline chords and performance notes."
+        "Lyrics and headings only",
     )
     fgrp.add_argument(
         "-w",
@@ -131,7 +142,7 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     validfiles = []
     for f in opts.inputfile:
         if not os.path.exists(f):
-            logger.warning("Ignoring non-existent input file {}".format(f))
+            logger.warning(f"Ignoring non-existent input file {f}")
         else:
             validfiles.append(f)
 
@@ -141,18 +152,14 @@ def parse_commandline(argv: list) -> argparse.Namespace:
     # if --style = WORD, look for opts.css_dir/WORD.css
     # else, look directly for WORD
 
-    if os.path.exists(opts.style):
-        opts.stylesheet = opts.style
-    elif os.path.exists(os.path.join(opts.css_dir, opts.style)):
-        opts.stylesheet = os.path.join(opts.css_dir, opts.style)
-    elif os.path.exists(os.path.join(opts.css_dir, "{0.style}.css".format(opts))):
-        opts.stylesheet = os.path.join(opts.css_dir, "{0.style}.css".format(opts))
-    elif os.path.exists(opts.style):
-        opts.stylesheet = opts.style
-    else:
-        logger.critical(
-            "cannot find stylesheet corresponding to {0.style}".format(opts)
-        )
+    spath = Path(opts.style).with_suffix(".css")
+    opts.stylesheet = None
+    for ss in [spath, opts.css_dir / spath]:
+        if ss.exists():
+            opts.stylesheet = ss
+            break
+    if not opts.stylesheet:
+        logger.critical(f"cannot find stylesheet corresponding to {opts.style}")
         sys.exit(1)
 
     return opts
@@ -164,8 +171,8 @@ def main():
     # simplistic as this is for karauke only
     opts = parse_commandline(sys.argv[1:])
     ctx = {
-        "book_css": os.path.basename(opts.stylesheet),
-        "css_path": os.path.dirname(opts.stylesheet),
+        "book_css": opts.stylesheet.name,
+        "css_path": opts.stylesheet.parent,
         "show_diagrams": opts.format == "ukeweds",
         "show_chords": opts.format != "singers",
         "ext_chords": True,
@@ -187,27 +194,32 @@ def main():
         env.filters["safe_name"] = safe_name
 
         st = env.get_template("song.html.j2")
-        # need to fix the title/artist parsing for some songs (Those with '-' in the title)
+        # need to fix the title/artist parsing for some songs
+        # (Those with '-' in the title)
         if opts.debug:
             print(yaml.safe_dump(ctx, default_flow_style=False))
         # render HTML in a tempdir, which we clean up afterwards
         # with tempfile.TemporaryDirectory() as td:
         td = tempfile.TemporaryDirectory()
+        tmppath = Path(td.name)
         # os.makedirs('tmp/test-output-{:Y-%m-%d.%H%M}'.format(datetime.datetime.now()))
-        logger.debug("creating temp structure in {0.name}".format(td))
-        css_path = os.path.join(td.name, "css")
-        os.makedirs(css_path)
-        os.makedirs(os.path.join(td.name, "chords"))
+        logger.debug(f"creating temp structure in {td.name}")
+        css_path = tmppath / "css"
+        css_path.mkdir(parents=True, exist_ok=True)
+        (tmppath / "chords").mkdir(parents=True, exist_ok=True)
+
         shutil.copy(opts.stylesheet, css_path)
 
         fontcfg = FontConfiguration()
-        logger.debug("using {} as stylesheet".format(os.path.realpath(opts.stylesheet)))
-        css = [CSS(os.path.realpath(opts.stylesheet))]
+        logger.debug(f"using {opts.stylesheet} as stylesheet")
+        css = [CSS(opts.stylesheet.resolve())]
+
+        htmlfile = tmppath / ctx["song"]["filename"]
 
         try:
-            with open(os.path.join(td.name, ctx["song"]["filename"]), "w") as sf:
-                content = bs(st.render(ctx), features="lxml")
-                sf.write(str(content))
+            content = bs(st.render(ctx), features="lxml")
+            # save an HTML version. Is this really needed?
+            htmlfile.write_text(str(content))
 
             # This is a standalone file, remove links to index and prev/next
             # for link in content.find_all('a'):
@@ -215,30 +227,34 @@ def main():
             content.find("a", {"class": "left"}).decompose()
             content.find("a", {"class": "right"}).decompose()
 
+            # create a PDF doc from the HTML
             doc = HTML(string=str(content)).render(stylesheets=css, font_config=fontcfg)
 
-            pdffile = os.path.join(
-                opts.output,
-                os.path.basename(ctx["song"]["filename"]).replace(".html", ".pdf"),
-            )
-            if not os.path.isdir(opts.output):
-                os.makedirs(opts.output)
+            opts.output.mkdir(parents=True, exist_ok=True)
 
-            if os.path.exists(pdffile):
-                logger.info("backing up existing file {}".format(pdffile))
-                os.rename(
-                    pdffile,
-                    "{}-{:%Y%m%d.%H%M}.pdf".format(
-                        os.path.splitext(pdffile)[0], datetime.datetime.now()
-                    ),
+            print(
+                f"filename: {ctx['song']['filename']}, {type(ctx['song']['filename'])}"
+            )
+            print(f"destdir: {opts.output}")
+
+            pdffile = opts.output / ctx["song"]["filename"].with_suffix(".pdf").name
+
+            if pdffile.exists() and not opts.force:
+                logger.info(f"backing up existing file {pdffile}")
+                ts = datetime.datetime.now()
+                backup = Path(
+                    pdffile.parent / f"{pdffile.stem}-{ts:%Y%m%d.%H%M}{pdffile.suffix}"
                 )
 
-            print("writing PDF to {}".format(pdffile))
+                pdffile.rename(backup)
+
+            print(f"writing PDF to {pdffile}")
 
             doc.write_pdf(pdffile)
         except jinja2.TemplateError:
             logger.exception(
-                "Failed to render template for {title} - {artist}".format(**ctx["song"])
+                f"Failed to render template for {ctx['song']['title']} - "
+                f"{ctx['song']['artist']}"
             )
             raise
         if opts.debug:
