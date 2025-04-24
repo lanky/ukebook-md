@@ -1,20 +1,21 @@
 @charset "utf-8";
-@import 'ukedown_elements.css';
+
+@import url("ukedown_elements.css");
 
 @page {
-    size: A4 landscape;
-    margin: 0.5cm;
+  margin: 0.5cm;
+  size: a4 landscape;
 
-    @bottom-right-corner {
-        content: counter(page) "/" counter(pages);
-        padding-right: 10px;
-        font-size: 0.8em;
-        font-style: bold;
-    }
+  @bottom-right-corner {
+    content: counter(page) "/" counter(pages);
+    font-size: 0.8em;
+    font-style: bold;
+    padding-right: 10px;
+  }
 
-    @top-center {
-        content: "Karauke Songbook"
-    }
+  @top-center {
+    content: "Karauke Songbook";
+  }
 }
 
 /*
@@ -27,154 +28,146 @@
 */
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-family: verdana, "dejavu sans", sans-serif;
-    font-size: 14px;
+  font-family: verdana, "dejavu sans", sans-serif;
+  font-size: 14px;
 }
 
 h1::before {
-    counter-increment: page;
+  counter-increment: page;
 }
 
 h1 {
-    font-size: 1.2em;
-    /* padding-bottom: 0.2em; */
-    padding-left: 5px;
-}
+  font-size: 1.2em;
 
+  /* padding-bottom: 0.2em; */
+  padding-left: 5px;
+}
 
 .header {
-    page-break-before: always;
-    width: 100%;
-    left: 0;
+  left: 0;
+  page-break-before: always;
+  width: 100%;
 }
 
-
 /* content div, max 2 cols in portrait mode */
+
 /* portrait in 72dpi is 595x842 pixels */
 .content {
-   column-width: 50%;
-   column-count: 2;
-   column-rule-style: solid;
-   column-rule-width: 1px;
-   column-fill: auto;
-   height: 90vh;
-   padding: 5px;
-   width: 100%;
-   max-width: 100%;
-   orphans: 0;
+  column-fill: auto;
+  column-rule-style: solid;
+  column-rule-width: 1px;
+  columns: auto 2;
+  height: 90vh;
+  max-width: 100%;
+  orphans: 0;
+  padding: 5px;
+  width: 100%;
 }
 
 .content > p {
-    padding: 0px;
-    margin-top: 0px;
-    orphans: 0 ;
+  margin-top: 0;
+  orphans: 0;
+  padding: 0;
 }
 
 /* footer  can have SVG background images */
 .footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 5vh;
-    page-break-after: always;
-    text-align: center;
+  bottom: 0;
+  height: 5vh;
+  left: 0;
+  page-break-after: always;
+  position: fixed;
+  text-align: center;
+  width: 100%;
 }
 
-/* div on the right of the page for chord diagrams, if we want any*/
+/* div on the right of the page for chord diagrams, if we want any */
 .chords {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    max-height: 590px;
-    float: right;
-    width: 50px;
-    max-width: 100px;
+  align-items: flex-start;
+  display: flex;
+  flex-flow: column wrap;
+  float: right;
+  max-height: 590px;
+  max-width: 100px;
+  width: 50px;
 }
 
 /* overflow is a second div for extra chords (10+), appears to the left of the normal chord div */
 .overflow {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    max-height: 590px;
-    width: 50px;
-    align-items: flex-start;
-    float: right;
+  align-items: flex-start;
+  display: flex;
+  flex-flow: column wrap;
+  float: right;
+  max-height: 590px;
+  width: 50px;
 }
 
 a.middle {
-    font-size: 1em;
-    text-align: center;
-    text-decoration: none;
+  font-size: 1em;
+  text-align: center;
+  text-decoration: none;
 }
 
-.section_header {
-    display: inline-block;
+.section-header {
+  display: inline-block;
 }
 
-/* fixed position at bottom of page for branding images, links etc*/
+/* fixed position at bottom of page for branding images, links etc */
 .footer img {
-    max-height: 25px;
-    width: auto;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5px;
-
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5px;
+  max-height: 25px;
+  width: auto;
 }
 
 .labels {
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
-  font-family: Verdana, Helvetica, Sans-Serif;
 }
 
-/* index page is multi-column*/
+/* index page is multi-column */
 .index {
-    column-width: auto;
-    column-count: 2;
-    column-rule-width: 1px;
-    column-rule-style: solid;
-    column-rule-color: black;
-    overflow: auto;
-    width: auto;
-    margin: auto;
-    column-count: 2;
-    max-height: 490px;
-    counter-reset: page
+  column-rule: 1px solid black;
+  columns: auto 2;
+  counter-reset: page;
+  margin: auto;
+  max-height: 490px;
+  overflow: auto;
+  width: auto;
 }
 
 .credits {
-    font-size: 0.6em;
-    font-style: italic;
-    text-align: left;
-    display: block;
+  display: block;
+  font-size: 0.6em;
+  font-style: italic;
+  text-align: left;
 }
 
 .container {
-    max-height: 100%;
-    page-break-after: always;
+  max-height: 100%;
+  page-break-after: always;
 }
 
-.chord_diagram {
-    width: 48px;
+.chord-diagram {
+  width: 48px;
 }
 
 .chordname {
-  font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
-  text-align: center;
-  font-weight: bold;
+  font-family: Verdana, "DejaVu Sans", Helvetica, sans-serif;
   font-size: 8px;
-  padding: 0;
+  font-weight: bold;
   margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 svg.labels {
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
-  font-family: Verdana, Helvetica, Sans-Serif;
 }

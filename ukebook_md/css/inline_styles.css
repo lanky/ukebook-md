@@ -1,142 +1,142 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body: {
-    font-family: verdana, sans-serif;
-    font-size: 100%;
-    width: 100%
+  font-family: verdana, sans-serif;
+  font-size: 100%;
+  width: 100%;
 }
 
 h1 {
-    font-family: verdana, sans-serif;
-    font-weight: bold;
-    font=size: 1em;
-    text-align: center;
-    float: top;
+  font-family: verdana, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
 }
 
 /* h2 is our 'section' header */
 h2 {
-    font-family: verdana, sans-serif;
-    font-weight: bold;
-    font-size: 1em;
-    padding-bottom: 0.5em;
+  font-family: verdana, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  padding-bottom: 0.5em;
 }
 
-h2:before {
-    content: "["
+h2::before {
+  content: "[";
 }
 
-h2:after {
-    content: "]"
+h2::after {
+  content: "]";
 }
 
 p {
-    font-family: verdana, sans-serif;
-    font-weight: normal;
-    padding: 0px;
+  font-family: verdana, sans-serif;
+  font-weight: normal;
+  padding: 0;
 }
 
 /* Box call-outs (repeated chorus etc) */
 .box {
-    padding: 2px;
-    margin: 1px;
-    border: 2px solid black;
-    width: 70%;
-    max-width: 90%;
+  border: 2px solid black;
+  margin: 1px;
+  max-width: 90%;
+  padding: 2px;
+  width: 70%;
 }
 
 div.box {
-    display: inline-block;
-    margin: 0.5em;
-    padding: 5px;
+  display: inline-block;
+  margin: 0.5em;
+  padding: 5px;
 }
 
 .box > p {
-    margin-top: 0;
-    margin-bottom: 1em;
+  margin-bottom: 1em;
+  margin-top: 0;
 }
 
 .box > p:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .box > h2 {
-    margin-top: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-bottom: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
-/* End box definitions*/
+/* End box definitions */
 
-/* chord styling - auto bold and enclose in ()*/
+/* chord styling - auto bold and enclose in () */
 .chord {
-    font-weight: bold;
-}
-.chord:before {
-    content: "("
-}
-.chord:after {
-    content: ")"
+  font-weight: bold;
 }
 
-/* End  chord definitions*/
+.chord::before {
+  content: "(";
+}
 
+.chord::after {
+  content: ")";
+}
+
+/* End  chord definitions */
 
 /* Performance notes etc */
 .notes {
-    font-weight: bold;
+  font-weight: bold;
 }
 
-.notes:before {
-    content: "["
+.notes::before {
+  content: "[";
 }
 
-.notes:after {
-    content: "]";
+.notes::after {
+  content: "]";
 }
-
 
 /* Backing vox, italic with () around them */
 .vox {
-    font-style: italic;
-    font-weight: normal;
+  font-style: italic;
+  font-weight: normal;
 }
-.vox:before {
-    content: '(';
+
+.vox::before {
+  content: "(";
 }
-.vox:after {
-    content: ')';
+
+.vox::after {
+  content: ")";
 }
 
 /* other block elements */
 
-
 a {
-    text-decoration: none;
-    font-family: verdana, sans-serif;
-    font-size: 0.8em;
+  font-family: verdana, sans-serif;
+  font-size: 0.8em;
+  text-decoration: none;
 }
 
 a.left {
-    float: left;
-    padding: 2px;
-    margin-left: 1em;
-    display: inline-block;
+  display: inline-block;
+  float: left;
+  margin-left: 1em;
+  padding: 2px;
 }
 
 a.right {
-    float: right;
-    margin-right: 1em;
-    padding: 2px;
-    display: inline-block;
+  display: inline-block;
+  float: right;
+  margin-right: 1em;
+  padding: 2px;
 }
 
 a.middle {
-    text-align: center;
-    padding: 2px;
-    display: inline-block;
-    margin : auto;
+  display: inline-block;
+  margin: auto;
+  padding: 2px;
+  text-align: center;
 }

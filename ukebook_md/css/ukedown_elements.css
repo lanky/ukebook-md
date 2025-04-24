@@ -1,48 +1,49 @@
 @charset 'utf-8';
 
 .indexlink {
-  text-decoration: none;
-  font-size: 0.9em;
   color: inherit;
+  font-size: 0.9em;
+  text-decoration: none;
 }
 
 .chord {
   font-weight: bold;
 }
 
-.chord:before {
+.chord::before {
   content: "(";
 }
-.chord:after {
+
+.chord::after {
   content: ")";
 }
 
-.section_header {
-  font-weight: bold;
+.section-header {
   font-size: 1em;
-  margin-top: 0.5em;
+  font-weight: bold;
   margin-bottom: 0.5em;
+  margin-top: 0.5em;
   padding-bottom: 0.5em;
 }
 
-.section_header:before {
+.section-header::before {
   content: "[";
 }
 
-.section_header:after {
+.section-header::after {
   content: "]";
 }
 
 .vox {
-  font-weight: normal;
   font-style: italic;
+  font-weight: normal;
 }
 
-.vox:before {
+.vox::before {
   content: "(";
 }
 
-.vox:after {
+.vox::after {
   content: ")";
 }
 
@@ -50,10 +51,12 @@
   font-style: normal;
   font-weight: bold;
 }
-.notes:before {
+
+.notes::before {
   content: "[";
 }
-.notes:after {
+
+.notes::after {
   content: "]";
 }
 
@@ -62,27 +65,43 @@
   font-weight: bold;
 }
 
+.singer {
+  font-style: normal;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* .singer:before { */
+
+/*  content: "<"; */
+
+/* } */
+
+.singer::after {
+  content: ":";
+}
+
 p {
-  margin-top: 0.5em;
   margin-bottom: 0.5em;
+  margin-top: 0.5em;
 }
 
 /* Box call-outs (repeated chorus etc) */
 .box {
-  padding: 5px;
-  padding-top: 0;
-  padding-bottom: 0;
   border-left: 5px solid black;
-  width: auto;
-  max-width: 98%;
   margin: 2px;
   margin-bottom: 0.5em;
+  max-width: 98%;
+  padding: 5px;
+  padding-bottom: 0;
+  padding-top: 0;
+  width: auto;
 }
 
 .box > p {
-  margin-top: 0;
   margin-bottom: 0;
   margin-left: 5px;
+  margin-top: 0;
 }
 
 .box > p:last-child {
@@ -91,11 +110,11 @@ p {
 }
 
 .box > h2,
-.section_header {
-  margin-top: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+.section-header {
   margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
-/* End box definitions*/
+/* End box definitions */
