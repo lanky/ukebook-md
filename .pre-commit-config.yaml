@@ -17,14 +17,9 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff
-        args: [ --fix ]
+        args: [--fix]
       # Run the formatter.
       - id: ruff-format
-
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0  # pick a git hash / tag to point to
-    hooks:
-    -   id: pydocstyle
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
@@ -43,7 +38,7 @@ repos:
     rev: "v4.0.0-alpha.8" # Use the sha or tag you want to point at
     hooks:
       - id: prettier
-        types_or: [ css, javascript, scss]
+        types_or: [css, javascript, scss]
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml
     rev: v1.1.0
@@ -60,12 +55,18 @@ repos:
       - id: html-attributes-blacklist
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v14.4.0
+    rev: v16.19.0
     hooks:
       - id: stylelint
         args: ["--fix"]
         additional_dependencies:
-        - stylelint-config-alphabetical-order@1.0.0
-        - stylelint-config-standard@38.0.0
-        - stylelint-config-recommended@16.0.0
-        - stylelint@16.19.0
+          - stylelint-config-alphabetical-order@1.0.0
+          - stylelint-config-standard@38.0.0
+          - stylelint-config-recommended@16.0.0
+          - stylelint@16.19.0
+
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.16.0
+    hooks:
+      - id: yamlfmt
+        language: system
