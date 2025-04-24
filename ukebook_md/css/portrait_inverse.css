@@ -1,11 +1,12 @@
 @charset "utf-8";
-@import "ukedown_inverse.css";
+
+@import url("ukedown_inverse.css");
 
 @page {
-  size: A4 portrait;
-  margin: 0.5cm;
   background-color: black;
   color: white;
+  margin: 0.5cm;
+  size: a4 portrait;
 }
 
 * {
@@ -17,17 +18,17 @@ html {
   color: white;
   font-family: verdana, "dejavu sans", sans-serif;
   font-size: 12pt;
-  width: 100%;
   height: 100%;
+  width: 100%;
 }
 
 body {
   height: 100%;
-  width: 100%;
-  max-height: 100%;
   margin: 0;
-  padding: 0;
+  max-height: 100%;
   overflow: auto;
+  padding: 0;
+  width: 100%;
 }
 
 h1 {
@@ -38,102 +39,99 @@ h1 {
 }
 
 p {
-  padding: 0px;
-  margin-top: 0px;
+  margin-top: 0;
+  padding: 0;
 }
 
 .header {
+  left: 0;
+  margin: 0;
+  padding: 0;
   page-break-before: always;
   width: 100%;
-  left: 0;
-  padding: 0;
-  margin: 0;
 }
 
 /* content div, max 2 cols in portrait mode */
 .content {
-  column-width: auto;
-  column-rule-style: solid;
   column-fill: auto;
-  max-height: 730px;
+  column-rule-style: solid;
+  column-width: auto;
   float: left;
+  max-height: 730px;
   padding-left: 5px;
   padding-right: 5px;
   width: 100%;
 }
 
 .chords {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  flex-wrap: wrap;
-  max-height: 840px;
+  display: flex;
+  flex-flow: column wrap;
   float: right;
-  width: 50px;
+  max-height: 840px;
   max-width: 100px;
   position: fixed;
   right: 0;
+  width: 50px;
 }
 
 .overflow {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  max-height: 840px;
-  width: 50px;
   align-items: flex-start;
+  display: flex;
+  flex-flow: column wrap;
   float: right;
+  max-height: 840px;
   position: fixed;
   right: 50px;
+  width: 50px;
 }
 
 /* footer  can have SVG background images */
 .footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: auto;
-  max-height: 30px;
   background: black;
+  bottom: 0;
   color: white;
+  height: auto;
+  left: 0;
+  max-height: 30px;
+  position: fixed;
   text-align: center;
+  width: 100%;
+
   /* page-break-after: always; */
 }
 
 .footer img {
-  max-height: 25px;
-  width: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-top: 5px;
+  max-height: 25px;
+  width: auto;
 }
 
 .footer a {
-  font-size: 0.8em;
   color: gray;
+  font-size: 0.8em;
   text-decoration: none;
 }
 
 .labels {
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
-  font-family: Verdana, Helvetica, Sans-Serif;
 }
 
-/* index page is multi-column*/
+/* index page is multi-column */
 .index {
-  column-width: 50vw;
-  column-rule-width: 1px;
-  column-rule-style: solid;
-  column-rule-color: white;
   background-color: inherit;
-  /*overflow: auto; */
-  width: 100%;
+  column-rule: 1px solid white;
+  columns: 50vw 2;
   margin: auto;
-  column-count: 2;
   max-height: 730px;
   padding: 5px;
+
+  /* overflow: auto; */
+  width: 100%;
 }
 
 .container {
@@ -141,49 +139,50 @@ p {
   page-break-after: always;
 }
 
-.chord_diagram {
+.chord-diagram {
   width: 48px;
 }
 
 .chordname {
-  font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
-  text-align: center;
-  font-weight: bold;
+  font-family: Verdana, "DejaVu Sans", Helvetica, sans-serif;
   font-size: 8px;
-  padding: 0;
+  font-weight: bold;
   margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 svg.labels {
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
-  font-family: Verdana, Helvetica, Sans-Serif;
 }
 
 /* logo, watermark etc */
 .branding {
-  position: absolute;
   bottom: 0;
+  position: absolute;
   right: 0;
 }
 
 .branding img {
-  height: 3cm;
   float: right;
-  margin-right: 5px;
+  height: 3cm;
   margin-bottom: 5px;
+  margin-right: 5px;
 }
 
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+@media only screen and (device-width >= 768px) and (device-width <= 1024px) and (orientation: landscape) {
   html {
-    width: 842px;
     height: 595px;
+    width: 842px;
   }
 
   .content {
     column-count: 2;
+    max-height: 540px;
+    min-height: 490px;
+
     /* A4 is 842 x 595 in landscape */
     width: 100%;
-    min-height: 490px;
-    max-height: 540px;
   }
 }

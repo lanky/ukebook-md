@@ -1,11 +1,9 @@
 @charset "utf-8";
-@import "ukebook.css";
+
+@import url("ukebook.css");
 
 @media print {
-    #editableArea {
-        display: none;
-
-    }
-
-
+  #editable-area {
+    display: none;
+  }
 }

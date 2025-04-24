@@ -1,78 +1,77 @@
 @charset "utf-8";
+
 /* core styles, including fonts etc */
-@import "core.css";
-/* include our ukedown-specific bits*/
-@import "ukedown_elements.css";
+@import url("core.css");
 
+/* include our ukedown-specific bits */
+@import url("ukedown_elements.css");
 
+/* grid-template: ROWS / COLUMNS */
 #container {
-    max-height: 100vfh;
-    display: grid;
-    grid-template-columns: auto minmax(min-content, 14vmin);
-    grid-template-rows: minmax(10px, min-content) 1fr minmax(1px, max-content);
-    grid-template-areas:
-        "header chords"
-        "content chords"
-        "footer footer";
+  display: grid;
+  grid-template: minmax(10px, min-content) 1fr minmax(1px, max-content) / auto minmax(
+      min-content,
+      14vmin
+    );
+  grid-template-areas:
+    "header chords"
+    "content chords"
+    "footer footer";
+  max-height: 100vh;
 }
 
 .content {
-    grid-area: content;
-    column-width: 31em;
-    column-rule-width: 1px;
-    column-rule-style: solid;
-    column-rule-color: black;
-    column-fill: auto;
-    max-height: 90vh;
-
+  column-fill: auto;
+  column-rule: 1px solid black;
+  column-width: 31em;
+  grid-area: content;
+  max-height: 90vh;
 }
 
-.chord_diagram {
-    width: 7vmin;
+.chord-diagram {
+  width: 7vmin;
 }
 
 .chords {
-    grid-area: chords;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    max-height: 100vh;
+  align-items: flex-start;
+  display: flex;
+  flex-flow: column wrap;
+  grid-area: chords;
+  max-height: 100vh;
 }
 
 .header {
-    grid-area: header;
+  grid-area: header;
 }
 
 .footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: auto;
-    max-height: 30px;
-    background: white;
+  background: white;
+  bottom: 0;
+  height: auto;
+  left: 0;
+  max-height: 30px;
+  position: fixed;
+  width: 100%;
 }
 
 .index {
-    grid-area: 1 / 1 / 3 / 3;
-    /*column-count: 3;*/
-    column-width: auto;
-    column-rule-width: 1px;
-    column-rule-style: solid;
-    column-rule-color: black;
-    overflow: auto;
-    width: auto;
-    margin: auto;
+  column-rule: 1px solid black;
+
+  /* column-count: 3; */
+  column-width: auto;
+  grid-area: 1 / 1 / 3 / 3;
+  margin: auto;
+  overflow: auto;
+  width: auto;
 }
 
 .chordname {
-  font-family: Verdana, Helvetica, Sans-Serif;
-  text-align: center;
+  font-family: Verdana, Helvetica, sans-serif;
   font-weight: bold;
+  text-align: center;
 }
 
 .labels {
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
-  font-family: Verdana, Helvetica, Sans-Serif;
 }

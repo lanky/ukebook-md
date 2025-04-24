@@ -1,11 +1,12 @@
 @charset "utf-8";
-@import url(ukedown_inverse.css);
+
+@import url("ukedown_inverse.css");
 
 @page {
   background-color: black;
   color: white;
   margin: 0.5cm;
-  size: A4 landscape;
+  size: a4 landscape;
 
   /*  @bottom-right {
     content: counter(page) "/" counter(pages);
@@ -36,6 +37,7 @@ h1::before {
 
 h1 {
   font-size: 1.2em;
+
   /* padding-bottom: 0.2em; */
   padding-left: 5px;
   text-align: center;
@@ -48,26 +50,26 @@ h1 {
 }
 
 .branding {
-  position: absolute;
   bottom: 0;
+  position: absolute;
   right: 0;
 }
 
 .branding img {
-  height: 3cm;
   float: right;
-  margin-right: 5px;
+  height: 3cm;
   margin-bottom: 5px;
+  margin-right: 5px;
 }
 
 /* content div, max 2 cols in portrait mode */
+
 /* portrait in 72dpi is 595x842 pixels */
 .content {
-  column-count: 2;
   column-fill: auto;
   column-rule-style: solid;
   column-rule-width: 1px;
-  column-width: auto;
+  columns: auto 2;
   height: 90vh;
   max-width: 100%;
   orphans: 4;
@@ -76,9 +78,9 @@ h1 {
 }
 
 .content > p {
-  margin-top: 0px;
+  margin-top: 0;
   orphans: 0;
-  padding: 0px;
+  padding: 0;
 }
 
 /* footer  can have SVG background images */
@@ -86,19 +88,18 @@ h1 {
   bottom: 0;
   height: 5vh;
   left: 0;
+  margin-top: 2px;
   page-break-after: always;
   position: fixed;
   text-align: center;
   width: 100%;
-  margin-top: 2px;
 }
 
-/* div on the right of the page for chord diagrams, if we want any*/
+/* div on the right of the page for chord diagrams, if we want any */
 .chords {
   align-items: flex-start;
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   float: right;
   max-height: 590px;
   max-width: 100px;
@@ -109,25 +110,24 @@ h1 {
 .overflow {
   align-items: flex-start;
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
   float: right;
   max-height: 590px;
   width: 50px;
 }
 
 a.middle {
+  color: gray;
   font-size: 0.8em;
   text-align: center;
   text-decoration: none;
-  color: gray;
 }
 
-.section_header {
+.section-header {
   display: inline-block;
 }
 
-/* fixed position at bottom of page for branding images, links etc*/
+/* fixed position at bottom of page for branding images, links etc */
 .footer img {
   display: block;
   margin-left: auto;
@@ -138,24 +138,20 @@ a.middle {
 }
 
 .labels {
-  font-family: Verdana, Helvetica, Sans-Serif;
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
 }
 
-/* index page is multi-column*/
+/* index page is multi-column */
 .index {
-  column-count: 2;
-  column-count: 2;
-  column-rule-color: black;
-  column-rule-style: solid;
-  column-rule-width: 1px;
-  column-width: auto;
+  column-rule: 1px solid black;
+  columns: auto 2;
   counter-reset: page;
+  font-size: 11pt;
   margin: auto;
   max-height: 490px;
   overflow: auto;
   width: auto;
-  font-size: 11pt;
 }
 
 .credits {
@@ -170,12 +166,12 @@ a.middle {
   page-break-after: always;
 }
 
-.chord_diagram {
+.chord-diagram {
   width: 48px;
 }
 
 .chordname {
-  font-family: Verdana, "DejaVu Sans", Helvetica, Sans-Serif;
+  font-family: Verdana, "DejaVu Sans", Helvetica, sans-serif;
   font-size: 8px;
   font-weight: bold;
   margin: 0;
@@ -184,6 +180,6 @@ a.middle {
 }
 
 svg.labels {
-  font-family: Verdana, Helvetica, Sans-Serif;
+  font-family: Verdana, Helvetica, sans-serif;
   font-size: 0.5em;
 }

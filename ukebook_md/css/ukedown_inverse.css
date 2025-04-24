@@ -10,15 +10,15 @@
   font-weight: bold;
 }
 
-.chord:before {
+.chord::before {
   content: "(";
 }
 
-.chord:after {
+.chord::after {
   content: ")";
 }
 
-.section_header {
+.section-header {
   font-size: 1em;
   font-weight: bold;
   margin-bottom: 0.2em;
@@ -26,11 +26,11 @@
   padding-bottom: 0.2em;
 }
 
-.section_header:before {
+.section-header::before {
   content: "[";
 }
 
-.section_header:after {
+.section-header::after {
   content: "]";
 }
 
@@ -39,11 +39,11 @@
   font-weight: normal;
 }
 
-.vox:before {
+.vox::before {
   content: "(";
 }
 
-.vox:after {
+.vox::after {
   content: ")";
 }
 
@@ -52,11 +52,11 @@
   font-weight: bold;
 }
 
-.notes:before {
+.notes::before {
   content: "[";
 }
 
-.notes:after {
+.notes::after {
   content: "]";
 }
 
@@ -76,7 +76,7 @@ p {
   margin: 2px;
   margin-bottom: 0.5em;
   max-width: 98%;
-  padding: 0px;
+  padding: 0;
   padding-bottom: 0;
   padding-top: 0;
   width: auto;
@@ -93,11 +93,11 @@ p {
   padding-bottom: 0;
 }
 
-.box > .section_header {
+.box > .section-header {
   margin-bottom: 0;
   margin-top: 0;
   padding-bottom: 0;
   padding-top: 0;
 }
 
-/* End box definitions*/
+/* End box definitions */
