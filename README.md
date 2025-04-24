@@ -2,7 +2,7 @@
 
 ## Intro
 
-A toolset to generate songsheets and indexed songbooks from 
+A toolset to generate songsheets and indexed songbooks from
 [ukedown](https://github.com/lanky/ukedown)-formatted inputs.
 
 ukedown is a special case of Markdown, with additions for inline chords,
@@ -57,7 +57,7 @@ Or you can just install all those packages into a system or user directory, of
 course.
 
 * markdown (well, obviously)
-* jinja2 (for templating) 
+* jinja2 (for templating)
 
 ## Current Functionality
 
