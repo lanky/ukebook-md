@@ -46,14 +46,14 @@
 {% if song.chords|length > 10 %}
 <div class="overflow">
   {% for chord in song.chords[10:] %}
-  <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
+  <img class="chord-diagram" src="chords/{{ chord|safe_name }}.svg">
   {% endfor %}
 </div>
 {% endif %}
 {% if not no_chord_boxes %}
 <div class="chords">
   {% for chord in song.chords[:10] %}
-  <img class="chord_diagram" src="chords/{{ chord|safe_name }}.svg">
+  <img class="chord-diagram" src="chords/{{ chord|safe_name }}.svg">
   {% endfor %}
 </div>
 {% endif %}

@@ -3,10 +3,8 @@
 {{ song.title|default('') }} - {{ song.artist|default('') }}
 {% endblock %}
 {% block songheader %}
+{# This supports up to 999 songs in a book with unique IDs. Should be enough. #}
 <h1 class="title" id="title_{{ song.id }}">{{ song.title|default('') }} - {{ song.artist|default('') }}</h1>
-{% endblock %}
-{% block branding %}
-  <img src="../images/karauke_logo.png" alt="Karauke Logo - you sing, we play ukulele"/>
 {% endblock %}
 
 {% block content %}
@@ -20,13 +18,13 @@
   {% if song.chords|length > 10 %}
     {% block overflow %}
       {% for chord in song.chords[10:] %}
-<article class="chord_diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
+<article class="chord-diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
       {% endfor %}
     {% endblock %}
   {% endif %}
   {% block chords %}
     {% for chord in song.chords[:10] %}
-<article class="chord_diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
+<article class="chord-diagram"> {% include 'svg/%s.svg'|format(chord|safe_name) %} </article>
     {% endfor %}
   {% endblock %}
 {% else %}
