@@ -8,9 +8,10 @@ import sys
 from pathlib import Path
 
 from bs4 import BeautifulSoup as bs
-from progress.bar import Bar
-from weasyprint import CSS, HTML
-from weasyprint.text.fonts import FontConfiguration
+from bs4.element import Tag
+from progress.bar import Bar  # type: ignore[import-untyped]
+from weasyprint import CSS, HTML  # type: ignore
+from weasyprint.text.fonts import FontConfiguration  # type: ignore
 
 
 def parse_cmdline(argv):
@@ -64,12 +65,17 @@ def parse_song(page: Path) -> str:
     with page.open() as content:
         linksoup = bs(content, features="lxml")
         ilink = linksoup.find("a", {"class": "middle"})
-        if ilink is not None:
+        if isinstance(ilink, Tag):
             ilink["href"] = "#index00"
 
         # remove the forward and back links
-        linksoup.find("a", {"class": "left"}).decompose()
-        linksoup.find("a", {"class": "right"}).decompose()
+        backlink = linksoup.find("a", {"class": "left"})
+        fwdlink = linksoup.find("a", {"class": "right"})
+        if isinstance(backlink, Tag):
+            backlink.decompose()
+        if isinstance(fwdlink, Tag):
+            fwdlink.decompose()
+
         for i in linksoup.findAll("img"):
             i["src"] = f"file://{page.parent.resolve()}/{i['src']}"
         return str(linksoup)
@@ -87,7 +93,7 @@ def collate(options: argparse.Namespace, fontcfg: FontConfiguration):
             if options.stylesheets
         ]
     else:
-        css = None
+        css = []
 
     # handle a cover page if there is one
     if (options.inputdir / "cover.html").exists():
