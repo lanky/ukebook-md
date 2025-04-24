@@ -608,6 +608,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
     ctx["show_diagrams"] = True
     ctx["show_notes"] = True
     ctx["show_credits"] = True
+    ctx["show_singer"] = False
     ctx["ext_chords"] = options.external
     ctx["orientation"] = options.orientation
     if options.hide_diagrams:
@@ -618,6 +619,7 @@ def make_context(ctx: dict, options: argparse.Namespace) -> dict:
         ctx["show_chords"] = False
         ctx["show_notes"] = False
         ctx["show_credits"] = False
+        ctx["show_singer"] = True
     elif options.format == "karauke":
         ctx["show_diagrams"] = False
         ctx["show_credits"] = False
