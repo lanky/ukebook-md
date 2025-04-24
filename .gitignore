@@ -5,7 +5,10 @@ bookenv*
 *.svg
 *.log
 *.pdf
+*.html
 Karauke*
+
+**.secrets*
 
 # python-specifics
 # Byte-compiled / optimized / DLL files
